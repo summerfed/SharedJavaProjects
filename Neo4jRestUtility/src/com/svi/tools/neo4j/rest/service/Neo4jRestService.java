@@ -12,11 +12,11 @@ public class Neo4jRestService {
 	private Relationships relationshipUtils;
 	private Index indexUtils;
 	public Neo4jRestService(String neo4jServerUrl) { 
-		urls = new UrlLocations(neo4jServerUrl);
-		nodeUtils = new NodeUtilities(urls);
-		cypher = new CypherUtilities(urls);
-		relationshipUtils = new Relationships(urls);
-		indexUtils = new Index(urls);
+			urls = new UrlLocations(neo4jServerUrl);
+			nodeUtils = new NodeUtilities(urls);
+			cypher = new CypherUtilities(urls);
+			relationshipUtils = new Relationships(urls);
+			indexUtils = new Index(urls);
 	}
 	
 	public String createNodeWithProperties(Map<String, Object> properties) {

@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import com.svi.bpo.graph.notifications.BPONotifications;
 import com.svi.bpo.graph.obj.ExceptionNodeObject;
 import com.svi.bpo.graph.utils.DataUtilities;
 import com.svi.tools.neo4j.rest.service.Neo4jRestService;
@@ -54,17 +54,12 @@ public class ExceptionNodeFunctions {
 	 * NOTIFICATIONS ***
 	 *******************/
 	protected static final String NOTIFICATION_NODE_DELETED_SUCCESSFULLY = "Node Deleted Successfully";
-	protected static final String NOTIFICATION_FAILED_CHECK_CONNECTION = "Failed, Check Connection";
-	protected static final String NOTIFICATION_EXCEPTION_NODE_IS_ADDED_SUCCESSFULLY = "Exception Node is Added Successfully";
-	protected static final String NOTIFICATION_EXCEPTION_NODE_ALREADY_EXIST = "Exception COde Already Exist";
 	protected static final String NOTIFICATION_NODE_ID_DOES_NOT_EXIST = "Node Id Does Not Exist";
 	
 	protected static final String CONSTANT_PIPE = "|";
 	
 	private Neo4jRestService neo4j;
 	
-	//To use just incase node functions need to use other functions
-	@SuppressWarnings("unused")
 	private BPO bpo;
 	
 	public ExceptionNodeFunctions(Neo4jRestService neo4j, BPO bpo) {
@@ -77,19 +72,20 @@ public class ExceptionNodeFunctions {
 	 ********************/
 	
 	/**
-	 * 
+	 * Insert Exception Node
 	 * @param nodeId
 	 * @param exceptionCode
 	 * @param exceptionName
 	 * @param allowedWaitingTime
 	 * @param allowedProcessTime
-	 * @return
+	 * @return 
+	 * <ul>
+	 * 	<li>BPONotifications.NODE_DOES_NOT_EXIST = Node Does Not Exist</li>
+	 * 	<li>BPONotifications.EXCEPTION_NODE_INSERT_SUCCESS = Exception Node Inserted Successfully</li>
+	 * 	<li>BPONotifications.FAILED_CHECK_CONNECTION = Graph Database Connection Error</li>
+	 * </ul>
 	 */
-	public String insertExceptionNode(String nodeId, String exceptionCode, String exceptionName, long allowedWaitingTime, long allowedProcessTime) {
-		if(isExceptionNodeExist(nodeId, exceptionCode)) {
-			return NOTIFICATION_EXCEPTION_NODE_ALREADY_EXIST;
-		}
-		
+	public BPONotifications insertExceptionNode(String nodeId, String exceptionCode, String exceptionName, long allowedWaitingTime, long allowedProcessTime) {
 		// Convert Seconds to Milliseconds
 		allowedWaitingTime = allowedWaitingTime * 1000;
 		allowedProcessTime = allowedProcessTime * 1000;
@@ -105,18 +101,26 @@ public class ExceptionNodeFunctions {
 		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
 		qb.append("MERGE (exception:" +NODE_LABEL_BPO_EXCEPTION_NODE+ " {"+EXCEPTION_NODE_ATTR_ID+":{"+EXCEPTION_NODE_ATTR_ID+"}}) ");
 		qb.append("ON CREATE SET exception."+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"}, exception."+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"}, ");
+		qb.append("ON MATCH SET exception."+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"}, exception."+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"}, ");
 		qb.append("exception."+EXCEPTION_NODE_ATTR_NAME+"={"+EXCEPTION_NODE_ATTR_NAME+"}, ");
 		qb.append("exception."+REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+" = 0, ");
 		qb.append("exception."+REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+" = 0 ");
-		qb.append("MERGE node-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->exception; ");
+		qb.append("MERGE node-[r:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->exception ");
+		qb.append("RETURN COUNT(r) AS data;");
 		
-		boolean dbResult = neo4j.sendCypherBooleanResult(qb.toString(), properties);
-		
-		if(dbResult) {
-			return NOTIFICATION_EXCEPTION_NODE_IS_ADDED_SUCCESSFULLY;
+		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
+		if(dbResult.size()>0) {
+			int tmp = DataUtilities.toInteger(dbResult.get(0).get("data"));
+			if(tmp == 1) {
+				return BPONotifications.EXCEPTION_NODE_INSERT_SUCCESS;
+			} else if(tmp == 0) {
+				if(!bpo.getNodeFunctions().isNodeExist(nodeId)) {
+					return BPONotifications.NODE_DOES_NOT_EXIST;
+				}
+			}
 		}
 		
-		return NOTIFICATION_FAILED_CHECK_CONNECTION;
+		return BPONotifications.FAILED_CHECK_CONNECTION;
 	}
 	
 	/**
@@ -125,8 +129,12 @@ public class ExceptionNodeFunctions {
 	 * @param currentExceptionCode
 	 * @param followingExceptionCodes
 	 * @return
+	 * <ul>
+	 * 	<li>BPONotifications.EXCEPTION_FLOW_CREATE_SUCCESS = Flow Creation Success</li>
+	 * 	<li>BPONotifications.EXCEPTION_LIST_DOES_NOT_EXIST = Any Exception Node Does Not Exist</li>
+	 * </ul>
 	 */
-	public String buildExceptionFlow(String nodeId, String currentExceptionCode, String... followingExceptionCodes) {
+	public BPONotifications buildExceptionFlow(String nodeId, String currentExceptionCode, String... followingExceptionCodes) {
 		List<String> tmp = new LinkedList<>(Arrays.asList(followingExceptionCodes));
 		tmp.add(currentExceptionCode);
 		if(checkIfExceptionCodesAllExist(nodeId, tmp)) {
@@ -153,11 +161,11 @@ public class ExceptionNodeFunctions {
 			qb.append(mergeQuery);
 			boolean isSuccess = neo4j.sendCypherBooleanResult(qb.toString(), properties);
 			if(isSuccess) {
-				return "Exception Flow Constructed Successfully!";
+				return BPONotifications.EXCEPTION_FLOW_CREATE_SUCCESS;
 			}
 		}
 		
-		return "Any of the Exception Node Does Not Exist OR " + NOTIFICATION_FAILED_CHECK_CONNECTION;
+		return BPONotifications.EXCEPTION_LIST_DOES_NOT_EXIST;
 	}
 	
 	
@@ -166,7 +174,7 @@ public class ExceptionNodeFunctions {
 	 ******************/
 	
 	/**
-	 * 
+	 * View Exception Nodes
 	 * @param nodeId, Put * to get all exceptions in all nodes
 	 * @return
 	 */
@@ -219,7 +227,9 @@ public class ExceptionNodeFunctions {
 		properties.put(EXCEPTION_NODE_ATTR_ID, exceptionId);
 		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(:"+NODE_LABEL_BPO_EXCEPTION_NODE+" {"+EXCEPTION_NODE_ATTR_ID+":{"+EXCEPTION_NODE_ATTR_ID+"}}) RETURN COUNT(*) AS data");
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(exception:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} AND exception."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
+		qb.append("RETURN COUNT(*) AS data;");
 		String query = qb.toString();
 		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(query, properties);
 		if(dataReturned!=null) {
@@ -256,6 +266,23 @@ public class ExceptionNodeFunctions {
 	/********************
 	 * UPDATE FUNCTIONS *
 	 ********************/
+	private void moveElementToException(String elementId, String nodeId, String exceptionCode) {
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
+		properties.put(ElementFunctions.ELEMENT_ATTR_ELEMENT_ID, elementId);
+		properties.put(EXCEPTION_NODE_ATTR_ID, exceptionCode);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")");
+		qb.append("-[r]->");
+		qb.append("(node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")");
+		qb.append("-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->");
+		qb.append("(exception:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("WHERE element."+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"={"+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"} ");
+		qb.append("AND node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
+		qb.append("AND exception."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
+	}
+	
 	/**
 	 * Update Node Attributes Sample usage:
 	 * <pre>

@@ -1,0 +1,12 @@
+import com.svi.bpo.graph.BPO;
+
+
+public class Main {
+
+	public static void main(String[] args) {
+		BPO bpo = new BPO("http://localhost:7474");
+		ExceptionNodeFunctionsTest test = new ExceptionNodeFunctionsTest(bpo);
+//		test.insertExceptionNodeMissingNode();
+	}
+
+}

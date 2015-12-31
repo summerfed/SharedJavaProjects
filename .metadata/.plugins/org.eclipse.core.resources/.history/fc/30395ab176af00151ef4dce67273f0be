@@ -1,0 +1,9 @@
+package com.svi.bpo.graph.notifications;
+
+public class BPONotifications {
+	public class ExceptionNodeFunctionsNotifications {
+		public enum insertExceptionNode {
+			
+		}
+	}
+}

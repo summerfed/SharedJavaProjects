@@ -11,6 +11,7 @@ import com.svi.tools.neo4j.rest.service.Neo4jRestService;
 
 public class ElementFunctions {
 	
+	private static final String RELATIONSHIP_LABEL_TASK_IN_PROCESS = "TASK_IN_PROCESS";
 	private static final String RELATIONSHI_LABEL_BPO_INCOMPLETE_TASK_AT = "BPO_INCOMPLETE_TASK_AT";
 	private static final String NOTIFICATION_WORKER_REMOVED_SUCCESSFULLY = "Worker Removed Successfully";
 	private static final String NOTIFICATION_FAILED_NO_WORKER_ASSIGNED_TO_ELEMENT = "Failed, No Worker Assigned To Element";
@@ -311,7 +312,7 @@ public class ElementFunctions {
 		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
 		properties.put(ELEMENT_ATTR_ELEMENT_ID, elementId);
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[:"+RELATIONSHIP_LABEL_TASK_AT+"]-(:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) RETURN COUNT(*) AS data");
+		qb.append("MATCH (:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[:"+RELATIONSHIP_LABEL_TASK_AT+"|"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]-(:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) RETURN COUNT(*) AS data");
 		String query = qb.toString();
 		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(query, properties);
 		if(dataReturned!=null) {
@@ -361,15 +362,19 @@ public class ElementFunctions {
 		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[r:"+RELATIONSHIP_LABEL_TASK_AT+" {workerId:{"+ELEMENT_ATTR_WORKER_ID+"}}]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"},"+ELEMENT_ATTR_STATUS+":{"+ELEMENT_ATTR_STATUS+"}}) "
 				+ "MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node "
 				+ "MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node "
+				+ "CREATE element-[taskInProcess:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->node "
 				+ "SET element.status = {"+CONSTANT_STATUS_IN_PROCESS+"} "
 				+ "SET r."+ELEMENT_ATTR_START_PROCESSING_TIME+"=TIMESTAMP() "
 				+ "SET r."+ELEMENT_ATTR_WAITING_DURATION+"=r."+ELEMENT_ATTR_START_PROCESSING_TIME+"-"+"r."+ELEMENT_ATTR_START_WAITING_TIME+" "
+				+ "SET taskInProcess = r "
 				+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(node."+NodeFunctions.NODE_ATTR_ALLOWED_WAITING_DURATION+"-r."+ELEMENT_ATTR_WAITING_DURATION+") "
 				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"+r."+ELEMENT_ATTR_WAITING_DURATION+" "
 				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"+1 "
 				+ "SET report."+NodeFunctions.REPORT_ATTR_AVERAGE_WAITING_DURATION+"=(report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"/report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+") "
 				+ "SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=(report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"-1) "
 				+ "SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"+1) "
+				+ "WITH r, node, element "
+				+ "DELETE r "
 				+ "RETURN node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS nodeId, "
 				+ "element."+ELEMENT_ATTR_ELEMENT_ID+" AS elementId, "
 				+ "element."+ELEMENT_ATTR_PRIORITY+" AS "+ELEMENT_ATTR_PRIORITY+", "
@@ -1119,7 +1124,7 @@ public class ElementFunctions {
 			properties.put(ELEMENT_ATTR_STATUS, CONSTANT_STATUS_COMPLETE);
 			StringBuilder qb = new StringBuilder();
 
-			qb.append("MATCH (firstNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[completedRel:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) "
+			qb.append("MATCH (firstNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[completedRel:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) "
 					+ "MATCH firstNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(firstNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") "
 					+ "CREATE element-[completedTask:"+RELATIONSHIP_LABEL_COMPLETED_TASK+"]->firstNode "
 					+ "SET element."+ELEMENT_ATTR_STATUS+" = {"+ELEMENT_ATTR_STATUS+"} " 

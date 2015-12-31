@@ -1,0 +1,5 @@
+package com.svi.bpo.graph.notifications;
+
+public class BPONotifications {
+
+}

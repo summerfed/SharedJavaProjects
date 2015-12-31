@@ -45,7 +45,6 @@ public class Index {
 	protected List<String> getIndexes(String label) {
 		List<String> dataToReturn = new ArrayList<>();
         WebResource resource = Client.create().resource(urls.getIndexes()+"/"+label);
-       
         String response = resource.accept( MediaType.APPLICATION_JSON ).get(String.class);
         
         try {

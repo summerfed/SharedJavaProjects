@@ -30,11 +30,12 @@ public class UrlLocations {
 	
 	protected UrlLocations(String neo4jUrlInstance) {
 		neo4jUrlInstance = neo4jUrlInstance.trim();
-		
-		if(neo4jUrlInstance.charAt(neo4jUrlInstance.length()-1) != '/') {
-			neo4jUrlInstance += "/";
+		if(!neo4jUrlInstance.isEmpty()) {
+			if(neo4jUrlInstance.charAt(neo4jUrlInstance.length()-1) != '/') {
+				neo4jUrlInstance += "/";
+			}
+			setUrls(neo4jUrlInstance);
 		}
-		setUrls(neo4jUrlInstance);
 	}
 	
 	private void setUrls(String neo4jUrlInstance) {

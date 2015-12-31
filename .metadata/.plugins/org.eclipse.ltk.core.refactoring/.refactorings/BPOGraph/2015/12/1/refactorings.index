@@ -1,1 +1,7 @@
 1451531789168	Delete element
+1451535344730	Delete element
+1451535584420	Delete element
+1451535682810	Rename type 'NodeFunctionsNotifications'
+1451535916879	Delete element
+1451536512427	Rename enum constant 'EXCEPTION_NODE_IS_ADDED_SUCCESSFULLY'
+1451587273092	Extract constant 'RELATIONSHIP_LABEL_TASK_IN_PROCESS'

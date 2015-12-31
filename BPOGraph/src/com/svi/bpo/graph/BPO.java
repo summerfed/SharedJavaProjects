@@ -12,7 +12,6 @@ import java.util.Set;
 import com.svi.tools.neo4j.rest.service.Neo4jRestService;
 
 /**
- * BPO GIT HUB TEST
  * @author fmanangan
  * <br>
  * BPO Graph Version 4.0

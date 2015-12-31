@@ -99,7 +99,6 @@ public class CypherUtilities {
 	                .type( MediaType.APPLICATION_JSON )
 	                .entity(jsonPostData.toString())
 	                .post( ClientResponse.class );
-	    System.out.println(response.getEntity(String.class));
 	    int statusCode = response.getStatus();
         boolean dataToReturn = checkPostConnection(statusCode, response);
         response.close();
