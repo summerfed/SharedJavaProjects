@@ -1,0 +1,40 @@
+import com.svi.bpo.graph.BPO;
+import com.svi.bpo.graph.ElementFunctions;
+import com.svi.bpo.graph.ExceptionNodeFunctions;
+import com.svi.bpo.graph.NodeFunctions;
+
+
+public class Main {
+
+	public static void main(String[] args) {
+		String nodeId = "Node1";
+		String nodeName = "Node";
+		String cluster = "Cluster";
+		String stdUM = "Box";
+		double cost = 2.2;
+		long time = 1;
+		int num = 1;
+		
+		String elementId = "Element1";
+		int priority = 9;
+		String workerId = "Fed";
+		
+		String exceptionCode = "ExCode1";
+		String exceptionName = "TestExName";
+		
+		BPO bpo = new BPO("http://localhost:7474");
+		bpo.clearBPO();
+		NodeFunctions node = bpo.getNodeFunctions();
+		ElementFunctions element = bpo.getElementFunctions();
+		ExceptionNodeFunctions exception = bpo.getExceptionNodeFunctions();
+		
+		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
+		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode, exceptionName, time, time));
+		System.out.println(element.insertElement(elementId, priority, nodeId, workerId));
+		System.out.println(element.getElement(elementId, nodeId, workerId));
+		System.out.println(exception.moveElementToException(elementId, nodeId, exceptionCode));
+		System.out.println(exception.getExceptionElement(nodeId, exceptionCode, elementId, workerId).getElementId());
+		
+	}
+
+}

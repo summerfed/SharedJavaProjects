@@ -1,17 +1,65 @@
 import com.svi.bpo.graph.BPO;
+import com.svi.bpo.graph.ElementFunctions;
+import com.svi.bpo.graph.ExceptionNodeFunctions;
+import com.svi.bpo.graph.NodeFunctions;
 
 
 public class Main {
 
 	public static void main(String[] args) {
+		String nodeId = "Node1";
+		String nodeName = "Node";
+		String cluster = "Cluster";
+		String stdUM = "Box";
+		double cost = 2.2;
+		long time = 1;
+		int num = 1;
+		
+		String elementId = "Element1";
+		int priority = 9;
+		String workerId = "Fed";
+		
+		String exceptionCode = "ExCode1";
+		String exceptionCode1 = "ExCode2";
+		String exceptionCode2 = "ExCode3";
+		String exceptionCode3 = "ExCode4";
+		String exceptionCode4 = "ExCode5";
+		String exceptionName = "TestExName";
+		
 		BPO bpo = new BPO("http://localhost:7474");
 		bpo.clearBPO();
-		System.out.println(bpo.getNodeFunctions().insertNode("Node1", "Node", "Cluster", "Box", 2.2, 100, 100, 100, 100));
-		System.out.println(bpo.getElementFunctions().insertElement("Element1", 9, "Node1"));
-		System.out.println(bpo.getElementFunctions().assignWorkerToElement("Node1", "Element1", "Fed"));
-		System.out.println(bpo.getElementFunctions().getElement("Element1", "Node1", "Fed"));
-		System.out.println(bpo.getElementFunctions().completeElement("Element1", "Node1", "Fed", 100, 0));
-		System.out.println(bpo.getElementFunctions().insertElement("Element2", 9, "Node1"));
+		NodeFunctions node = bpo.getNodeFunctions();
+		ElementFunctions element = bpo.getElementFunctions();
+		ExceptionNodeFunctions exception = bpo.getExceptionNodeFunctions();
+		
+		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
+		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode, exceptionName, time, time));
+		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode1, exceptionName, time, time));
+		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode2, exceptionName, time, time));
+		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode3, exceptionName, time, time));
+		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode4, exceptionName, time, time));
+		System.out.println(exception.buildExceptionFlow(nodeId, exceptionCode, exceptionCode1, exceptionCode2, exceptionCode3, exceptionCode4));
+		System.out.println(element.insertElement(elementId, priority, nodeId, workerId));
+		System.out.println(element.getElement(elementId, nodeId, workerId));
+		System.out.println(exception.moveElementToException(elementId, nodeId, exceptionCode));
+		System.out.println(exception.assignWorkerToExceptionElement(nodeId, exceptionCode, elementId, workerId));
+		System.out.println(exception.getExceptionElement(nodeId, exceptionCode, elementId, workerId).getElementId());
+		exception.completeExceptionElement(nodeId, exceptionCode, exceptionCode1, elementId, workerId);
+		System.out.println(exception.assignWorkerToExceptionElement(nodeId, exceptionCode1, elementId, workerId));
+		System.out.println(exception.getExceptionElement(nodeId, exceptionCode1, elementId, workerId).getElementId());
+//		exception.completeExceptionElement(nodeId, exceptionCode1, elementId, workerId);
+		
 	}
+	
+	//TODO
+	
+	/**
+	 * MATCH (exception:BPO_EXCEPTION_NODE)
+		MATCH path1=(:BPO_EXCEPTION_NODE)-[:NEXT_FLOW*0..]->exception
+		MATCH path2=exception-[:NEXT_FLOW*0..]->(:BPO_EXCEPTION_NODE)
+		WHERE ID(exception)=453
+		WITH MAX(LENGTH(path1))+1 AS idx, MAX(LENGTH(path2)) AS after
+		RETURN idx +"/"+(after+idx);
+	 */
 
 }

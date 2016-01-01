@@ -7,54 +7,47 @@ import java.util.List;
 import java.util.Map;
 
 import com.svi.bpo.graph.notifications.BPONotifications;
+import com.svi.bpo.graph.obj.ElementObject;
 import com.svi.bpo.graph.obj.ExceptionNodeObject;
 import com.svi.bpo.graph.utils.DataUtilities;
 import com.svi.tools.neo4j.rest.service.Neo4jRestService;
 
 public class ExceptionNodeFunctions {
+	private static final String EXCEPTION_ATTR_UUID = "exceptionUUID";
+	protected static final String CONSTANT_NEXT_EXCEPTION_CODE = "nextExceptionCode";
+	protected static final String RELATIONSHIP_LABEL_TAGGED_AS_EXCEPTION = "TAGGED_AS_EXCEPTION";
 	protected static final String VAR_EXCEPTION_CODE_COLLECTION = "exceptionCodeCollection";
 	protected static final String RELATIONSHIP_LABEL_EXCEPTION_TO = "EXCEPTION_TO";
-	protected static final String NODE_PROCESS_STATUS = "nodeProcessStatus";
+	
 	protected static final String REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS = "currentTotalInProcessElements";
 	protected static final String REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS = "currentTotalWaitingElements";
-	protected static final String REPORT_ATTR_TOTAL_PROCESS_DURATION = "totalProcessDuration";
-	protected static final String REPORT_ATTR_TOTAL_PROCESS_ELEMENT = "totalProcessElement";
-	protected static final String REPORT_ATTR_AVERAGE_PROCESS_DURATION = "averageProcessDuration";
-	protected static final String REPORT_ATTR_TOTAL_WAITING_DURATION = "totalWaitingDuration";
+//	protected static final String REPORT_ATTR_TOTAL_PROCESS_DURATION = "totalProcessDuration";
+//	protected static final String REPORT_ATTR_TOTAL_PROCESS_ELEMENT = "totalProcessElement";
+//	protected static final String REPORT_ATTR_AVERAGE_PROCESS_DURATION = "averageProcessDuration";
+//	protected static final String REPORT_ATTR_TOTAL_WAITING_DURATION = "totalWaitingDuration";
 	protected static final String REPORT_ATTR_TOTAL_WAITING_ELEMENT = "totalWaitingElement";
 	protected static final String REPORT_ATTR_AVERAGE_WAITING_DURATION = "averageWaitingDuration";
-	protected static final String REPORT_ATTR_TOTAL_ERROR_COUNT = "totalErrorCount";
-	protected static final String REPORT_ATTR_TOTAL_OUTPUT_COUNT = "totalOutputCount";
+//	protected static final String REPORT_ATTR_TOTAL_ERROR_COUNT = "totalErrorCount";
+//	protected static final String REPORT_ATTR_TOTAL_OUTPUT_COUNT = "totalOutputCount";
 
-	protected static final String RELATIONSHIP_LABEL_BPO_NODE_IN = "BPO_NODE_IN";
-	protected static final String RELATIONSHIP_LABEL_REPORTING_OF = "BPO_REPORTING_OF";
 	protected static final String NODE_LABEL_BPO_EXCEPTION_NODE = "BPO_EXCEPTION_NODE";
-	protected static final String NODE_LABEL_CLUSTER = "BPO_CLUSTER";
-	protected static final String NODE_LABEL_BPO_REPORT = "BPO_NODE_REPORT";
 	
 	/*******************
 	 * NODE ATTRIBUTES *
 	 *******************/
-	protected static final String NODE_ATTR_ERROR_NODE = "errorNode";// need
-	protected static final String NODE_ATTR_ALLOWED_ERROR = "allowedError";// need
-	protected static final String NODE_ATTR_TARGET_OUTPUT = "targetOutput";// need
 	protected static final String EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION = "allowedWaitingDuration";
 	protected static final String EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION = "allowedProcessDuration";
-	protected static final String NODE_ATTR_STD_UNIT_MEASURE = "stdUnitOfMeasure";// need
-	protected  static final String NODE_ATTR_CLUSTER = "cluster";// need
-	protected  static final String EXCEPTION_NODE_ATTR_NAME = "exceptionName";//need
-	protected  static final String EXCEPTION_NODE_ATTR_ID = "exceptionCode";// need
-	protected  static final String NODE_ATTR_COST = "cost";
+	protected static final String EXCEPTION_NODE_ATTR_NAME = "exceptionName";//need
+	protected static final String EXCEPTION_NODE_ATTR_ID = "exceptionCode";// need
 	
-	protected  static final String CLUSTER_ATTR_ID = "clusterId";
-	protected  static final String CLUSTER_ATTR_TARGET_COMPLETION_TIME = "targetCompletionTime";
-	protected  static final String CLUSTER_ATTR_ESTIMATED_COMPLETION_TIME = "targetEstimatedTime";
+	protected static final String CONSTANT_STATUS_EXCEPTION_WAITING = "EW";
+	protected static final String CONSTANT_STATUS_EXCEPTION_IN_PROCESS = "EP";
+	protected static final String CONSTANT_STATUS_EXCEPTION_COMPLETE = "EC";
+	
 	
 	/*******************
 	 * NOTIFICATIONS ***
 	 *******************/
-	protected static final String NOTIFICATION_NODE_DELETED_SUCCESSFULLY = "Node Deleted Successfully";
-	protected static final String NOTIFICATION_NODE_ID_DOES_NOT_EXIST = "Node Id Does Not Exist";
 	
 	protected static final String CONSTANT_PIPE = "|";
 	
@@ -100,7 +93,10 @@ public class ExceptionNodeFunctions {
 		StringBuilder qb = new StringBuilder();
 		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
 		qb.append("MERGE (exception:" +NODE_LABEL_BPO_EXCEPTION_NODE+ " {"+EXCEPTION_NODE_ATTR_ID+":{"+EXCEPTION_NODE_ATTR_ID+"}}) ");
-		qb.append("ON CREATE SET exception."+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"}, exception."+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"}, ");
+		qb.append("ON CREATE SET exception."+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"}, ");
+		qb.append("exception."+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"}, ");
+		qb.append("exception."+REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=0, ");
+		qb.append("exception."+REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=0 ");
 		qb.append("ON MATCH SET exception."+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+"}, exception."+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"={"+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"}, ");
 		qb.append("exception."+EXCEPTION_NODE_ATTR_NAME+"={"+EXCEPTION_NODE_ATTR_NAME+"}, ");
 		qb.append("exception."+REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+" = 0, ");
@@ -264,23 +260,234 @@ public class ExceptionNodeFunctions {
 	}
 
 	/********************
-	 * UPDATE FUNCTIONS *
+	 * UPDATE FUNCTIONS 
 	 ********************/
-	private void moveElementToException(String elementId, String nodeId, String exceptionCode) {
+	public BPONotifications moveElementToException(String elementId, String nodeId, String exceptionCode) {
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
 		properties.put(ElementFunctions.ELEMENT_ATTR_ELEMENT_ID, elementId);
 		properties.put(EXCEPTION_NODE_ATTR_ID, exceptionCode);
+		properties.put(ElementFunctions.ELEMENT_ATTR_STATUS, CONSTANT_STATUS_EXCEPTION_WAITING);
 		
 		StringBuilder qb = new StringBuilder();
 		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")");
-		qb.append("-[r]->");
+		qb.append("-[r:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->");
 		qb.append("(node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")");
 		qb.append("-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->");
 		qb.append("(exception:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("MATCH node<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(nodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") ");
 		qb.append("WHERE element."+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"={"+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"} ");
 		qb.append("AND node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
 		qb.append("AND exception."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
+		qb.append("MERGE element-[exceptionTag:"+RELATIONSHIP_LABEL_TAGGED_AS_EXCEPTION+"]->node ");
+		qb.append("SET element."+ElementFunctions.ELEMENT_ATTR_STATUS+" = {"+ElementFunctions.ELEMENT_ATTR_STATUS+"} ");
+		qb.append("SET element."+ElementFunctions.ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=element."+ElementFunctions.ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" + ");
+		qb.append("(exception."+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"+exception."+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+") ");
+		qb.append("SET element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" + ");
+		qb.append("(exception."+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"+exception."+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+") ");
+		qb.append("SET r."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() ");
+		qb.append("SET r."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+"=r."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+"-r."+ElementFunctions.RELATIONSHIP_ATTR_START_PROCESSING_TIME+" ");
+		qb.append("SET exceptionTag = r ");
+		qb.append("MERGE element-[exceptionTaskAt:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_AT+"]->exception ");
+		qb.append("SET exceptionTaskAt."+ElementFunctions.RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
+		qb.append("SET exceptionTaskAt."+ElementFunctions.RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='' ");
+		qb.append("SET exceptionTaskAt."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='' ");
+		qb.append("SET nodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"=nodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"+r."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+" ");
+		qb.append("SET nodeReport."+NodeFunctions.REPORT_ATTR_AVERAGE_PROCESS_DURATION+"=(nodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"/nodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+") ");
+		qb.append("SET nodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(nodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"-1) ");
+		qb.append("SET exception."+REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=(exception."+REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1) ");
+		qb.append("SET exceptionTag."+EXCEPTION_ATTR_UUID+"=r."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+" ");
+		qb.append("SET exceptionTaskAt."+EXCEPTION_ATTR_UUID+"=r."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+" ");
+		qb.append("DELETE r ");
+		qb.append("RETURN COUNT(element) AS count; ");
+		
+		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
+		if(dbResult.size()>0) {
+			int status = DataUtilities.toInteger(dbResult.get(0).get("count"));
+			if(status>0) {
+				return BPONotifications.EXCEPTION_TAG_SUCCESSFUL;
+			} else {
+				return BPONotifications.EXCEPTION_TAG_ELEMENT_NOT_PROCESS;
+			}
+		}
+		return BPONotifications.FAILED_CHECK_CONNECTION;
+	}
+	
+	public ElementObject getExceptionElement(String nodeId, String exceptionCode, String elementId, String workerId) {
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
+		properties.put(ElementFunctions.ELEMENT_ATTR_ELEMENT_ID, elementId);
+		properties.put(EXCEPTION_NODE_ATTR_ID, exceptionCode);
+		properties.put(ElementFunctions.ELEMENT_ATTR_WORKER_ID, workerId);
+		properties.put(CONSTANT_STATUS_EXCEPTION_IN_PROCESS, CONSTANT_STATUS_EXCEPTION_IN_PROCESS);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(exception:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")-[task:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_AT+"]->exception ");
+		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
+		qb.append("AND element."+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"={"+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"} ");
+		qb.append("AND task."+ElementFunctions.ELEMENT_ATTR_WORKER_ID+"={"+ElementFunctions.ELEMENT_ATTR_WORKER_ID+"} ");
+		qb.append("AND exception."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
+		qb.append("MERGE element-[taskInProcess:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->exception ");
+		qb.append("SET element."+ElementFunctions.ELEMENT_ATTR_STATUS+" = {"+CONSTANT_STATUS_EXCEPTION_IN_PROCESS+"} ");
+		qb.append("SET task."+ElementFunctions.RELATIONSHIP_ATTR_START_PROCESSING_TIME+"=TIMESTAMP() ");
+		qb.append("SET task."+ElementFunctions.RELATIONSHIP_ATTR_WAITING_DURATION+"=task."+ElementFunctions.RELATIONSHIP_ATTR_START_PROCESSING_TIME+"-"+"task."+ElementFunctions.RELATIONSHIP_ATTR_START_WAITING_TIME+" ");
+		qb.append("SET taskInProcess = task ");
+		qb.append("SET exception."+REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=(exception."+REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"-1) ");
+		qb.append("SET exception."+REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(exception."+REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"+1) ");
+		qb.append("SET element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=(element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" - ");
+		qb.append("exception."+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+") + ");
+		qb.append("task."+ElementFunctions.RELATIONSHIP_ATTR_WAITING_DURATION+" ");
+		qb.append("WITH task, node, element ");
+		qb.append("DELETE task ");
+		qb.append("RETURN node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS nodeId, ");
+		qb.append("element."+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+" AS elementId, ");
+		qb.append("element."+ElementFunctions.ELEMENT_ATTR_PRIORITY+" AS "+ElementFunctions.ELEMENT_ATTR_PRIORITY+", ");
+		qb.append("element."+ElementFunctions.ELEMENT_ATTR_STATUS+" AS "+ElementFunctions.ELEMENT_ATTR_STATUS+", ");
+		qb.append("element."+ElementFunctions.ELEMENT_ATTR_EXTRA1+" AS "+ElementFunctions.ELEMENT_ATTR_EXTRA1+", ");
+		qb.append("element."+ElementFunctions.ELEMENT_ATTR_EXTRA2+" AS "+ElementFunctions.ELEMENT_ATTR_EXTRA2+", ");
+		qb.append("element."+ElementFunctions.ELEMENT_ATTR_EXTRA3+" AS "+ElementFunctions.ELEMENT_ATTR_EXTRA3+", ");
+		qb.append("element."+ElementFunctions.ELEMENT_ATTR_FILE_POINTER+" AS "+ElementFunctions.ELEMENT_ATTR_FILE_POINTER+", ");
+		qb.append("element."+ElementFunctions.ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" AS "+ElementFunctions.ELEMENT_ATTR_TARGET_COMPLETION_DURATION+", ");
+		qb.append("element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" AS "+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+";");
+		ElementObject element = null;
+		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(qb.toString(), properties);
+		for(int i=0; i<dataReturned.size(); i++) {
+			Map<String, Object> data = dataReturned.get(i);
+			String ndeId =  data.get("nodeId").toString();
+			String elemId =  data.get("elementId").toString();
+			int priority = (int) data.get(ElementFunctions.ELEMENT_ATTR_PRIORITY);
+			String status =  data.get(ElementFunctions.ELEMENT_ATTR_STATUS).toString();
+			String extra1 =  data.get(ElementFunctions.ELEMENT_ATTR_EXTRA1).toString();
+			String extra2 =  data.get(ElementFunctions.ELEMENT_ATTR_EXTRA2).toString();
+			String extra3 =  data.get(ElementFunctions.ELEMENT_ATTR_EXTRA3).toString();
+			String filePointer =  data.get(ElementFunctions.ELEMENT_ATTR_FILE_POINTER).toString();
+			long targetCompletionDuration = DataUtilities.toLongValue(data.get(ElementFunctions.ELEMENT_ATTR_TARGET_COMPLETION_DURATION));
+			long estimatedCompletionDuration = DataUtilities.toLongValue(data.get(ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION));
+			
+			element = new ElementObject();
+			element.setElementId(elemId);
+			element.setNodeId(ndeId);
+			element.setPriority(priority);
+			element.setStatus(status);
+			element.setExtra1(extra1);
+			element.setExtra2(extra2);
+			element.setExtra3(extra3);
+			element.setFilePointer(filePointer);
+			element.setTargetCompletionDuration(targetCompletionDuration);
+			element.setEstimatedCompletionDuration(estimatedCompletionDuration);
+		}
+		return element;
+	}
+	
+	//TODO RETURN
+	public void completeExceptionElement(String nodeId, String currentExceptionCode, String nextExceptionCode, String elementId, String workerId) {
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
+		properties.put(ElementFunctions.ELEMENT_ATTR_ELEMENT_ID, elementId);
+		properties.put(EXCEPTION_NODE_ATTR_ID, currentExceptionCode);
+		properties.put(CONSTANT_NEXT_EXCEPTION_CODE, nextExceptionCode);
+		properties.put(ElementFunctions.ELEMENT_ATTR_WORKER_ID, workerId);
+		properties.put(ElementFunctions.ELEMENT_ATTR_STATUS, ElementFunctions.CONSTANT_STATUS_WAITING);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("MATCH node-[current:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(firstExceptionNode:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("MATCH node-[next:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(nextExceptionNode:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")-[completedRel:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->firstExceptionNode ");
+		qb.append("MATCH element-[taggedException:"+RELATIONSHIP_LABEL_TAGGED_AS_EXCEPTION+"]->node ");
+		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
+		qb.append("AND element."+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"={"+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"} ");
+		qb.append("AND completedRel."+ElementFunctions.ELEMENT_ATTR_WORKER_ID+"={"+ElementFunctions.ELEMENT_ATTR_WORKER_ID+"} ");
+		qb.append("AND firstExceptionNode."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
+		qb.append("AND nextExceptionNode."+EXCEPTION_NODE_ATTR_ID+"={"+CONSTANT_NEXT_EXCEPTION_CODE+"} ");
+		qb.append("CREATE element-[nextNodeRel:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_AT+"]->nextExceptionNode ");
+		qb.append("CREATE element-[completedTask:"+ElementFunctions.RELATIONSHIP_LABEL_COMPLETED_TASK+"]->firstExceptionNode ");
+		qb.append("SET element."+ElementFunctions.ELEMENT_ATTR_STATUS+" = {"+ElementFunctions.ELEMENT_ATTR_STATUS+"} ");
+		qb.append("SET completedRel."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() ");
+		qb.append("SET nextNodeRel."+ElementFunctions.RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
+		qb.append("SET nextNodeRel."+ElementFunctions.RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='' ");
+		qb.append("SET nextNodeRel."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='' ");
+		qb.append("SET nextNodeRel."+EXCEPTION_ATTR_UUID+"=taggedException."+EXCEPTION_ATTR_UUID+" ");
+		qb.append("SET completedRel."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+"=completedRel."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+"-completedRel."+ElementFunctions.RELATIONSHIP_ATTR_START_PROCESSING_TIME+" ");
+		qb.append("SET completedTask=completedRel ");
+		qb.append("SET element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" + ");
+		qb.append("(nextExceptionNode."+EXCEPTION_NODE_ATTR_ALLOWED_PROCESS_DURATION+"+nextExceptionNode."+EXCEPTION_NODE_ATTR_ALLOWED_WAITING_DURATION+") + ");
+		qb.append("completedRel."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+" ");
+		qb.append("WITH completedRel, firstExceptionNode, nextExceptionNode ");
+		qb.append("SET firstExceptionNode."+REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(firstExceptionNode."+REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"-1) ");
+		qb.append("SET nextExceptionNode."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=(nextExceptionNode."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1) ");
+		qb.append("DELETE completedRel;");
+		neo4j.sendCypherQuery(qb.toString(), properties);
+	}
+	
+	//TODO RETURN
+	public void completeExceptionElement(String nodeId, String currentExceptionCode, String elementId, String workerId) {
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
+		properties.put(ElementFunctions.ELEMENT_ATTR_ELEMENT_ID, elementId);
+		properties.put(EXCEPTION_NODE_ATTR_ID, currentExceptionCode);
+		properties.put(ElementFunctions.ELEMENT_ATTR_WORKER_ID, workerId);
+		properties.put(ElementFunctions.ELEMENT_ATTR_STATUS, ElementFunctions.CONSTANT_STATUS_WAITING);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MATCH node-[current:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(firstExceptionNode:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")-[completedRel:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->firstExceptionNode ");
+		qb.append("MATCH element-[taggedException:"+RELATIONSHIP_LABEL_TAGGED_AS_EXCEPTION+"]->node ");
+		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
+		qb.append("AND element."+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"={"+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"} ");
+		qb.append("AND completedRel."+ElementFunctions.ELEMENT_ATTR_WORKER_ID+"={"+ElementFunctions.ELEMENT_ATTR_WORKER_ID+"} ");
+		qb.append("AND firstExceptionNode."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
+		qb.append("CREATE element-[resolvedException:"+"RESOLVED_EXCEPTION"+"]->node ");
+		qb.append("CREATE element-[completedTask:"+ElementFunctions.RELATIONSHIP_LABEL_COMPLETED_TASK+"]->firstExceptionNode ");
+		qb.append("CREATE element-[nextNodeRel:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_AT+"]->node ");
+		qb.append("SET element."+ElementFunctions.ELEMENT_ATTR_STATUS+" = {"+ElementFunctions.ELEMENT_ATTR_STATUS+"} ");
+		qb.append("SET completedRel."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() ");
+		qb.append("SET nextNodeRel."+ElementFunctions.RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
+		qb.append("SET nextNodeRel."+ElementFunctions.RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='' ");
+		qb.append("SET nextNodeRel."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='' ");
+		qb.append("SET completedRel."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+"=completedRel."+ElementFunctions.RELATIONSHIP_ATTR_END_PROCESSING_TIME+"-completedRel."+ElementFunctions.RELATIONSHIP_ATTR_START_PROCESSING_TIME+" ");
+		qb.append("SET completedTask=completedRel ");
+		qb.append("SET resolvedException=taggedException ");
+		qb.append("SET element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" + ");
+		qb.append("completedRel."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+" ");
+		qb.append("WITH completedRel, firstExceptionNode, report, taggedException ");
+		qb.append("SET firstExceptionNode."+REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(firstExceptionNode."+REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"-1) ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
+		qb.append("DELETE completedRel, taggedException;");
+		neo4j.sendCypherQuery(qb.toString(), properties);
+	}
+	
+		
+	
+	public BPONotifications assignWorkerToExceptionElement(String nodeId, String exceptionCode, String elementId, String workerId) {
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
+		properties.put(ElementFunctions.ELEMENT_ATTR_ELEMENT_ID, elementId);
+		properties.put(EXCEPTION_NODE_ATTR_ID, exceptionCode);
+		properties.put(ElementFunctions.ELEMENT_ATTR_WORKER_ID, workerId);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(exception:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")-[task:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_AT+"]->exception ");
+		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
+		qb.append("AND element."+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"={"+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID+"} ");
+		qb.append("AND exception."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
+		qb.append("SET task."+ElementFunctions.ELEMENT_ATTR_WORKER_ID+"={"+ElementFunctions.ELEMENT_ATTR_WORKER_ID+"} ");
+		qb.append("RETURN COUNT(task) AS data;");
+		
+		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
+		if(dbResult.size()>0) {
+			int statusCode = DataUtilities.toInteger(dbResult.get(0).get("data"));
+			if(statusCode>0) {
+				return BPONotifications.EXCEPTION_ELEMENT_WORKER_ADDED;
+			}
+		}
+		
+		return BPONotifications.EXCEPTION_EITHER_NODE_ELEMENT_DOES_NOT_EXIST;
+		
 	}
 	
 	/**

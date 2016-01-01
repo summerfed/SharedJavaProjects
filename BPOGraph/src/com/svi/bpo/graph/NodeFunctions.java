@@ -558,17 +558,17 @@ public class NodeFunctions {
 		qb.append("MATCH (node:"+NODE_LABEL_BPO_NODE+")<-[taskAt:"+ElementFunctions.RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+ElementFunctions.NODE_LABEL_ELEMENT+") ");
 		qb.append("MATCH (report:"+NODE_LABEL_BPO_REPORT+")-[:"+RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
 		qb.append("WHERE element."+ElementFunctions.ELEMENT_ATTR_STATUS+"={"+ElementFunctions.CONSTANT_STATUS_WAITING+"} ");
-		qb.append("SET taskAt."+ElementFunctions.ELEMENT_ATTR_WAITING_DURATION+" = currentTime-taskAt."+ElementFunctions.ELEMENT_ATTR_START_WAITING_TIME+" ");
-		qb.append("SET taskAt."+ElementFunctions.ELEMENT_ATTR_PROCESS_DURATION+" = node."+NODE_ATTR_ALLOWED_PROCESS_DURATION + " ");
+		qb.append("SET taskAt."+ElementFunctions.RELATIONSHIP_ATTR_WAITING_DURATION+" = currentTime-taskAt."+ElementFunctions.RELATIONSHIP_ATTR_START_WAITING_TIME+" ");
+		qb.append("SET taskAt."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+" = node."+NODE_ATTR_ALLOWED_PROCESS_DURATION + " ");
 //		qb.append("SET report."+REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"=report."+REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"+1 ");
-		qb.append("SET report."+REPORT_ATTR_TOTAL_WAITING_DURATION+"=report."+REPORT_ATTR_TOTAL_WAITING_DURATION+"+taskAt."+ElementFunctions.ELEMENT_ATTR_WAITING_DURATION+" ");
+		qb.append("SET report."+REPORT_ATTR_TOTAL_WAITING_DURATION+"=report."+REPORT_ATTR_TOTAL_WAITING_DURATION+"+taskAt."+ElementFunctions.RELATIONSHIP_ATTR_WAITING_DURATION+" ");
 		qb.append("SET report."+REPORT_ATTR_AVERAGE_WAITING_DURATION+"=report."+REPORT_ATTR_TOTAL_WAITING_DURATION+"/report."+REPORT_ATTR_TOTAL_WAITING_ELEMENT+" ");
-		qb.append("SET report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"=report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"+taskAt."+ElementFunctions.ELEMENT_ATTR_PROCESS_DURATION+" ");
+		qb.append("SET report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"=report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"+taskAt."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+" ");
 		qb.append("SET report."+REPORT_ATTR_AVERAGE_PROCESS_DURATION+"=report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"/report."+REPORT_ATTR_TOTAL_PROCESS_ELEMENT+" ");
 		qb.append("WITH currentTime, node, report, taskAt, element."+ElementFunctions.ELEMENT_ATTR_STATUS+" as status ");
 		qb.append("WHERE status={"+ElementFunctions.CONSTANT_STATUS_IN_PROCESS+"} ");
-		qb.append("SET taskAt."+ElementFunctions.ELEMENT_ATTR_PROCESS_DURATION+"= currentTime-taskAt."+ElementFunctions.ELEMENT_ATTR_START_PROCESSING_TIME+" ");
-		qb.append("SET report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"=report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"+taskAt."+ElementFunctions.ELEMENT_ATTR_PROCESS_DURATION+" ");
+		qb.append("SET taskAt."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+"= currentTime-taskAt."+ElementFunctions.RELATIONSHIP_ATTR_START_PROCESSING_TIME+" ");
+		qb.append("SET report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"=report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"+taskAt."+ElementFunctions.RELATIONSHIP_ATTR_PROCESS_DURATION+" ");
 		qb.append("SET report."+REPORT_ATTR_AVERAGE_PROCESS_DURATION+"=report."+REPORT_ATTR_TOTAL_PROCESS_DURATION+"/report."+REPORT_ATTR_TOTAL_PROCESS_ELEMENT+" ");
 		neo4j.sendCypherBooleanResult(qb.toString(), properties);
 	}

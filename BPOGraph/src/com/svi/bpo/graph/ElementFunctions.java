@@ -11,23 +11,15 @@ import com.svi.tools.neo4j.rest.service.Neo4jRestService;
 
 public class ElementFunctions {
 	
-	private static final String RELATIONSHIP_LABEL_TASK_IN_PROCESS = "TASK_IN_PROCESS";
-	private static final String RELATIONSHI_LABEL_BPO_INCOMPLETE_TASK_AT = "BPO_INCOMPLETE_TASK_AT";
-	private static final String NOTIFICATION_WORKER_REMOVED_SUCCESSFULLY = "Worker Removed Successfully";
-	private static final String NOTIFICATION_FAILED_NO_WORKER_ASSIGNED_TO_ELEMENT = "Failed, No Worker Assigned To Element";
-	private static final String NOTIFICATION_FAILED_THERE_IS_WORKER_ASSIGNED_TO_THE_ELEMENT = "Failed, There is Worker Assigned to the Element";
-	private static final String NOTIFICATION_WORKER_ADDED_SUCCESSFULLY = "Worker Added Successfully";
-	protected static final String ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION = "estimatedCompletionDuration";
-	private static final String ELEMENT_ATTR_TARGET_COMPLETION_DURATION = "targetCompletionDuration";
-	protected static final String RELATIONSHIP_LABEL_COMPLETED_TASK = "BPO_COMPLETED_TASK";
-	protected static final String RELATIONSHIP_LABEL_TASK_AT = "BPO_TASK_AT";
-	protected static final String NODE_LABEL_ELEMENT = "BPO_ELEMENT";
-	protected static final String NOTIFICATION_INVALID_PRIORITY_RANGE = "Insert Element Failed: Element Priority must be in 0-9 range";
-	protected static final String ELEMENT_ATTR_PROCESS_DURATION = "processDuration";
-	protected static final String ELEMENT_ATTR_END_PROCESSING_TIME = "endProcessingTime";
-	protected static final String ELEMENT_ATTR_START_PROCESSING_TIME = "startProcessingTime";
-	protected static final String ELEMENT_ATTR_START_WAITING_TIME = "startWaitingTime";
-	protected static final String ELEMENT_ATTR_WAITING_DURATION = "waitingDuration";
+	protected static final String NOTIFICATION_WORKER_ID_MUST_NOT_EMPTY = "Worker Id Must Not Empty";
+	protected static final String ELEMENT_FLAG_IS_INSERTED = "isInsertedFlag";
+	protected static final String NOTIFICATION_EITHER_NODE_OR_ELEMENT_DOES_NOT_EXIST = "Either Node or Element Does Not Exist";
+	protected static final String RELATIONSHIP_ATTR_PROCESS_DURATION = "processDuration";
+	protected static final String RELATIONSHIP_ATTR_END_PROCESSING_TIME = "endProcessingTime";
+	protected static final String RELATIONSHIP_ATTR_START_PROCESSING_TIME = "startProcessingTime";
+	protected static final String RELATIONSHIP_ATTR_START_WAITING_TIME = "startWaitingTime";
+	protected static final String RELATIONSHIP_ATTR_WAITING_DURATION = "waitingDuration";
+	
 	protected static final String ELEMENT_ATTR_TOTAL_ERROR = "totalError";
 	protected static final String ELEMENT_ATTR_TOTAL_OUPUT = "totalOuput";
 	protected static final String ELEMENT_ATTR_EXTRA3 = "extra3";
@@ -38,14 +30,28 @@ public class ElementFunctions {
 	protected static final String ELEMENT_ATTR_WORKER_ID = "workerId";
 	protected static final String ELEMENT_ATTR_PRIORITY = "priority";
 	protected static final String ELEMENT_ATTR_ELEMENT_ID = "elementId";
+	
+	protected static final String ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION = "estimatedCompletionDuration";
+	protected static final String ELEMENT_ATTR_TARGET_COMPLETION_DURATION = "targetCompletionDuration";
+	
 	protected static final String ELEMENT_VAR_CAN_MEET_DEADLINE = "canMeetDeadline";
+	
+	protected static final String NODE_LABEL_ELEMENT = "BPO_ELEMENT";
+	
+	protected static final String RELATIONSHIP_LABEL_TASK_IN_PROCESS = "TASK_IN_PROCESS";
+	protected static final String RELATIONSHI_LABEL_BPO_INCOMPLETE_TASK_AT = "BPO_INCOMPLETE_TASK_AT";
+	protected static final String RELATIONSHIP_LABEL_COMPLETED_TASK = "BPO_COMPLETED_TASK";
+	protected static final String RELATIONSHIP_LABEL_TASK_AT = "BPO_TASK_AT";
 	
 	protected static final String CONSTANT_STATUS_IN_PROCESS = "P";
 	protected static final String CONSTANT_STATUS_WAITING = "W";
 	protected static final String CONSTANT_STATUS_COMPLETE = "C";
+
+	
 	protected static final String CONSTANT_STATUS = "status";
 	protected static final String CONSTANT_NEXT_NODE_ID = "nextNodeId";
 
+	protected static final String NOTIFICATION_INVALID_PRIORITY_RANGE = "Insert Element Failed: Element Priority must be in 0-9 range";
 	protected static final String NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY = "Element Added Successfuly";
 	protected static final String NOTIFICATION_CHANGE_WORKED_ID_SUCCESSFULLY = "Change Worked Id Successfully";
 	protected static final String NOTIFICATION_ELEMENT_DELETED_SUCCESSFULLY = "Element Deleted Successfully";
@@ -55,6 +61,11 @@ public class ElementFunctions {
 	protected static final String NOTIFICATION_ELEMENT_DOES_NOT_EXIST = "Element Does Not Exist";
 	protected static final String NOTIFICATION_ELEMENT_ALREADY_EXIST = "Element Already Exist";
 	protected static final String NOTIFICATION_NODE_ID_DOES_NOT_EXIST = "Node Id Does Not Exist";
+	protected static final String NOTIFICATION_WORKER_REMOVED_SUCCESSFULLY = "Worker Removed Successfully";
+	protected static final String NOTIFICATION_FAILED_NO_WORKER_ASSIGNED_TO_ELEMENT = "Failed, No Worker Assigned To Element";
+	protected static final String NOTIFICATION_FAILED_THERE_IS_WORKER_ASSIGNED_TO_THE_ELEMENT = "Failed, There is Worker Assigned to the Element";
+	protected static final String NOTIFICATION_WORKER_ADDED_SUCCESSFULLY = "Worker Added Successfully";
+	
 
 	private Neo4jRestService neo4j;
 	private BPO bpo;
@@ -87,13 +98,6 @@ public class ElementFunctions {
 			return NOTIFICATION_INVALID_PRIORITY_RANGE;
 		}
 		
-		if(!bpo.getNodeFunctions().isNodeExist(nodeId)) {
-			return NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
-		} else if(isElementExist(elementId)) {
-			
-			return NOTIFICATION_ELEMENT_ALREADY_EXIST;
-		} 
-		
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(ELEMENT_ATTR_ELEMENT_ID, elementId);
 		properties.put(ELEMENT_ATTR_PRIORITY, priority);
@@ -107,34 +111,42 @@ public class ElementFunctions {
 		properties.put(ELEMENT_ATTR_STATUS, CONSTANT_STATUS_WAITING);
 		
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) "
-				+ "MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node "
-				+ "MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node "
-				+ "CREATE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) "
-				+ "SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"} "
-				+ "SET element."+ELEMENT_ATTR_STATUS+"={"+ELEMENT_ATTR_STATUS+"} "
-				+ "SET element."+ELEMENT_ATTR_FILE_POINTER+"={"+ELEMENT_ATTR_FILE_POINTER+"} " 
-				+ "SET element."+ELEMENT_ATTR_EXTRA1+"={"+ELEMENT_ATTR_EXTRA1+"} " 
-				+ "SET element."+ELEMENT_ATTR_EXTRA2+"={"+ELEMENT_ATTR_EXTRA2+"} " 
-				+ "SET element."+ELEMENT_ATTR_EXTRA3+"={"+ELEMENT_ATTR_EXTRA3+"} " 
-				+ "SET element."+ELEMENT_ATTR_TOTAL_OUPUT+"={"+ELEMENT_ATTR_TOTAL_OUPUT+"} " 
-				+ "SET element."+ELEMENT_ATTR_TOTAL_ERROR+"={"+ELEMENT_ATTR_TOTAL_ERROR+"} "
-				+ "SET element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+" "
-				+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+" "
-				+ "CREATE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node "
-				+ "SET r."+ELEMENT_ATTR_START_WAITING_TIME+"=TIMESTAMP() "
-				+ "SET r."+ELEMENT_ATTR_START_PROCESSING_TIME+"='' "
-				+ "SET r."+ELEMENT_ATTR_END_PROCESSING_TIME+"='' "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1;");
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
+		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MERGE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) ");
+		qb.append("ON MATCH SET element."+ELEMENT_FLAG_IS_INSERTED+"=FALSE ");
+		qb.append("ON CREATE SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"}, ");
+		qb.append("element."+ELEMENT_ATTR_STATUS+"={"+ELEMENT_ATTR_STATUS+"}, ");
+		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_ATTR_FILE_POINTER+"={"+ELEMENT_ATTR_FILE_POINTER+"}, ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA1+"={"+ELEMENT_ATTR_EXTRA1+"}, ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA2+"={"+ELEMENT_ATTR_EXTRA2+"}, ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA3+"={"+ELEMENT_ATTR_EXTRA3+"}, ");
+		qb.append("element."+ELEMENT_ATTR_TOTAL_OUPUT+"={"+ELEMENT_ATTR_TOTAL_OUPUT+"}, " );
+		qb.append("element."+ELEMENT_ATTR_TOTAL_ERROR+"={"+ELEMENT_ATTR_TOTAL_ERROR+"}, ");
+		qb.append("element."+ELEMENT_FLAG_IS_INSERTED+"=TRUE ");
+		qb.append("MERGE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
+		qb.append("SET r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
+		qb.append("SET r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='' ");
+		qb.append("SET r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='' ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
+		qb.append("RETURN element."+ELEMENT_FLAG_IS_INSERTED+" AS status;");
 		
-		boolean result = neo4j.sendCypherBooleanResult(qb.toString(), properties);
-		
-		if(result) {
-			return NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY;
-		} else {
-			return NOTIFICATION_FAILED_CHECK_CONNECTION;
+		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
+		if(dbResult.size()>0) {
+			boolean status = DataUtilities.toBoolean(dbResult.get(0).get("status"));
+			if(status) {
+				return NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY;
+			} else {
+				return NOTIFICATION_ELEMENT_ALREADY_EXIST;
+			}
 		}
+		
+		return NodeFunctions.NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
 	}
 
 	/**
@@ -142,7 +154,6 @@ public class ElementFunctions {
 	 * @param elementId
 	 * @param priority
 	 * @param nodeId
-	 * @param workerId
 	 * @return
 	 */
 	public String insertElement(String elementId, int priority, String nodeId) {
@@ -150,13 +161,6 @@ public class ElementFunctions {
 			return NOTIFICATION_INVALID_PRIORITY_RANGE;
 		}
 		
-		if(!bpo.getNodeFunctions().isNodeExist(nodeId)) {
-			return NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
-		} else if(isElementExist(elementId)) {
-			return NOTIFICATION_ELEMENT_ALREADY_EXIST;
-		} 
-		
-		
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(ELEMENT_ATTR_ELEMENT_ID, elementId);
 		properties.put(ELEMENT_ATTR_PRIORITY, priority);
@@ -164,34 +168,37 @@ public class ElementFunctions {
 		properties.put(ELEMENT_ATTR_STATUS, CONSTANT_STATUS_WAITING);
 		
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) "
-				+ "MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node "
-				+ " MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node "
-
-				+ "MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node "
-
-				+ "CREATE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) "
-				+ "SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"} "
-				+ "SET element."+ELEMENT_ATTR_STATUS+"={"+ELEMENT_ATTR_STATUS+"} "
-					+ "CREATE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node "
-				+ "SET r."+ELEMENT_ATTR_START_WAITING_TIME+"=TIMESTAMP() "
-				+ "SET r."+ELEMENT_ATTR_START_PROCESSING_TIME+"='' "
-				+ "SET r."+ELEMENT_ATTR_END_PROCESSING_TIME+"='' "
-				
-			
-				+ "SET element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+" "
-				+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+" "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1;");
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
+		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MERGE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) ");
+		qb.append("ON MATCH SET element."+ELEMENT_FLAG_IS_INSERTED+"=FALSE ");
+		qb.append("ON CREATE SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"}, ");
+		qb.append("element."+ELEMENT_ATTR_STATUS+"={"+ELEMENT_ATTR_STATUS+"}, ");
+		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_FLAG_IS_INSERTED+"=TRUE ");
+		qb.append("MERGE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
+		qb.append("SET r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
+		qb.append("SET r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='' ");
+		qb.append("SET r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='' ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
+		qb.append("RETURN element."+ELEMENT_FLAG_IS_INSERTED+" AS status;");
 		
 		
-		boolean result = neo4j.sendCypherBooleanResult(qb.toString(), properties);
-		
-		if(result) {
-			return NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY;
-		} else {
-			return NOTIFICATION_FAILED_CHECK_CONNECTION;
+		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
+		if(dbResult.size()>0) {
+			boolean status = DataUtilities.toBoolean(dbResult.get(0).get("status"));
+			if(status) {
+				return NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY;
+			} else {
+				return NOTIFICATION_ELEMENT_ALREADY_EXIST;
+			}
 		}
+		
+		return NodeFunctions.NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
 	}
 	
 	/**
@@ -202,65 +209,57 @@ public class ElementFunctions {
 	 * @param workerId
 	 * @return
 	 */
-	public String insertElement(String elementId, int priority, String nodeId,String workerId) {//workerID added by jm
+	public String insertElement(String elementId, int priority, String nodeId, String workerId) { //workerID added by jm, modified for performance by fed
 		if(!checkIfValidPriority(priority)) {
 			return NOTIFICATION_INVALID_PRIORITY_RANGE;
 		}
 		
-		if(!bpo.getNodeFunctions().isNodeExist(nodeId)) {
-			return NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
-		} else if(isElementExist(elementId)) {
-			return NOTIFICATION_ELEMENT_ALREADY_EXIST;
-		} 
-		String worker ="SET r."+ELEMENT_ATTR_WORKER_ID+"={"+ELEMENT_ATTR_WORKER_ID+"} ";// added by jm
-		if (workerId.equals("")){// added by jm
-			worker = "";// 
+		if(workerId.trim().isEmpty()) {
+			return NOTIFICATION_WORKER_ID_MUST_NOT_EMPTY;
 		}
 		
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(ELEMENT_ATTR_ELEMENT_ID, elementId);
 		properties.put(ELEMENT_ATTR_PRIORITY, priority);
-		properties.put(ELEMENT_ATTR_WORKER_ID, workerId);// added by jm
 		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
 		properties.put(ELEMENT_ATTR_STATUS, CONSTANT_STATUS_WAITING);
+		properties.put(ELEMENT_ATTR_WORKER_ID, workerId);
 		
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) "
-				+ "MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node "
-
-
-				
-
-				+ "MATCH (report:BPO_NODE_REPORT)-[:REPORTING_OF]->node "
-
-
-				+ "MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node "
-
-				+ "CREATE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) "
-				+ "SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"} "
-				+ "SET element."+ELEMENT_ATTR_STATUS+"={"+ELEMENT_ATTR_STATUS+"} "
-				+ "CREATE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node "
-				+ "SET r."+ELEMENT_ATTR_START_WAITING_TIME+"=TIMESTAMP() "
-				+ "SET r."+ELEMENT_ATTR_START_PROCESSING_TIME+"='' "
-				+ "SET r."+ELEMENT_ATTR_END_PROCESSING_TIME+"='' "
-				+ worker//added by jm
-			
-				+ "SET element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+" "
-				+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+" "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1;");
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
+		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MERGE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) ");
+		qb.append("ON MATCH SET element."+ELEMENT_FLAG_IS_INSERTED+"=FALSE ");
+		qb.append("ON CREATE SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"}, ");
+		qb.append("element."+ELEMENT_ATTR_STATUS+"={"+ELEMENT_ATTR_STATUS+"}, ");
+		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_FLAG_IS_INSERTED+"=TRUE ");
+		qb.append("MERGE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
+		qb.append("ON CREATE SET r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP(), ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='', ");
+		qb.append("r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='', ");
+		qb.append("r."+ELEMENT_ATTR_WORKER_ID+"={"+ELEMENT_ATTR_WORKER_ID+"}, ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1, ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
+		qb.append("RETURN element."+ELEMENT_FLAG_IS_INSERTED+" AS status;");
 		
-		System.out.println("QUERY INSERT ELEMENT: " + qb.toString());
-		boolean result = neo4j.sendCypherBooleanResult(qb.toString(), properties);
 		
-		if(result) {
-			return NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY;
-		} else {
-			return NOTIFICATION_FAILED_CHECK_CONNECTION;
+		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
+		if(dbResult.size()>0) {
+			boolean status = DataUtilities.toBoolean(dbResult.get(0).get("status"));
+			if(status) {
+				return NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY;
+			} else {
+				return NOTIFICATION_ELEMENT_ALREADY_EXIST;
+			}
 		}
+		
+		return NodeFunctions.NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
 	}
-
+	
 	/******************
 	 * READ FUNCTIONS *
 	 ******************/	
@@ -268,8 +267,8 @@ public class ElementFunctions {
 	public String viewElementTable() {
 		StringBuilder qb = new StringBuilder();
 		qb.append("MATCH (element:"+NODE_LABEL_ELEMENT+")-[task:"+RELATIONSHIP_LABEL_TASK_AT+"]->(node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") RETURN element."+ELEMENT_ATTR_ELEMENT_ID+" As "+ELEMENT_ATTR_ELEMENT_ID+",element."+ELEMENT_ATTR_PRIORITY+" As "+ELEMENT_ATTR_PRIORITY+",");
-		qb.append("node."+NodeFunctions.NODE_ATTR_NODE_ID+" As "+NodeFunctions.NODE_ATTR_NODE_ID+",task."+ELEMENT_ATTR_WORKER_ID+" AS "+ELEMENT_ATTR_WORKER_ID+",task."+ELEMENT_ATTR_START_WAITING_TIME+" As "+ ELEMENT_ATTR_START_WAITING_TIME+",");
-		qb.append("task."+ELEMENT_ATTR_START_PROCESSING_TIME+" As "+ELEMENT_ATTR_START_PROCESSING_TIME+",task."+ELEMENT_ATTR_END_PROCESSING_TIME+" AS "+ELEMENT_ATTR_END_PROCESSING_TIME+",element."+ELEMENT_ATTR_EXTRA1+" As "+ ELEMENT_ATTR_EXTRA1+",");
+		qb.append("node."+NodeFunctions.NODE_ATTR_NODE_ID+" As "+NodeFunctions.NODE_ATTR_NODE_ID+",task."+ELEMENT_ATTR_WORKER_ID+" AS "+ELEMENT_ATTR_WORKER_ID+",task."+RELATIONSHIP_ATTR_START_WAITING_TIME+" As "+ RELATIONSHIP_ATTR_START_WAITING_TIME+",");
+		qb.append("task."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+" As "+RELATIONSHIP_ATTR_START_PROCESSING_TIME+",task."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+" AS "+RELATIONSHIP_ATTR_END_PROCESSING_TIME+",element."+ELEMENT_ATTR_EXTRA1+" As "+ ELEMENT_ATTR_EXTRA1+",");
 		qb.append("element."+ELEMENT_ATTR_EXTRA2+" As "+ELEMENT_ATTR_EXTRA2+",element."+ELEMENT_ATTR_EXTRA3+" AS "+ELEMENT_ATTR_EXTRA3+",element."+ELEMENT_ATTR_FILE_POINTER+" As "+ ELEMENT_ATTR_FILE_POINTER+",");
 		qb.append("element."+ELEMENT_ATTR_TOTAL_OUPUT+" As " + ELEMENT_ATTR_TOTAL_OUPUT+ ",element."+ELEMENT_ATTR_TOTAL_ERROR+" As "+ELEMENT_ATTR_TOTAL_ERROR+",element."+ ELEMENT_ATTR_STATUS+" As " + ELEMENT_ATTR_STATUS );// NOTE: ELEMENT STATUS IS JUST ADDED 
 		//Element Table: [[[ELEM0, NODE1, 0, W, , 11/26/2015 15:50:03, null, null, null, null, null, null, 2611125, 0, 0, 0], [ELEM1, NODE1, 0, W, , 11/26/2015 15:50:03, null, null, null, null, null, null, 2611125, 0, 0, 0], [ELEM2, NODE1, 0, W, , 11/26/2015 15:50:03, null, null, null, null, null, null, 2611125, 0, 0, 0], [ELEM3, NODE1, 0, W, , 11/26/2015 15:50:03, null, null, null, null, null, null, 2611125, 0, 0, 0], [ELEM4, NODE1, 0, W, , 11/26/2015 15:50:03, null, null, null, null, null, null, 2611125, 0, 0, 0]], [], [], [[elem1, hey, 0, W, W1, 11/26/2015 16:33:34, null, null, null, , , , 0, 0, 0, 0]]]
@@ -363,12 +362,12 @@ public class ElementFunctions {
 				+ "MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node "
 				+ "MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node "
 				+ "CREATE element-[taskInProcess:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->node "
-				+ "SET element.status = {"+CONSTANT_STATUS_IN_PROCESS+"} "
-				+ "SET r."+ELEMENT_ATTR_START_PROCESSING_TIME+"=TIMESTAMP() "
-				+ "SET r."+ELEMENT_ATTR_WAITING_DURATION+"=r."+ELEMENT_ATTR_START_PROCESSING_TIME+"-"+"r."+ELEMENT_ATTR_START_WAITING_TIME+" "
+				+ "SET element."+ELEMENT_ATTR_STATUS+" = {"+CONSTANT_STATUS_IN_PROCESS+"} "
+				+ "SET r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"=TIMESTAMP() "
+				+ "SET r."+RELATIONSHIP_ATTR_WAITING_DURATION+"=r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"-"+"r."+RELATIONSHIP_ATTR_START_WAITING_TIME+" "
 				+ "SET taskInProcess = r "
-				+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(node."+NodeFunctions.NODE_ATTR_ALLOWED_WAITING_DURATION+"-r."+ELEMENT_ATTR_WAITING_DURATION+") "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"+r."+ELEMENT_ATTR_WAITING_DURATION+" "
+				+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(node."+NodeFunctions.NODE_ATTR_ALLOWED_WAITING_DURATION+"-r."+RELATIONSHIP_ATTR_WAITING_DURATION+") "
+				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"+r."+RELATIONSHIP_ATTR_WAITING_DURATION+" "
 				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"+1 "
 				+ "SET report."+NodeFunctions.REPORT_ATTR_AVERAGE_WAITING_DURATION+"=(report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"/report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+") "
 				+ "SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=(report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"-1) "
@@ -861,28 +860,28 @@ public class ElementFunctions {
 				properties.put(ELEMENT_ATTR_STATUS, CONSTANT_STATUS_WAITING);
 				StringBuilder qb = new StringBuilder();
 
-				qb.append("MATCH (firstNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[completedRel:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}), (nextNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+CONSTANT_NEXT_NODE_ID+"}}) "
-						+ "MATCH firstNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(firstNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") "
-						+ "MATCH nextNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(nextNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") "
-						+ "CREATE element-[nextNodeRel:"+RELATIONSHIP_LABEL_TASK_AT+" {"+ELEMENT_ATTR_WORKER_ID+":{"+ELEMENT_ATTR_WORKER_ID+"}}]->nextNode "
-						+ "CREATE element-[completedTask:COMPLETED_TASK]->firstNode "
-						+ "SET element."+ELEMENT_ATTR_FILE_POINTER+" = {"+ELEMENT_ATTR_FILE_POINTER+"} "
-						+ "SET element."+ELEMENT_ATTR_EXTRA1+" = {"+ELEMENT_ATTR_EXTRA1+"} "
-						+ "SET element."+ELEMENT_ATTR_EXTRA2+" = {"+ELEMENT_ATTR_EXTRA2+"} "
-						+ "SET element."+ELEMENT_ATTR_EXTRA3+" = {"+ELEMENT_ATTR_EXTRA3+"} "
-						+ "SET element."+ELEMENT_ATTR_STATUS+" = {"+ELEMENT_ATTR_STATUS+"} " 
-						+ "SET completedRel."+ELEMENT_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() "
-						+ "SET nextNodeRel."+ELEMENT_ATTR_START_WAITING_TIME+"=TIMESTAMP() "
-						+ "SET completedRel."+ELEMENT_ATTR_PROCESS_DURATION+"=completedRel."+ELEMENT_ATTR_END_PROCESSING_TIME+"-completedRel."+ELEMENT_ATTR_START_PROCESSING_TIME+" "
-						+ "SET completedTask=completedRel "
-						+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(node."+NodeFunctions.NODE_ATTR_ALLOWED_PROCESS_DURATION+"-completedRel."+ELEMENT_ATTR_PROCESS_DURATION+") "
-						+ "WITH completedRel, firstNodeReport, nextNodeReport "
-						+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"=firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"+completedRel."+ELEMENT_ATTR_PROCESS_DURATION+" "
-						+ "SET nextNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=nextNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 "
-						+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_AVERAGE_PROCESS_DURATION+"=(firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"/firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+") "
-						+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(firstNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"-1) "
-						+ "SET nextNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=(nextNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1) "
-						+ "DELETE completedRel;");
+				qb.append("MATCH (firstNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[completedRel:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}), (nextNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+CONSTANT_NEXT_NODE_ID+"}}) ");
+				qb.append("MATCH firstNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(firstNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") ");
+				qb.append("MATCH nextNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(nextNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") ");
+				qb.append("CREATE element-[nextNodeRel:"+RELATIONSHIP_LABEL_TASK_AT+" {"+ELEMENT_ATTR_WORKER_ID+":{"+ELEMENT_ATTR_WORKER_ID+"}}]->nextNode ");
+				qb.append("CREATE element-[completedTask:"+RELATIONSHIP_LABEL_COMPLETED_TASK+"]->firstNode ");
+				qb.append("SET element."+ELEMENT_ATTR_FILE_POINTER+" = {"+ELEMENT_ATTR_FILE_POINTER+"} ");
+				qb.append("SET element."+ELEMENT_ATTR_EXTRA1+" = {"+ELEMENT_ATTR_EXTRA1+"} ");
+				qb.append("SET element."+ELEMENT_ATTR_EXTRA2+" = {"+ELEMENT_ATTR_EXTRA2+"} ");
+				qb.append("SET element."+ELEMENT_ATTR_EXTRA3+" = {"+ELEMENT_ATTR_EXTRA3+"} ");
+				qb.append("SET element."+ELEMENT_ATTR_STATUS+" = {"+ELEMENT_ATTR_STATUS+"} ");
+				qb.append("SET completedRel."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() ");
+				qb.append("SET nextNodeRel."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
+				qb.append("SET completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+"=completedRel."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"-completedRel."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+" ");
+				qb.append("SET completedTask=completedRel ");
+				qb.append("SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(node."+NodeFunctions.NODE_ATTR_ALLOWED_PROCESS_DURATION+"-completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+") ");
+				qb.append("WITH completedRel, firstNodeReport, nextNodeReport ");
+				qb.append("SET firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"=firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"+completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+" ");
+				qb.append("SET nextNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=nextNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 ");
+				qb.append("SET firstNodeReport."+NodeFunctions.REPORT_ATTR_AVERAGE_PROCESS_DURATION+"=(firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"/firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+") ");
+				qb.append("SET firstNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(firstNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"-1) ");
+				qb.append("SET nextNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=(nextNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1) ");
+				qb.append("DELETE completedRel;");
 				dbQueryStat = neo4j.sendCypherBooleanResult(qb.toString(), properties);
 			} else {
 				return "Node: " + nextNodeId + " Does Not Exist";
@@ -951,13 +950,13 @@ public class ElementFunctions {
 						+ "CREATE element-[nextNodeRel:"+RELATIONSHIP_LABEL_TASK_AT+" {"+ELEMENT_ATTR_WORKER_ID+":{"+ELEMENT_ATTR_WORKER_ID+"}}]->nextNode "
 						+ "CREATE element-[completedTask:"+RELATIONSHIP_LABEL_COMPLETED_TASK+"]->firstNode "
 						+ "SET element."+ELEMENT_ATTR_STATUS+" = {"+ELEMENT_ATTR_STATUS+"} " 
-						+ "SET completedRel."+ELEMENT_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() "
-						+ "SET nextNodeRel."+ELEMENT_ATTR_START_WAITING_TIME+"=TIMESTAMP() "
-						+ "SET completedRel."+ELEMENT_ATTR_PROCESS_DURATION+"=completedRel."+ELEMENT_ATTR_END_PROCESSING_TIME+"-completedRel."+ELEMENT_ATTR_START_PROCESSING_TIME+" "
+						+ "SET completedRel."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() "
+						+ "SET nextNodeRel."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() "
+						+ "SET completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+"=completedRel."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"-completedRel."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+" "
 						+ "SET completedTask=completedRel "
-						+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(firstNode."+NodeFunctions.NODE_ATTR_ALLOWED_PROCESS_DURATION+"-completedRel."+ELEMENT_ATTR_PROCESS_DURATION+") "
+						+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(firstNode."+NodeFunctions.NODE_ATTR_ALLOWED_PROCESS_DURATION+"-completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+") "
 						+ "WITH completedRel, firstNodeReport, nextNodeReport "
-						+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"=firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"+completedRel."+ELEMENT_ATTR_PROCESS_DURATION+" "
+						+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"=firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"+completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+" "
 						+ "SET nextNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=nextNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 "
 						+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_AVERAGE_PROCESS_DURATION+"=(firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"/firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+") "
 						+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(firstNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"-1) "
@@ -997,7 +996,7 @@ public class ElementFunctions {
 		
 		StringBuilder qb = new StringBuilder();
 		qb.append("MATCH (:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]-(:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) ");
-		qb.append("WHERE NOT HAS (r."+ELEMENT_ATTR_WORKER_ID+") ");
+//		qb.append("WHERE NOT HAS (r."+ELEMENT_ATTR_WORKER_ID+") ");
 		qb.append("SET r."+ELEMENT_ATTR_WORKER_ID+"={"+ELEMENT_ATTR_WORKER_ID+"} ");
 		qb.append("RETURN COUNT(r) AS count;");
 		
@@ -1052,7 +1051,7 @@ public class ElementFunctions {
 	 * @param elementId
 	 * @param workerId
 	 * @return Status
-	 */
+	 *//*
 	public String replaceWorkerOfElement(String nodeId, String elementId, String workerId) {
 		if(!bpo.getElementFunctions().isElementExist(elementId)) {
 			return NOTIFICATION_ELEMENT_DOES_NOT_EXIST;
@@ -1079,7 +1078,7 @@ public class ElementFunctions {
 			} 
 		}
 		return "Failed, No Worker to Replace";
-	}
+	}*/
 	/**
 	 * Complete Element no Next Node
 	 * @param elementId
@@ -1128,12 +1127,12 @@ public class ElementFunctions {
 					+ "MATCH firstNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(firstNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") "
 					+ "CREATE element-[completedTask:"+RELATIONSHIP_LABEL_COMPLETED_TASK+"]->firstNode "
 					+ "SET element."+ELEMENT_ATTR_STATUS+" = {"+ELEMENT_ATTR_STATUS+"} " 
-					+ "SET completedRel."+ELEMENT_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() "
-					+ "SET completedRel."+ELEMENT_ATTR_PROCESS_DURATION+"=completedRel."+ELEMENT_ATTR_END_PROCESSING_TIME+"-completedRel."+ELEMENT_ATTR_START_PROCESSING_TIME+" "
+					+ "SET completedRel."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() "
+					+ "SET completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+"=completedRel."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"-completedRel."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+" "
 					+ "SET completedTask=completedRel "
 					+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=0 "
 					+ "WITH completedRel, firstNodeReport " 
-					+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"=firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"+completedRel."+ELEMENT_ATTR_PROCESS_DURATION+" "
+					+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"=firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"+completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+" "
 					+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_AVERAGE_PROCESS_DURATION+"=(firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"/firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+") "
 					+ "SET firstNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(firstNodeReport."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"-1) "
 					+ "DELETE completedRel;");
@@ -1199,32 +1198,31 @@ public class ElementFunctions {
 		
 		StringBuilder qb = new StringBuilder();
 		
-		qb.append("MATCH (element:"+NODE_LABEL_ELEMENT+")-[currentTask:"+RELATIONSHIP_LABEL_TASK_AT+"]->(node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("WITH TIMESTAMP() AS currentTimeStamp ");
+		qb.append("MATCH (element:"+NODE_LABEL_ELEMENT+")-[currentTask:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->(node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
 		qb.append("MATCH node<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") ");
 		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
 		qb.append("AND element."+ELEMENT_ATTR_ELEMENT_ID+"={"+ELEMENT_ATTR_ELEMENT_ID+"} ");
 		qb.append("AND currentTask."+ELEMENT_ATTR_WORKER_ID+"={"+ELEMENT_ATTR_WORKER_ID+"} ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_PROCESS_DURATION+"=currentTask."+ELEMENT_ATTR_END_PROCESSING_TIME+"-currentTask."+ELEMENT_ATTR_START_PROCESSING_TIME+" ");
+		qb.append("SET currentTask."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"=currentTimeStamp ");
+		qb.append("SET currentTask."+RELATIONSHIP_ATTR_PROCESS_DURATION+"=currentTimeStamp-currentTask."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+" ");
 		qb.append("CREATE element-[incompleteTask:"+RELATIONSHI_LABEL_BPO_INCOMPLETE_TASK_AT+"]->node ");
+		qb.append("CREATE element-[waitingTask:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
 		qb.append("SET incompleteTask=currentTask ");
 		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
 		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"-1 ");
-		qb.append("WITH currentTask, element ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_START_PROCESSING_TIME+"='' ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_END_PROCESSING_TIME+"='' ");
-		qb.append("REMOVE currentTask."+ELEMENT_ATTR_WORKER_ID+" ");
-		qb.append("REMOVE currentTask."+ELEMENT_ATTR_WAITING_DURATION+" ");
-		qb.append("REMOVE currentTask."+ELEMENT_ATTR_PROCESS_DURATION+" ");
+		qb.append("SET waitingTask."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
+		qb.append("SET waitingTask."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='' ");
+		qb.append("SET waitingTask."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='' ");
 		qb.append("SET element."+ELEMENT_ATTR_STATUS+"={"+CONSTANT_STATUS_WAITING+"} ");
-		qb.append("RETURN COUNT(currentTask) AS count;");
+		qb.append("DELETE currentTask ");
+		qb.append("RETURN COUNT(waitingTask) AS count;");
 		int result = (int) neo4j.sendCypherQuery(qb.toString(), properties).get(0).get("count");
 		if(result>0) {
 			return "Element Returned Successfully";
 		}
 		
-		return "Failed!, Either Node, Element or Worker Does Not Exist";
+		return "Failed!, Element Not In Process";
 	}
 	
 	/**
@@ -1243,24 +1241,26 @@ public class ElementFunctions {
 		
 		StringBuilder qb = new StringBuilder();
 		
-		qb.append("MATCH (element:"+NODE_LABEL_ELEMENT+")-[currentTask:"+RELATIONSHIP_LABEL_TASK_AT+"]->(node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("MATCH (element:"+NODE_LABEL_ELEMENT+")-[currentTask:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->(node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
 		qb.append("MATCH node<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") ");
 		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
 		qb.append("AND element."+ELEMENT_ATTR_ELEMENT_ID+"={"+ELEMENT_ATTR_ELEMENT_ID+"} ");
 		qb.append("AND currentTask."+ELEMENT_ATTR_WORKER_ID+"={"+ELEMENT_ATTR_WORKER_ID+"} ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_PROCESS_DURATION+"=currentTask."+ELEMENT_ATTR_END_PROCESSING_TIME+"-currentTask."+ELEMENT_ATTR_START_PROCESSING_TIME+" ");
+		qb.append("SET currentTask."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"=TIMESTAMP() ");
+		qb.append("SET currentTask."+RELATIONSHIP_ATTR_PROCESS_DURATION+"=currentTask."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"-currentTask."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+" ");
 		qb.append("CREATE element-[incompleteTask:"+RELATIONSHI_LABEL_BPO_INCOMPLETE_TASK_AT+"]->node ");
+		qb.append("CREATE element-[waitingTask:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
 		qb.append("SET incompleteTask=currentTask ");
 		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
 		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"-1 ");
-		qb.append("WITH currentTask, element ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_START_PROCESSING_TIME+"='' ");
-		qb.append("SET currentTask."+ELEMENT_ATTR_END_PROCESSING_TIME+"='' ");
-		qb.append("REMOVE currentTask."+ELEMENT_ATTR_WAITING_DURATION+" ");
-		qb.append("REMOVE currentTask."+ELEMENT_ATTR_PROCESS_DURATION+" ");
-		qb.append("SET element."+ELEMENT_ATTR_STATUS+"={"+CONSTANT_STATUS_WAITING+"};");
+		qb.append("SET waitingTask."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
+		qb.append("SET waitingTask."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='' ");
+		qb.append("SET waitingTask."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='' ");
+		qb.append("SET waitingTask."+ELEMENT_ATTR_WORKER_ID+"={"+ELEMENT_ATTR_WORKER_ID+"} ");
+		qb.append("SET element."+ELEMENT_ATTR_STATUS+"={"+CONSTANT_STATUS_WAITING+"} ");
+		qb.append("SET element."+ELEMENT_ATTR_STATUS+"={"+CONSTANT_STATUS_WAITING+"} ");
+		qb.append("DELETE currentTask ");
+		qb.append("RETURN COUNT(waitingTask) AS count");
 		
 		int result = (int) neo4j.sendCypherQuery(qb.toString(), properties).get(0).get("count");
 		if(result>0) {
