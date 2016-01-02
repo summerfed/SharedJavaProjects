@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 import com.svi.bpo.graph.BPO;
 import com.svi.bpo.graph.ElementFunctions;
 import com.svi.bpo.graph.ExceptionNodeFunctions;
@@ -33,6 +36,11 @@ public class Main {
 		ExceptionNodeFunctions exception = bpo.getExceptionNodeFunctions();
 		
 		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
+		System.out.println(node.insertNode("Node2", nodeName, cluster, stdUM, cost, time, time, num, num));
+		System.out.println(node.insertNode("Node3", nodeName, cluster, stdUM, cost, time, time, num, num));
+		node.buildExceptionFlow(cluster, nodeId, "Node2", "Node3");
+		
+		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
 		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode, exceptionName, time, time));
 		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode1, exceptionName, time, time));
 		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode2, exceptionName, time, time));
@@ -41,14 +49,18 @@ public class Main {
 		System.out.println(exception.buildExceptionFlow(nodeId, exceptionCode, exceptionCode1, exceptionCode2, exceptionCode3, exceptionCode4));
 		System.out.println(element.insertElement(elementId, priority, nodeId, workerId));
 		System.out.println(element.getElement(elementId, nodeId, workerId));
-		System.out.println(exception.moveElementToException(elementId, nodeId, exceptionCode));
+		System.out.println(element.viewElementsInNode(nodeId, 0, 1)[0].getNormalFlowLocation());
+		/*System.out.println(exception.moveElementToException(elementId, nodeId, exceptionCode));
 		System.out.println(exception.assignWorkerToExceptionElement(nodeId, exceptionCode, elementId, workerId));
 		System.out.println(exception.getExceptionElement(nodeId, exceptionCode, elementId, workerId).getElementId());
 		exception.completeExceptionElement(nodeId, exceptionCode, exceptionCode1, elementId, workerId);
 		System.out.println(exception.assignWorkerToExceptionElement(nodeId, exceptionCode1, elementId, workerId));
 		System.out.println(exception.getExceptionElement(nodeId, exceptionCode1, elementId, workerId).getElementId());
+		exception.viewExceptionElements(nodeId, exceptionCode1);*/
 //		exception.completeExceptionElement(nodeId, exceptionCode1, elementId, workerId);
 		
+		
+	
 	}
 	
 	//TODO

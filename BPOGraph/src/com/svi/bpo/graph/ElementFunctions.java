@@ -358,32 +358,35 @@ public class ElementFunctions {
 		properties.put(ELEMENT_ATTR_STATUS, CONSTANT_STATUS_WAITING);
 		
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[r:"+RELATIONSHIP_LABEL_TASK_AT+" {workerId:{"+ELEMENT_ATTR_WORKER_ID+"}}]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"},"+ELEMENT_ATTR_STATUS+":{"+ELEMENT_ATTR_STATUS+"}}) "
-				+ "MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node "
-				+ "MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node "
-				+ "CREATE element-[taskInProcess:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->node "
-				+ "SET element."+ELEMENT_ATTR_STATUS+" = {"+CONSTANT_STATUS_IN_PROCESS+"} "
-				+ "SET r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"=TIMESTAMP() "
-				+ "SET r."+RELATIONSHIP_ATTR_WAITING_DURATION+"=r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"-"+"r."+RELATIONSHIP_ATTR_START_WAITING_TIME+" "
-				+ "SET taskInProcess = r "
-				+ "SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(node."+NodeFunctions.NODE_ATTR_ALLOWED_WAITING_DURATION+"-r."+RELATIONSHIP_ATTR_WAITING_DURATION+") "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"+r."+RELATIONSHIP_ATTR_WAITING_DURATION+" "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"+1 "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_AVERAGE_WAITING_DURATION+"=(report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"/report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+") "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=(report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"-1) "
-				+ "SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"+1) "
-				+ "WITH r, node, element "
-				+ "DELETE r "
-				+ "RETURN node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS nodeId, "
-				+ "element."+ELEMENT_ATTR_ELEMENT_ID+" AS elementId, "
-				+ "element."+ELEMENT_ATTR_PRIORITY+" AS "+ELEMENT_ATTR_PRIORITY+", "
-				+ "element."+ELEMENT_ATTR_STATUS+" AS "+ELEMENT_ATTR_STATUS+", "
-				+ "element."+ELEMENT_ATTR_EXTRA1+" AS "+ELEMENT_ATTR_EXTRA1+", "
-				+ "element."+ELEMENT_ATTR_EXTRA2+" AS "+ELEMENT_ATTR_EXTRA2+", "
-				+ "element."+ELEMENT_ATTR_EXTRA3+" AS "+ELEMENT_ATTR_EXTRA3+", "
-				+ "element."+ELEMENT_ATTR_FILE_POINTER+" AS "+ELEMENT_ATTR_FILE_POINTER+", "
-				+ "element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+", "
-				+ "element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+";");
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
+		qb.append("WITH node ");
+		qb.append("MATCH node<-[r:"+RELATIONSHIP_LABEL_TASK_AT+" {workerId:{"+ELEMENT_ATTR_WORKER_ID+"}}]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"},"+ELEMENT_ATTR_STATUS+":{"+ELEMENT_ATTR_STATUS+"}}) ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node ");
+		qb.append("CREATE element-[taskInProcess:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->node ");
+		qb.append("SET element."+ELEMENT_ATTR_STATUS+" = {"+CONSTANT_STATUS_IN_PROCESS+"} ");
+		qb.append("SET r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"=TIMESTAMP() ");
+		qb.append("SET r."+RELATIONSHIP_ATTR_WAITING_DURATION+"=r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"-"+"r."+RELATIONSHIP_ATTR_START_WAITING_TIME+" ");
+		qb.append("SET taskInProcess = r ");
+		qb.append("SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(node."+NodeFunctions.NODE_ATTR_ALLOWED_WAITING_DURATION+"-r."+RELATIONSHIP_ATTR_WAITING_DURATION+") ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"+r."+RELATIONSHIP_ATTR_WAITING_DURATION+" ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_ELEMENT+"+1 ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_AVERAGE_WAITING_DURATION+"=(report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_DURATION+"/report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+") ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=(report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"-1) ");
+		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"=(report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS+"+1) ");
+		qb.append("WITH r, node, element ");
+		qb.append("DELETE r ");
+		qb.append("RETURN node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS nodeId, ");
+		qb.append("element."+ELEMENT_ATTR_ELEMENT_ID+" AS elementId, ");
+		qb.append("element."+ELEMENT_ATTR_PRIORITY+" AS "+ELEMENT_ATTR_PRIORITY+", ");
+		qb.append("element."+ELEMENT_ATTR_STATUS+" AS "+ELEMENT_ATTR_STATUS+", ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA1+" AS "+ELEMENT_ATTR_EXTRA1+", ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA2+" AS "+ELEMENT_ATTR_EXTRA2+", ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA3+" AS "+ELEMENT_ATTR_EXTRA3+", ");
+		qb.append("element."+ELEMENT_ATTR_FILE_POINTER+" AS "+ELEMENT_ATTR_FILE_POINTER+", ");
+		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+", ");
+		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+";");
 		ElementObject element = null;
 		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(qb.toString(), properties);
 		for(int i=0; i<dataReturned.size(); i++) {
@@ -638,8 +641,13 @@ public class ElementFunctions {
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")<-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+") ");
-		qb.append("MATCH node-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN +"]->(cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+" )");
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("MATCH path1=(:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:NEXT_FLOW*0..]->node ");
+		qb.append("MATCH path2=node-[:NEXT_FLOW*0..]->(:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
+		qb.append("WITH node, MAX(LENGTH(path1))+1 AS currentIdx, MAX(LENGTH(path2)) AS totalIdx ");
+		qb.append("MATCH node<-[r]-(element:"+NODE_LABEL_ELEMENT+") ");
+		qb.append("MATCH node-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN +"]->(cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+") ");
 		
 		if(!nodeId.contains("*")) {
 			qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
@@ -654,8 +662,8 @@ public class ElementFunctions {
 		qb.append("element."+ELEMENT_ATTR_FILE_POINTER+" AS "+ELEMENT_ATTR_FILE_POINTER+", ");
 		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+", ");
 		qb.append("r."+ELEMENT_ATTR_WORKER_ID+" AS "+ELEMENT_ATTR_WORKER_ID+", ");
-		
 		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION +",");
+		qb.append("currentIdx + ' Out of ' + (totalIdx+currentIdx) AS currentProcessLocation, ");
 		qb.append("CASE element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" <= cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME +" WHEN TRUE THEN TRUE WHEN FALSE THEN FALSE END AS "+ ELEMENT_VAR_CAN_MEET_DEADLINE + page +";");
 
 		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(qb.toString(), properties);
@@ -674,6 +682,7 @@ public class ElementFunctions {
 			long targetCompletionDuration = DataUtilities.toLongValue(data.get(ELEMENT_ATTR_TARGET_COMPLETION_DURATION));
 			long estimatedCompletionDuration = DataUtilities.toLongValue(data.get(ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION));
 			boolean canMeetDeadline = DataUtilities.toBoolean(data.get(ELEMENT_VAR_CAN_MEET_DEADLINE));
+			String normalFlowLocation = DataUtilities.toStringValue(data.get("currentProcessLocation"));
 			ElementObject element =  new ElementObject();
 			element.setElementId(elemId);
 			element.setNodeId(ndeId);
@@ -687,6 +696,7 @@ public class ElementFunctions {
 			element.setEstimatedCompletionDuration(estimatedCompletionDuration);
 			element.setWorkerId(data.get(ELEMENT_ATTR_WORKER_ID).toString());
 			element.setCanMeetDeadline(canMeetDeadline);
+			element.setNormalFlowLocation(normalFlowLocation);
 			dataToReturn[i] = element;
 		}
 		return dataToReturn;

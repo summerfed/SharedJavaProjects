@@ -1,16 +1,20 @@
 package com.svi.bpo.graph;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.svi.bpo.graph.notifications.BPONotifications;
 import com.svi.bpo.graph.obj.ClusterObject;
 import com.svi.bpo.graph.obj.NodeObject;
 import com.svi.bpo.graph.utils.DataUtilities;
 import com.svi.tools.neo4j.rest.service.Neo4jRestService;
 
 public class NodeFunctions {
+	private static final String RELATIONSHIP_LABEL_NEXT_FLOW = "NEXT_FLOW";
 	private static final String NODE_PROCESS_STATUS = "nodeProcessStatus";
 	protected static final String REPORT_ATTR_CURRENT_TOTAL_IN_PROCESS_ELEMENTS = "currentTotalInProcessElements";
 	protected static final String REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS = "currentTotalWaitingElements";
@@ -28,6 +32,8 @@ public class NodeFunctions {
 	protected static final String NODE_LABEL_BPO_NODE = "BPO_NODE";
 	protected static final String NODE_LABEL_CLUSTER = "BPO_CLUSTER";
 	protected static final String NODE_LABEL_BPO_REPORT = "BPO_NODE_REPORT";
+	
+	protected static final String VAR_EXCEPTION_CODE_COLLECTION = "exceptionCodeCollection";
 	
 	/*******************
 	 * NODE ATTRIBUTES *
@@ -190,6 +196,59 @@ public class NodeFunctions {
 		neo4j.sendCypherQuery(qb.toString(), properties);
 		
 		return NOTIFICATION_NODE_IS_ADDED_SUCCESSFULLY;
+	}
+	
+	public BPONotifications buildExceptionFlow(String cluster, String... followingNodeIds) {
+		List<String> tmp = new LinkedList<>(Arrays.asList(followingNodeIds));
+		if(checkIfExceptionCodesAllExist(cluster, tmp)) {
+			Map<String, Object> properties = new HashMap<>();
+			properties.put(CLUSTER_ATTR_ID, cluster);
+			StringBuilder qb = new StringBuilder();
+			qb.append("MATCH (node:"+NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_BPO_NODE_IN+"]->(cluster:"+NODE_LABEL_CLUSTER+") ");
+			qb.append("WHERE cluster."+CLUSTER_ATTR_ID+"={"+CLUSTER_ATTR_ID+"} ");
+			qb.append("WITH cluster, node ");
+			int flowNodeSize = followingNodeIds.length;
+			
+			StringBuilder mergeQuery = new StringBuilder();
+			for(int i=0; i<flowNodeSize; i++) {
+				String tmpVar = "node"+i;
+				properties.put(tmpVar, followingNodeIds[i]);
+				qb.append("MATCH cluster<-[:"+RELATIONSHIP_LABEL_BPO_NODE_IN+"]-("+tmpVar+":"+NODE_LABEL_BPO_NODE+" {"+NODE_ATTR_NODE_ID+":{"+tmpVar+"}}) ");
+				if(i>0) {
+					String prevNode = "node"+(i-1);
+					mergeQuery.append("MERGE "+prevNode+"-[:"+RELATIONSHIP_LABEL_NEXT_FLOW+"]->"+tmpVar+" ");
+				}
+			}
+			qb.append(mergeQuery);
+			boolean isSuccess = neo4j.sendCypherBooleanResult(qb.toString(), properties);
+			if(isSuccess) {
+				return BPONotifications.EXCEPTION_FLOW_CREATE_SUCCESS;
+			}
+		}
+		
+		return BPONotifications.EXCEPTION_LIST_DOES_NOT_EXIST;
+	}
+	
+	private boolean checkIfExceptionCodesAllExist(String cluster, List<String> exceptionCodesToCheck) {
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(CLUSTER_ATTR_ID, cluster);
+		properties.put(VAR_EXCEPTION_CODE_COLLECTION, exceptionCodesToCheck);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (node:"+NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_BPO_NODE_IN+"]->(cluster:"+NODE_LABEL_CLUSTER+") ");
+		qb.append("WHERE cluster."+CLUSTER_ATTR_ID+"={"+CLUSTER_ATTR_ID+"} AND node."+NODE_ATTR_NODE_ID+" IN {"+VAR_EXCEPTION_CODE_COLLECTION+"} ");
+		qb.append("WITH COLLECT (node."+NODE_ATTR_NODE_ID+") AS nodeIds ");
+		qb.append("RETURN ALL(x IN {"+VAR_EXCEPTION_CODE_COLLECTION+"} WHERE x IN nodeIds) AS result;");
+		
+		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
+		if(dbResult.size()>0) {
+			Map<String, Object> dbRow = dbResult.get(0);
+			boolean result = DataUtilities.toBoolean(dbRow.get("result"));
+			if(result == true) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/******************

@@ -13,6 +13,7 @@ public class ElementObject {
 	private long estimatedCompletionDuration;
 	private boolean canMeetDeadline;
 	private String workerId;//added by jm
+	private String normalFlowLocation = "N/A";
 	/**
 	 * @return the nodeId
 	 */
@@ -146,5 +147,11 @@ public class ElementObject {
 	}
 	public void setCanMeetDeadline(boolean canMeetDeadline) {
 		this.canMeetDeadline = canMeetDeadline;
+	}
+	public String getNormalFlowLocation() {
+		return normalFlowLocation;
+	}
+	public void setNormalFlowLocation(String normalFlowLocation) {
+		this.normalFlowLocation = normalFlowLocation;
 	}
 }

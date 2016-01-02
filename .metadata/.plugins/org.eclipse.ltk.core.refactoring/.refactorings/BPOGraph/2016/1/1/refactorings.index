@@ -12,3 +12,8 @@
 1451642347925	Rename field 'CONSTANT_STATUS_EXCEPTION'
 1451657389531	Extract constant 'CONSTANT_NEXT_EXCEPTION_CODE'
 1451660253518	Extract constant 'EXCEPTION_ATTR_UUID'
+1451714685823	Rename local variable 'followingExceptionCodes'
+1451715503762	Extract constant 'RELATIONSHIP_LABEL_NEXT_FLOW'
+1451715680091	Rename local variable 'flowExceptionSize'
+1451715691424	Rename local variable 'prevException'
+1451716206968	Encapsulate field 'normalFlowLocation'

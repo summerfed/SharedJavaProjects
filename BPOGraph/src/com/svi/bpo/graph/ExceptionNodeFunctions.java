@@ -213,6 +213,26 @@ public class ExceptionNodeFunctions {
 		
 		return dataToReturn;
 	}
+	
+	public void viewExceptionElements(String nodeId, String exceptionCode) {
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
+		properties.put(EXCEPTION_NODE_ATTR_ID, exceptionCode);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (exception:BPO_EXCEPTION_NODE) ");
+		qb.append("MATCH path1=(:BPO_EXCEPTION_NODE)-[:NEXT_FLOW*0..]->exception ");
+		qb.append("MATCH path2=exception-[:NEXT_FLOW*0..]->(:BPO_EXCEPTION_NODE) ");
+		qb.append("WHERE exception."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
+		qb.append("WITH exception, MAX(LENGTH(path1))+1 AS currentIdx, MAX(LENGTH(path2)) AS totalIdx ");
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(exception:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")-[]->exception ");
+		qb.append("RETURN element, currentIdx + ' Out of ' + (totalIdx+currentIdx) AS currentProcessLocation;");
+		System.out.println(neo4j.sendCypherQuery(qb.toString(), properties));
+		
+	}
+	
+	
 	/**
 	 * Check if Exception Node Exist by Matching @param exceptionCode with Existing Nodes 
 	 * @param exceptionId
