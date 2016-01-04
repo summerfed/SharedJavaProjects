@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="ImageViewer" default="all" basedir="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph">
+	<description>
+		This is build file for GWT module 'com.svi.bpo.BpoAdmin' deployment.
+		GWT Designer generates it each time when you initiate deployment.
+		
+		You can use this file later for manual deployment, but keep in mind, that
+		classpath is hardcoded in it, so after changes in classpath you should
+		regenerate build file.
+	</description>
+
+	<property name="gwt.home" value="C:/Documents and Settings/jhinolan/Desktop/gwt-2.5.1" />
+	<property name="gwt.module.id" value="com.svi.bpo.BpoAdmin" />
+	<property name="war.name" value="BPOAdminToolGraph122915-6pm.war" />
+
+	<target name="jars" description="Package up the module project and required projects as jars">
+		<mkdir dir="war/WEB-INF/lib" />
+		<!--=== BPOAdminTool Graph ===-->
+		<jar destfile='war/WEB-INF/lib/BPOAdminTool Graph.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/classes">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+		<copy todir='war/WEB-INF/lib'>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\lucene-analyzers-common-4.1.0.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\lucene-core-4.1.0.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\lucene-queries-4.1.0.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\lucene-queryparser-4.1.0.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\LuceneUtil.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\gwt-servlet.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\guava-18.0.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\commons-fileupload-1.3.1.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\ApacheLogging.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\INI.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\poi-3.10-FINAL.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\Neo4jRestUtility.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\json-20090211.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\BPOAdminTool Graph\war\WEB-INF\lib\jersey-bundle-1.19.jar"/>
+			<fileset file="C:\Documents and Settings\jhinolan\Desktop\gwt-2.5.1\gwt-dev.jar"/>
+			<fileset file="C:\Documents and Settings\jhinolan\Desktop\gwt-2.5.1\validation-api-1.0.0.GA-sources.jar"/>
+			<fileset file="C:\Documents and Settings\jhinolan\Desktop\gwt-2.5.1\validation-api-1.0.0.GA.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\Neo4jRestUtility\lib\jersey-bundle-1.19.jar"/>
+			<fileset file="C:\Documents and Settings\aenriquez\workspace\Neo4jRestUtility\lib\json-20090211.jar"/>
+		</copy>
+		<!--=== BPOGraph ===-->
+		<jar destfile='war/WEB-INF/lib/BPOGraph.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/BPOGraph/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/BPOGraph/bin">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+		<!--=== Neo4jRestUtility ===-->
+		<jar destfile='war/WEB-INF/lib/Neo4jRestUtility.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/Neo4jRestUtility/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/Neo4jRestUtility/bin">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+		<!--=== CryptoGWT ===-->
+		<jar destfile='war/WEB-INF/lib/CryptoGWT.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/CryptoGWT/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/CryptoGWT/war/WEB-INF/classes">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+		<!--=== FutureGWT ===-->
+		<jar destfile='war/WEB-INF/lib/FutureGWT.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/FutureGWT/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/FutureGWT/war/WEB-INF/classes">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+		<!--=== FutureGWT ===-->
+		<jar destfile='war/WEB-INF/lib/FutureGWT.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/FutureGWT/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/FutureGWT/war/WEB-INF/classes">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+		<!--=== SSOCookieGWT ===-->
+		<jar destfile='war/WEB-INF/lib/SSOCookieGWT.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/SSOCookieGWT/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/SSOCookieGWT/war/WEB-INF/classes">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+		<!--=== CryptoGWT ===-->
+		<jar destfile='war/WEB-INF/lib/CryptoGWT.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/CryptoGWT/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/CryptoGWT/war/WEB-INF/classes">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+		<!--=== FutureGWT ===-->
+		<jar destfile='war/WEB-INF/lib/FutureGWT.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/FutureGWT/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/FutureGWT/war/WEB-INF/classes">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>
+		<!--=== FutureGWT ===-->
+		<jar destfile='war/WEB-INF/lib/FutureGWT.jar'>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/FutureGWT/src">
+				<include name="**"/>
+			</fileset>
+			<fileset dir="C:/Documents and Settings/aenriquez/workspace/FutureGWT/war/WEB-INF/classes">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar>		
+	</target>
+
+	<target name="gwt-compile" description="Compile to JavaScript">
+		<java classname="com.google.gwt.dev.Compiler" fork="yes" failonerror="true" maxmemory="1024m">
+			<classpath>
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/src" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOGraph/src" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/Neo4jRestUtility/src" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/CryptoGWT/src" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/FutureGWT/src" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/SSOCookieGWT/src" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/classes" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/lucene-analyzers-common-4.1.0.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/lucene-core-4.1.0.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/lucene-queries-4.1.0.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/lucene-queryparser-4.1.0.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/LuceneUtil.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/gwt-servlet.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/guava-18.0.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/commons-fileupload-1.3.1.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/ApacheLogging.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/INI.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/poi-3.10-FINAL.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/Neo4jRestUtility.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/json-20090211.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOAdminTool Graph/war/WEB-INF/lib/jersey-bundle-1.19.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/CryptoGWT/war/WEB-INF/classes" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/FutureGWT/war/WEB-INF/classes" />
+				<pathelement location="C:/Documents and Settings/jhinolan/Desktop/gwt-2.5.1/gwt-user.jar" />
+				<pathelement location="C:/Documents and Settings/jhinolan/Desktop/gwt-2.5.1/gwt-dev.jar" />
+				<pathelement location="C:/Documents and Settings/jhinolan/Desktop/gwt-2.5.1/validation-api-1.0.0.GA-sources.jar" />
+				<pathelement location="C:/Documents and Settings/jhinolan/Desktop/gwt-2.5.1/validation-api-1.0.0.GA.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/SSOCookieGWT/war/WEB-INF/classes" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/BPOGraph/bin" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/Neo4jRestUtility/bin" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/Neo4jRestUtility/lib/jersey-bundle-1.19.jar" />
+				<pathelement location="C:/Documents and Settings/aenriquez/workspace/Neo4jRestUtility/lib/json-20090211.jar" />
+				<pathelement location="C:/Documents and Settings/jhinolan/Desktop/gwt-2.5.1/gwt-dev.jar" />
+			</classpath>
+			<arg value="-style"/>
+			<arg value="DETAILED"/>
+			<arg value="${gwt.module.id}" />
+		</java>
+	</target>
+
+	<target name="war" depends="gwt-compile, jars">
+		<delete file="${war.name}" />
+		<jar destfile="${war.name}" basedir="war" duplicate="preserve" />
+	</target>
+	
+	<target name="deploy" depends="war">
+		<move file="${war.name}" todir="C:/Documents and Settings/jhinolan/Desktop" />
+	</target>
+
+	<target name="all" depends="deploy" />
+
+</project>

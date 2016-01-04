@@ -38,7 +38,7 @@ public class Main {
 		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
 		System.out.println(node.insertNode("Node2", nodeName, cluster, stdUM, cost, time, time, num, num));
 		System.out.println(node.insertNode("Node3", nodeName, cluster, stdUM, cost, time, time, num, num));
-		node.buildExceptionFlow(cluster, nodeId, "Node2", "Node3");
+		node.buildFlow(cluster, nodeId, "Node2", "Node3");
 		
 		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
 		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode, exceptionName, time, time));
@@ -46,7 +46,7 @@ public class Main {
 		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode2, exceptionName, time, time));
 		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode3, exceptionName, time, time));
 		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode4, exceptionName, time, time));
-		System.out.println(exception.buildExceptionFlow(nodeId, exceptionCode, exceptionCode1, exceptionCode2, exceptionCode3, exceptionCode4));
+		System.out.println(exception.buildFlow(nodeId, exceptionCode, exceptionCode1, exceptionCode2, exceptionCode3, exceptionCode4));
 		System.out.println(element.insertElement(elementId, priority, nodeId, workerId));
 		System.out.println(element.getElement(elementId, nodeId, workerId));
 		System.out.println(element.viewElementsInNode(nodeId, 0, 1)[0].getNormalFlowLocation());

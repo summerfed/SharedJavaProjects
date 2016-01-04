@@ -1,0 +1,18 @@
+[BPO1]
+	ENDPOINT = http://192.168.160.112:8080/BPO_3_15_Java6_12_03_14_1129/BPOWebService?wsdl
+	ENDPOINT_LABEL = Test BPOAdmin Endpoint
+[BPO2]
+	ENDPOINT = http://192.168.160.132:8080/BPO_3_16/BPOWebService?WSDL
+	ENDPOINT_LABEL = Test BPOAdmin Endpoint 2
+[BPO3]
+	ENDPOINT = http://192.168.128.151:8080/BPO3.17_WBS_Test/BPOWebService?wsdl
+	ENDPOINT_LABEL = Test Server Local
+[BPO4]
+	ENDPOINT = http://52.8.189.115:8080/BPO3.17_WBS_Test/BPOWebService?wsdl
+	ENDPOINT_LABEL = Test Server Public
+[BPOTEST1]
+	ENDPOINT = http://localhost:7474
+	ENDPOINT_LABEL = Test Server Local
+[BPOTEST2]
+	ENDPOINT = http://localhost:7474
+	ENDPOINT_LABEL = Test Server Public

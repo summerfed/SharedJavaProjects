@@ -17,4 +17,5 @@
 <fullyQualifiedTypeName name="java.util.List"/>
 <fullyQualifiedTypeName name="com.svi.bpo.graph.NodeFunctions"/>
 <fullyQualifiedTypeName name="com.svi.bpo.graph.utils.DataUtilities"/>
+<fullyQualifiedTypeName name="com.google.gwt.activity.shared.FilteredActivityMapper.Filter"/>
 </qualifiedTypeNameHistroy>

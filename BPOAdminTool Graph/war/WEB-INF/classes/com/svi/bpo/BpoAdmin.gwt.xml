@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<module rename-to='bpo'>
+	<!-- Inherit the core Web Toolkit stuff. -->
+	<inherits name='com.google.gwt.user.User' />
+	<inherits name="com.svi.ssocookie.SSOCookie" />
+
+	<entry-point class='com.svi.bpo.client.BpoAdmin' />
+
+	<!-- Specify the paths for translatable code -->
+	<source path='client' />
+	<source path='objects' />
+	<source path='constants' />
+	<source path='com.svi.SSO.client' />
+
+
+</module>

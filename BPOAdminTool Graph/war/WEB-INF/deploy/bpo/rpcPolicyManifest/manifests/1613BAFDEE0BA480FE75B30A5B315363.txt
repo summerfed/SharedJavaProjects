@@ -1,0 +1,2 @@
+serviceClass: com.svi.bpo.client.svc.LginSvc
+path: E5894955D29F47B45AD4B9338BEBEC3D.gwt.rpc

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repositories-view>
+	<repository id=":pserver:mmoreno@192.168.160.184:/home/disk-1/CVS_root">
+		<module path="/" lastAcessTime="1451893255593">
+		</module>
+		<module path="BPOGraph" lastAcessTime="1451890336250">
+			<tag name="Version4_0_2" type="branch"/>
+			<tag name="Version4_0_1" type="version"/>
+			<tag name="Version4_0_0" type="version"/>
+		</module>
+	</repository>
+</repositories-view>
