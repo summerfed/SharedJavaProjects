@@ -1,0 +1,7 @@
+1451954332625	Rename local variable 'req'
+1451954338531	Rename local variable 'resp'
+1451959610734	Extract constant 'TIME'
+1451959664562	Extract constant 'WAITING'
+1451959672062	Extract constant 'IN_PROCESS'
+1451959920656	Encapsulate field 'bpo'
+1451975144484	Extract method 'setCurrentData'

@@ -1,5 +1,7 @@
 package com.svi.bpo.graph;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +68,17 @@ public class ElementFunctions {
 	protected static final String NOTIFICATION_FAILED_THERE_IS_WORKER_ASSIGNED_TO_THE_ELEMENT = "Failed, There is Worker Assigned to the Element";
 	protected static final String NOTIFICATION_WORKER_ADDED_SUCCESSFULLY = "Worker Added Successfully";
 	
-
+	protected static final String ELEMENT_PROCESSING_STATE_3_NAME = "processingState3";
+	protected static final String ELEMENT_PROCESSING_STATE_3_DESCRIPTION = "Element Exceed Target Process Duration";
+	
+	protected static final String ELEMENT_PROCESSING_STATE_2_NAME = "processingState2";
+	protected static final String ELEMENT_PROCESSING_STATE_2_DESCRIPTION = "Element is 20% Away from Completion Time";
+	
+	protected static final String ELEMENT_PROCESSING_STATE_1_NAME = "processingState1";
+	protected static final String ELEMENT_PROCESSING_STATE_1_DESCRIPTION = "Element is Within Target Duration";
+	
+	private static SimpleDateFormat df = new SimpleDateFormat("MMM'-'dd'-'yyyy'_'hh':'mm':'a");
+	
 	private Neo4jRestService neo4j;
 	private BPO bpo;
 	
@@ -440,17 +452,9 @@ public class ElementFunctions {
 		
 		StringBuilder qb = new StringBuilder();
 		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+") "
-				+ "WHERE r."+ELEMENT_ATTR_WORKER_ID+"={"+ELEMENT_ATTR_WORKER_ID+"} "+extWhere
-				+ "RETURN node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS nodeId, "
-				+ "element."+ELEMENT_ATTR_ELEMENT_ID+" AS elementId, "
-				+ "element."+ELEMENT_ATTR_PRIORITY+" AS "+ELEMENT_ATTR_PRIORITY+", "
-				+ "element."+ELEMENT_ATTR_STATUS+" AS "+ELEMENT_ATTR_STATUS+", "
-				+ "element."+ELEMENT_ATTR_EXTRA1+" AS "+ELEMENT_ATTR_EXTRA1+", "
-				+ "element."+ELEMENT_ATTR_EXTRA2+" AS "+ELEMENT_ATTR_EXTRA2+", "
-				+ "element."+ELEMENT_ATTR_EXTRA3+" AS "+ELEMENT_ATTR_EXTRA3+", "
-				+ "element."+ELEMENT_ATTR_FILE_POINTER+" AS "+ELEMENT_ATTR_FILE_POINTER+", "
-				+ "element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+", "
-				+ "element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+";");
+				+ "WHERE r."+ELEMENT_ATTR_WORKER_ID+"={"+ELEMENT_ATTR_WORKER_ID+"} "+extWhere);
+				
+		viewElementsReturnTag(qb);
 		
 		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(qb.toString(), properties);
 		ElementObject[] dataToReturn = new ElementObject[dataReturned.size()];
@@ -469,6 +473,8 @@ public class ElementFunctions {
 			long targetCompletionDuration = tmpTCD.longValue();
 			Number tmpECD = (Number)data.get(ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION);
 			long estimatedCompletionDuration = tmpECD.longValue();
+			long startWaitingDuration = DataUtilities.toLongValue(data.get(RELATIONSHIP_ATTR_START_WAITING_TIME));
+			long endProcessingDuration = DataUtilities.toLongValue(data.get(RELATIONSHIP_ATTR_END_PROCESSING_TIME));
 			
 			ElementObject element =  new ElementObject();
 			element.setElementId(elemId);
@@ -481,11 +487,16 @@ public class ElementFunctions {
 			element.setFilePointer(filePointer);
 			element.setTargetCompletionDuration(targetCompletionDuration);
 			element.setEstimatedCompletionDuration(estimatedCompletionDuration);
-			
+			setArrivalAndCompletionTime(startWaitingDuration,
+					endProcessingDuration, element);
+			setProcessingState(targetCompletionDuration,
+					estimatedCompletionDuration, element);
 			dataToReturn[i] = element;
 		}
 		return dataToReturn;
 	}
+
+	
 	
 	/**
 	 * View Elements with Assigned Worker
@@ -506,17 +517,8 @@ public class ElementFunctions {
 		
 		StringBuilder qb = new StringBuilder();
 		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+") "
-				+ "WHERE HAS(r."+ELEMENT_ATTR_WORKER_ID+") "+extWhere
-				+ "RETURN node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS nodeId, "
-				+ "element."+ELEMENT_ATTR_ELEMENT_ID+" AS elementId, "
-				+ "element."+ELEMENT_ATTR_PRIORITY+" AS "+ELEMENT_ATTR_PRIORITY+", "
-				+ "element."+ELEMENT_ATTR_STATUS+" AS "+ELEMENT_ATTR_STATUS+", "
-				+ "element."+ELEMENT_ATTR_EXTRA1+" AS "+ELEMENT_ATTR_EXTRA1+", "
-				+ "element."+ELEMENT_ATTR_EXTRA2+" AS "+ELEMENT_ATTR_EXTRA2+", "
-				+ "element."+ELEMENT_ATTR_EXTRA3+" AS "+ELEMENT_ATTR_EXTRA3+", "
-				+ "element."+ELEMENT_ATTR_FILE_POINTER+" AS "+ELEMENT_ATTR_FILE_POINTER+", "
-				+ "element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+", "
-				+ "element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+";");
+				+ "WHERE HAS(r."+ELEMENT_ATTR_WORKER_ID+") "+extWhere);
+				viewElementsReturnTag(qb);
 		
 		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(qb.toString(), properties);
 		ElementObject[] dataToReturn = new ElementObject[dataReturned.size()];
@@ -535,6 +537,8 @@ public class ElementFunctions {
 			long targetCompletionDuration = tmpTCD.longValue();
 			Number tmpECD = (Number)data.get(ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION);
 			long estimatedCompletionDuration = tmpECD.longValue();
+			long startWaitingDuration = DataUtilities.toLongValue(data.get(RELATIONSHIP_ATTR_START_WAITING_TIME));
+			long endProcessingDuration = DataUtilities.toLongValue(data.get(RELATIONSHIP_ATTR_END_PROCESSING_TIME));
 			
 			ElementObject element =  new ElementObject();
 			element.setElementId(elemId);
@@ -547,7 +551,10 @@ public class ElementFunctions {
 			element.setFilePointer(filePointer);
 			element.setTargetCompletionDuration(targetCompletionDuration);
 			element.setEstimatedCompletionDuration(estimatedCompletionDuration);
-			
+			setArrivalAndCompletionTime(startWaitingDuration,
+					endProcessingDuration, element);
+			setProcessingState(targetCompletionDuration,
+					estimatedCompletionDuration, element);
 			dataToReturn[i] = element;
 		}
 		return dataToReturn;
@@ -572,17 +579,9 @@ public class ElementFunctions {
 		
 		StringBuilder qb = new StringBuilder();
 		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+") "
-				+ "WHERE NOT HAS(r."+ELEMENT_ATTR_WORKER_ID+") "+extWhere
-				+ "RETURN node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS nodeId, "
-				+ "element."+ELEMENT_ATTR_ELEMENT_ID+" AS elementId, "
-				+ "element."+ELEMENT_ATTR_PRIORITY+" AS "+ELEMENT_ATTR_PRIORITY+", "
-				+ "element."+ELEMENT_ATTR_STATUS+" AS "+ELEMENT_ATTR_STATUS+", "
-				+ "element."+ELEMENT_ATTR_EXTRA1+" AS "+ELEMENT_ATTR_EXTRA1+", "
-				+ "element."+ELEMENT_ATTR_EXTRA2+" AS "+ELEMENT_ATTR_EXTRA2+", "
-				+ "element."+ELEMENT_ATTR_EXTRA3+" AS "+ELEMENT_ATTR_EXTRA3+", "
-				+ "element."+ELEMENT_ATTR_FILE_POINTER+" AS "+ELEMENT_ATTR_FILE_POINTER+", "
-				+ "element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+", "
-				+ "element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+";");
+				+ "WHERE NOT HAS(r."+ELEMENT_ATTR_WORKER_ID+") "+extWhere);
+		viewElementsReturnTag(qb);
+		
 		
 		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(qb.toString(), properties);
 		ElementObject[] dataToReturn = new ElementObject[dataReturned.size()];
@@ -601,6 +600,8 @@ public class ElementFunctions {
 			long targetCompletionDuration = tmpTCD.longValue();
 			Number tmpECD = (Number)data.get(ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION);
 			long estimatedCompletionDuration = tmpECD.longValue();
+			long startWaitingDuration = DataUtilities.toLongValue(data.get(RELATIONSHIP_ATTR_START_WAITING_TIME));
+			long endProcessingDuration = DataUtilities.toLongValue(data.get(RELATIONSHIP_ATTR_END_PROCESSING_TIME));
 			
 			ElementObject element =  new ElementObject();
 			element.setElementId(elemId);
@@ -613,6 +614,13 @@ public class ElementFunctions {
 			element.setFilePointer(filePointer);
 			element.setTargetCompletionDuration(targetCompletionDuration);
 			element.setEstimatedCompletionDuration(estimatedCompletionDuration);
+			
+			
+			setArrivalAndCompletionTime(startWaitingDuration,
+					endProcessingDuration, element);
+			
+			setProcessingState(targetCompletionDuration,
+					estimatedCompletionDuration, element);
 			
 			dataToReturn[i] = element;
 		}
@@ -662,9 +670,10 @@ public class ElementFunctions {
 		qb.append("element."+ELEMENT_ATTR_FILE_POINTER+" AS "+ELEMENT_ATTR_FILE_POINTER+", ");
 		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+", ");
 		qb.append("r."+ELEMENT_ATTR_WORKER_ID+" AS "+ELEMENT_ATTR_WORKER_ID+", ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_WAITING_TIME+" AS "+RELATIONSHIP_ATTR_START_WAITING_TIME+", ");
+		qb.append("r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+" AS "+RELATIONSHIP_ATTR_END_PROCESSING_TIME+", ");
 		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION +",");
-		qb.append("currentIdx + ' Out of ' + (totalIdx+currentIdx) AS currentProcessLocation, ");
-		qb.append("CASE element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" <= cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME +" WHEN TRUE THEN TRUE WHEN FALSE THEN FALSE END AS "+ ELEMENT_VAR_CAN_MEET_DEADLINE + page +";");
+		qb.append("currentIdx + ' Out of ' + (totalIdx+currentIdx) AS currentProcessLocation "+ page +";");
 
 		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(qb.toString(), properties);
 		ElementObject[] dataToReturn = new ElementObject[dataReturned.size()];
@@ -681,8 +690,9 @@ public class ElementFunctions {
 			String filePointer =  data.get(ELEMENT_ATTR_FILE_POINTER).toString();
 			long targetCompletionDuration = DataUtilities.toLongValue(data.get(ELEMENT_ATTR_TARGET_COMPLETION_DURATION));
 			long estimatedCompletionDuration = DataUtilities.toLongValue(data.get(ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION));
-			boolean canMeetDeadline = DataUtilities.toBoolean(data.get(ELEMENT_VAR_CAN_MEET_DEADLINE));
 			String normalFlowLocation = DataUtilities.toStringValue(data.get("currentProcessLocation"));
+			long startWaitingDuration = DataUtilities.toLongValue(data.get(RELATIONSHIP_ATTR_START_WAITING_TIME));
+			long endProcessingDuration = DataUtilities.toLongValue(data.get(RELATIONSHIP_ATTR_END_PROCESSING_TIME));
 			ElementObject element =  new ElementObject();
 			element.setElementId(elemId);
 			element.setNodeId(ndeId);
@@ -695,12 +705,21 @@ public class ElementFunctions {
 			element.setTargetCompletionDuration(targetCompletionDuration);
 			element.setEstimatedCompletionDuration(estimatedCompletionDuration);
 			element.setWorkerId(data.get(ELEMENT_ATTR_WORKER_ID).toString());
-			element.setCanMeetDeadline(canMeetDeadline);
 			element.setNormalFlowLocation(normalFlowLocation);
+			
+			
+			setArrivalAndCompletionTime(startWaitingDuration,
+					endProcessingDuration, element);
+			
+			setProcessingState(targetCompletionDuration,
+					estimatedCompletionDuration, element);
+			
 			dataToReturn[i] = element;
 		}
 		return dataToReturn;
 	}
+
+	
 	
 	/********************
 	 * UPDATE FUNCTIONS *
@@ -1323,5 +1342,60 @@ public class ElementFunctions {
 			return false; 
 		} 
 		return true;
+	}
+
+	private void viewElementsReturnTag(StringBuilder qb) {
+		qb.append("RETURN node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS nodeId, ");
+		qb.append("element."+ELEMENT_ATTR_ELEMENT_ID+" AS elementId, ");
+		qb.append("element."+ELEMENT_ATTR_PRIORITY+" AS "+ELEMENT_ATTR_PRIORITY+", ");
+		qb.append("element."+ELEMENT_ATTR_STATUS+" AS "+ELEMENT_ATTR_STATUS+", ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA1+" AS "+ELEMENT_ATTR_EXTRA1+", ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA2+" AS "+ELEMENT_ATTR_EXTRA2+", ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA3+" AS "+ELEMENT_ATTR_EXTRA3+", ");
+		qb.append("element."+ELEMENT_ATTR_FILE_POINTER+" AS "+ELEMENT_ATTR_FILE_POINTER+", ");
+		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+", ");
+		qb.append("r."+ELEMENT_ATTR_WORKER_ID+" AS "+ELEMENT_ATTR_WORKER_ID+", ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_WAITING_TIME+" AS "+RELATIONSHIP_ATTR_START_WAITING_TIME+", ");
+		qb.append("r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+" AS "+RELATIONSHIP_ATTR_END_PROCESSING_TIME+", ");
+		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" AS "+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION +",");
+		qb.append("currentIdx + ' Out of ' + (totalIdx+currentIdx) AS currentProcessLocation;");
+	}
+	
+	private void setArrivalAndCompletionTime(long startWaitingDuration,
+			long endProcessingDuration, ElementObject element) {
+		String arrivalTime = df.format(new Date(startWaitingDuration));
+		String completionTime = "N/A";
+		if(endProcessingDuration>0) {
+			completionTime = df.format(new Date(endProcessingDuration));
+		}
+		
+		element.setArrivalTime(arrivalTime);
+		element.setCompletionTime(completionTime);
+	}
+
+	private void setProcessingState(long targetCompletionDuration,
+			long estimatedCompletionDuration, ElementObject element) {
+		int processingState = 1;
+		String processingDescription = ELEMENT_PROCESSING_STATE_1_DESCRIPTION;
+		
+		if(estimatedCompletionDuration>targetCompletionDuration) {
+			processingState = 3;
+		} else if(!(targetCompletionDuration==0 || estimatedCompletionDuration==0)) {
+			double diff = targetCompletionDuration - estimatedCompletionDuration;
+			double tmp = (diff/targetCompletionDuration)*100.00;
+			if(tmp<=20 && tmp>=0) {
+				processingState = 2;
+			}
+		}
+		
+		switch(processingState) {
+			case 2: processingDescription = ELEMENT_PROCESSING_STATE_2_DESCRIPTION;
+				break;
+			case 3: processingDescription = ELEMENT_PROCESSING_STATE_2_DESCRIPTION;
+				break;
+		}
+		
+		element.setProcessingState(processingState);
+		element.setProcessingStateDescription(processingDescription);
 	}
 }

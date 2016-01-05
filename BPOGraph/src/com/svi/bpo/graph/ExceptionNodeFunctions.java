@@ -214,7 +214,7 @@ public class ExceptionNodeFunctions {
 		return dataToReturn;
 	}
 	
-	public void viewExceptionElements(String nodeId, String exceptionCode) {
+	public ElementObject[] viewExceptionElements(String nodeId, String exceptionCode) {
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
 		properties.put(EXCEPTION_NODE_ATTR_ID, exceptionCode);
@@ -225,11 +225,48 @@ public class ExceptionNodeFunctions {
 		qb.append("MATCH path2=exception-[:NEXT_FLOW*0..]->(:BPO_EXCEPTION_NODE) ");
 		qb.append("WHERE exception."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
 		qb.append("WITH exception, MAX(LENGTH(path1))+1 AS currentIdx, MAX(LENGTH(path2)) AS totalIdx ");
-		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(exception:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
-		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")-[]->exception ");
-		qb.append("RETURN element, currentIdx + ' Out of ' + (totalIdx+currentIdx) AS currentProcessLocation;");
-		System.out.println(neo4j.sendCypherQuery(qb.toString(), properties));
-		
+		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-(node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(exception:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
+		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")-[r]->exception ");
+		qb.append("RETURN r."+ElementFunctions.ELEMENT_ATTR_WORKER_ID+" AS "+ElementFunctions.ELEMENT_ATTR_WORKER_ID+", node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS "+NodeFunctions.NODE_ATTR_NODE_ID+", element, currentIdx + ' Out of ' + (totalIdx+currentIdx) AS currentProcessLocation,");
+		qb.append("CASE element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" <= cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME +" WHEN TRUE THEN TRUE WHEN FALSE THEN FALSE END AS "+ ElementFunctions.ELEMENT_VAR_CAN_MEET_DEADLINE +";");
+		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(qb.toString(), properties);
+		ElementObject[] dataToReturn = new ElementObject[dataReturned.size()];
+		String nodeKey = "element.";
+		for(int i=0; i<dataReturned.size(); i++) {
+			Map<String, Object> data = dataReturned.get(i);
+			
+			String ndeId =  DataUtilities.toStringValue(data.get(NodeFunctions.NODE_ATTR_NODE_ID));
+			String elemId =  DataUtilities.toStringValue(data.get(nodeKey+ElementFunctions.ELEMENT_ATTR_ELEMENT_ID));
+			String workerId = DataUtilities.toStringValue(data.get(ElementFunctions.ELEMENT_ATTR_WORKER_ID));
+			int priority = DataUtilities.toInteger(data.get(nodeKey+ElementFunctions.ELEMENT_ATTR_PRIORITY));
+			String status =  DataUtilities.toStringValue(data.get(nodeKey+ElementFunctions.ELEMENT_ATTR_STATUS));
+			String extra1 =  DataUtilities.toStringValue(data.get(nodeKey+ElementFunctions.ELEMENT_ATTR_EXTRA1));
+			String extra2 =  DataUtilities.toStringValue(data.get(nodeKey+ElementFunctions.ELEMENT_ATTR_EXTRA2));
+			String extra3 =  DataUtilities.toStringValue(data.get(nodeKey+ElementFunctions.ELEMENT_ATTR_EXTRA3));
+			String filePointer =  DataUtilities.toStringValue(data.get(nodeKey+ElementFunctions.ELEMENT_ATTR_FILE_POINTER));
+			long targetCompletionDuration = DataUtilities.toLongValue(data.get(nodeKey+ElementFunctions.ELEMENT_ATTR_TARGET_COMPLETION_DURATION));
+			long estimatedCompletionDuration = DataUtilities.toLongValue(data.get(nodeKey+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION));
+			boolean canMeetDeadline = DataUtilities.toBoolean(data.get(ElementFunctions.ELEMENT_VAR_CAN_MEET_DEADLINE));
+			String normalFlowLocation = DataUtilities.toStringValue(data.get("currentProcessLocation"));
+			ElementObject element =  new ElementObject();
+			element.setElementId(elemId);
+			element.setNodeId(ndeId);
+			element.setPriority(priority);
+			element.setStatus(status);
+			element.setExtra1(extra1);
+			element.setExtra2(extra2);
+			element.setExtra3(extra3);
+			element.setFilePointer(filePointer);
+			element.setTargetCompletionDuration(targetCompletionDuration);
+			element.setEstimatedCompletionDuration(estimatedCompletionDuration);
+			element.setWorkerId(workerId);
+			//TODO 
+//			element.setCanMeetDeadline(canMeetDeadline);
+			element.setNormalFlowLocation(normalFlowLocation);
+			
+			dataToReturn[i] = element;
+		}
+		return dataToReturn;
 	}
 	
 	

@@ -11,9 +11,12 @@ public class ElementObject {
 	private String filePointer;
 	private long targetCompletionDuration;
 	private long estimatedCompletionDuration;
-	private boolean canMeetDeadline;
 	private String workerId;//added by jm
 	private String normalFlowLocation = "N/A";
+	private int processingState;
+	private String processingStateDescription;
+	private String arrivalTime;
+	private String completionTime;
 	/**
 	 * @return the nodeId
 	 */
@@ -142,16 +145,35 @@ public class ElementObject {
 	public String getWorkerId(){
 		return this.workerId ;
 	}
-	public boolean isCanMeetDeadline() {
-		return canMeetDeadline;
-	}
-	public void setCanMeetDeadline(boolean canMeetDeadline) {
-		this.canMeetDeadline = canMeetDeadline;
-	}
+	
 	public String getNormalFlowLocation() {
 		return normalFlowLocation;
 	}
 	public void setNormalFlowLocation(String normalFlowLocation) {
 		this.normalFlowLocation = normalFlowLocation;
+	}
+	public int getProcessingState() {
+		return processingState;
+	}
+	public void setProcessingState(int processingState) {
+		this.processingState = processingState;
+	}
+	public String getProcessingDescription() {
+		return processingStateDescription;
+	}
+	public void setProcessingStateDescription(String processingDescription) {
+		this.processingStateDescription = processingDescription;
+	}
+	public String getArrivalTime() {
+		return arrivalTime;
+	}
+	public void setArrivalTime(String arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+	public String getCompletionTime() {
+		return completionTime;
+	}
+	public void setCompletionTime(String completionTime) {
+		this.completionTime = completionTime;
 	}
 }

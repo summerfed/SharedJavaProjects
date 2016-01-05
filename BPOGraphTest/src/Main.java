@@ -30,28 +30,31 @@ public class Main {
 		String exceptionName = "TestExName";
 		
 		BPO bpo = new BPO("http://localhost:7474");
-		bpo.clearBPO();
-		NodeFunctions node = bpo.getNodeFunctions();
+//		bpo.clearBPO();
+//		NodeFunctions node = bpo.getNodeFunctions();
 		ElementFunctions element = bpo.getElementFunctions();
-		ExceptionNodeFunctions exception = bpo.getExceptionNodeFunctions();
-		
-		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
-		System.out.println(node.insertNode("Node2", nodeName, cluster, stdUM, cost, time, time, num, num));
-		System.out.println(node.insertNode("Node3", nodeName, cluster, stdUM, cost, time, time, num, num));
-		node.buildFlow(cluster, nodeId, "Node2", "Node3");
-		
-		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
-		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode, exceptionName, time, time));
-		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode1, exceptionName, time, time));
-		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode2, exceptionName, time, time));
-		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode3, exceptionName, time, time));
-		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode4, exceptionName, time, time));
-		System.out.println(exception.buildFlow(nodeId, exceptionCode, exceptionCode1, exceptionCode2, exceptionCode3, exceptionCode4));
-		System.out.println(element.insertElement(elementId, priority, nodeId, workerId));
-		System.out.println(element.getElement(elementId, nodeId, workerId));
+//		ExceptionNodeFunctions exception = bpo.getExceptionNodeFunctions();
+//		
+//		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
+//		System.out.println(node.insertNode("Node2", nodeName, cluster, stdUM, cost, time, time, num, num));
+//		System.out.println(node.insertNode("Node3", nodeName, cluster, stdUM, cost, time, time, num, num));
+//		node.buildFlow(cluster, nodeId, "Node2", "Node3");
+//		
+//		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
+//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode, exceptionName, time, time));
+//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode1, exceptionName, time, time));
+//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode2, exceptionName, time, time));
+//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode3, exceptionName, time, time));
+//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode4, exceptionName, time, time));
+//		System.out.println(exception.buildFlow(nodeId, exceptionCode, exceptionCode1, exceptionCode2, exceptionCode3, exceptionCode4));
+//		System.out.println(element.insertElement(elementId, priority, nodeId, workerId));
+//		System.out.println(element.getElement(elementId, nodeId, workerId));
+		System.out.println(element.viewElementsInNode(nodeId, 0, 1)[0].getArrivalTime());
+		/*System.out.println(element.getElement(elementId, nodeId, workerId));
 		System.out.println(element.viewElementsInNode(nodeId, 0, 1)[0].getNormalFlowLocation());
-		/*System.out.println(exception.moveElementToException(elementId, nodeId, exceptionCode));
-		System.out.println(exception.assignWorkerToExceptionElement(nodeId, exceptionCode, elementId, workerId));
+		System.out.println(exception.moveElementToException(elementId, nodeId, exceptionCode));
+		System.out.println(exception.viewExceptionElements(nodeId, exceptionCode)[0].getElementId());*/
+		/*System.out.println(exception.assignWorkerToExceptionElement(nodeId, exceptionCode, elementId, workerId));
 		System.out.println(exception.getExceptionElement(nodeId, exceptionCode, elementId, workerId).getElementId());
 		exception.completeExceptionElement(nodeId, exceptionCode, exceptionCode1, elementId, workerId);
 		System.out.println(exception.assignWorkerToExceptionElement(nodeId, exceptionCode1, elementId, workerId));

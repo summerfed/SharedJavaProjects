@@ -2,17 +2,28 @@ package com.svi.bpo.graph.utils;
 
 public class DataUtilities {
 	
+	/**
+	 * IF object is null then return empty string
+	 * @param object
+	 * @return
+	 */
 	public static String toStringValue(Object object) {
-		if(!(object.toString().equalsIgnoreCase("null") && object!=null)) {
-			return object.toString();
+		if(object!=null) {
+			if(!object.toString().equalsIgnoreCase("null")) {
+				return object.toString();
+			}
 		}
-		return null;
+		
+		return "";
 	}
 	
 	public static long toLongValue(Object object) {
 		if(!(object.toString().equalsIgnoreCase("null") && object!=null)) {
-			Number tmp = (Number) object;
-			return tmp.longValue();
+			if(object instanceof Number) {
+				Number tmp = (Number) object;
+				return tmp.longValue();
+			}
+			
 		}
 		return 0L;
 	}

@@ -1,0 +1,56 @@
+package com.svi.bpo.server;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.svi.bpo.graph.BPO;
+
+public class SampleServlet extends HttpServlet {
+	private BPO bpo;
+	
+	@Override
+	public void init() throws ServletException {
+		bpo = BpoSvcImpl.getInstance().getBpo();
+	}
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 987L;
+
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String currentTime = new SimpleDateFormat("hh':'mm':'ss").format(new Date());
+		List<Map<String, Object>> tmp = bpo.getNodeCurrentWaitingAndInProcessElementCount("Node1");
+		for(Map<String, Object> each: tmp) {
+			int waiting = (int) each.get("currentTotalWaitingElements");
+			int process = (int) each.get("currentTotalInProcessElements");
+			String data = currentTime+"\t"+waiting+"\t"+process+"\n";
+			Files.write(csvFile.toPath(), data.getBytes(), StandardOpenOption.APPEND);
+			Thread.sleep(1000);
+		}
+		JSONObject json = new JSONObject();
+		try {
+			json.put("test", "value");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		PrintWriter out = response.getWriter();
+		out.print(json);
+	}
+}

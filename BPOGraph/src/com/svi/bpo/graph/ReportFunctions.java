@@ -3,7 +3,7 @@ package com.svi.bpo.graph;
 import java.util.List;
 import java.util.Map;
 
-class ReportFunctions {
+public class ReportFunctions {
 	private BPO bpo;
 	
 	protected ReportFunctions(BPO bpo) {

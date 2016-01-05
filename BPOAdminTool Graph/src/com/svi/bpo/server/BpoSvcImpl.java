@@ -5,12 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletException;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.svi.bpo.client.svc.BpoSvc;
 import com.svi.bpo.constants.ResultCnstnts;
 import com.svi.bpo.graph.BPO;
 import com.svi.bpo.graph.ElementAttributes;
-import com.svi.bpo.graph.NodeFunctions;
 import com.svi.bpo.graph.obj.ClusterObject;
 import com.svi.bpo.graph.obj.ElementObject;
 import com.svi.bpo.graph.obj.ExceptionNodeObject;
@@ -30,15 +31,22 @@ import com.svi.bpo.tools.BPOUploader;
  */
 @SuppressWarnings("serial")
 public class BpoSvcImpl extends RemoteServiceServlet implements BpoSvc {
-
+	private static BpoSvcImpl modelInstance;
 	public BPO bpo;
 
-
+	
+	
+	@Override
+	public void init() throws ServletException {
+		
+	}
+	
 	@Override
 	public List<NodeDtlObj> getNodes(String endpoint) {
 		if (bpo == null)
 		{
 			bpo = new BPO(Controller.endpointMap.get(endpoint));
+			SampleServlet.setBpo(bpo);
 		}
 		System.out.println("Endpoint is " + endpoint);
 	//	endpoint = "http://localhost:7474";
@@ -761,6 +769,7 @@ ElementObject[] elements = getAllElements(node.split("\\|")[0]);
 		}
 		
 		bpo.setEndpoint(Controller.endpointMap.get(endpoint));
+		SampleServlet.setBpo(bpo);
 		ClusterObject[] clustObj = bpo.getNodeFunctions().viewClusters();
 		String returnedString[] = new String[clustObj.length];
 		int i =0;

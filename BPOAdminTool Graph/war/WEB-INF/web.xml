@@ -12,10 +12,20 @@
   		<servlet-class>com.svi.bpo.server.LginSvcImpl</servlet-class>
  	</servlet>
  	
+ 	<servlet>
+ 		<servlet-name>reportServlet</servlet-name>
+  		<servlet-class>com.svi.bpo.server.SampleServlet</servlet-class>
+ 	</servlet>
+ 	
  	
  	<servlet-mapping>
  	<servlet-name>lginServlet</servlet-name>
   		<url-pattern>/bpo/lginSvc</url-pattern>
+  	</servlet-mapping>
+  	
+  	<servlet-mapping>
+ 	<servlet-name>reportServlet</servlet-name>
+  		<url-pattern>/bporeports</url-pattern>
   	</servlet-mapping>
   	
   	<servlet>
