@@ -9,8 +9,10 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.svi.bpo.client.presenter.DashboardViewScnPresenter.Display;
 import com.svi.bpo.client.view.widgets.dshbrd.EndPointsExceptionDashboardWidget;
 import com.svi.bpo.client.view.widgets.dshbrd.EndpointNodesDshBrdWidget;
+import com.svi.bpo.client.view.widgets.dshbrd.ExceptionNodeDshBrdRecord;
 import com.svi.bpo.client.view.widgets.dshbrd.NodeDshBrdRecord;
 import com.svi.bpo.constants.Notification;
+import com.svi.bpo.objects.ExceptionNodeDshBrdObj;
 import com.svi.bpo.objects.NodeDshBrdObj;
 
 public class DashboardViewScn extends BsScn implements Display {
@@ -18,11 +20,19 @@ public class DashboardViewScn extends BsScn implements Display {
 	private FlowPanel tblPnl;
 	private EndpointNodesDshBrdWidget dashBoard;
 	private EndPointsExceptionDashboardWidget exDashboard;
+	private FlowPanel nodeDashBoard;
+	private FlowPanel exceptionDashBoard;
 	private Button nodeTabBtn;
-	private FlowPanel tabPnl;
+	//private FlowPanel tabPnl;
 	private Button exceptionTabBtn;
 	@Override
 	public FlowPanel bldCtnt() {
+		
+		nodeDashBoard = new FlowPanel();
+		nodeDashBoard.setStyleName("admin-node-pnl");
+		exceptionDashBoard = new FlowPanel();
+		exceptionDashBoard.setStyleName("admin-node-pnl");
+		
 		nodeTabBtn = new Button("Node");
 		nodeTabBtn.addClickHandler(new ClickHandler() {
 			
@@ -46,18 +56,19 @@ public class DashboardViewScn extends BsScn implements Display {
 		tabBtnPnl.add(nodeTabBtn);
 		tabBtnPnl.add(exceptionTabBtn);
 		
-		tabPnl = new FlowPanel();
-		tabPnl.setStyleName("admin-tab-body-pnl");
+	//	tabPnl = new FlowPanel();
+	//	tabPnl.setStyleName("admin-tab-body-pnl");
 		
 		getNavPnl().selectDashboardBtn();
 		tblPnl = new FlowPanel();
 		tblPnl.setStyleName("dshbrd-pnl");
-	//	FlowPanel mainPnl = new FlowPanel();
-		tblPnl.setStyleName("admin-pnl");
-		tblPnl.add(tabBtnPnl);
-		tblPnl.add(tabPnl);
-		
-		return tblPnl;
+		FlowPanel mainPnl = new FlowPanel();
+		mainPnl.setStyleName("admin-pnl");
+		mainPnl.add(tabBtnPnl);
+	//	mainPnl.add(tabPnl);
+		mainPnl.add(tblPnl);
+		selectNodeTab();
+		return mainPnl;
 	}
 
 	@Override
@@ -78,7 +89,7 @@ public class DashboardViewScn extends BsScn implements Display {
 			widget.addNode(record);
 		}
 		
-		tblPnl.add(widget);
+		nodeDashBoard.add(widget);
 	}
 
 	
@@ -89,12 +100,31 @@ public class DashboardViewScn extends BsScn implements Display {
 	}
 	
 	public void selectNodeTab(){
+		nodeTabBtn.setStyleName("admin-tab-btn-selected");
 		
+		exceptionTabBtn.removeStyleName("admin-tab-btn-selected");
+		tblPnl.clear();
+		tblPnl.add(nodeDashBoard);
 	}
 	
 public void selectExceptionTab(){
-		
+	exceptionTabBtn.setStyleName("admin-tab-btn-selected");
+	
+	nodeTabBtn.removeStyleName("admin-tab-btn-selected");
+	tblPnl.clear();
+	tblPnl.add(exceptionDashBoard);
 	}
+
+@Override
+public void addExceptionEndpoint(EndPointsExceptionDashboardWidget widget,
+		List<ExceptionNodeDshBrdObj> nodes) {
+	for(final ExceptionNodeDshBrdObj node : nodes){
+		final ExceptionNodeDshBrdRecord record = new ExceptionNodeDshBrdRecord(node);
+		widget.addNode(record);
+	}
+	
+	exceptionDashBoard.add(widget);
+}
 	
 	
 }

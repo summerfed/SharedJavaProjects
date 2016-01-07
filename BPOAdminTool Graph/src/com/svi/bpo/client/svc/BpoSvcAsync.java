@@ -6,6 +6,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.svi.bpo.graph.obj.ClusterObject;
 import com.svi.bpo.objects.ElemDtlObj;
 import com.svi.bpo.objects.ExceptionDtlObj;
+import com.svi.bpo.objects.ExceptionNodeDshBrdObj;
 import com.svi.bpo.objects.NodeDshBrdObj;
 import com.svi.bpo.objects.NodeDtlObj;
 import com.svi.bpo.objects.ResultObj;
@@ -72,6 +73,9 @@ public interface BpoSvcAsync {
 
 	void deleteExceptionNode(List<ExceptionDtlObj> nodes,
 			AsyncCallback<List<String>> callback);
+
+	void getSummarizedExNodes(String endpoint,
+			AsyncCallback<List<ExceptionNodeDshBrdObj>> callback);
 
 	
 

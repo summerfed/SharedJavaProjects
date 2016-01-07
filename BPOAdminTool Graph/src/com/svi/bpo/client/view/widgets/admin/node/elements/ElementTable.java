@@ -30,15 +30,20 @@ public class ElementTable extends Composite{
 		HTMLPanel priorHdr = getStyledPnl("Priority", "elem-tbl-prior-col");
 //		HTMLPanel waitTime = getStyledPnl("Waiting Start Time", "elem-tbl-wait-time");
 //		HTMLPanel procTime = getStyledPnl("Process Start Time", "elem-tbl-proc-time");
+		HTMLPanel arrvHdr = getStyledPnl("Arrival Time", "elem-tbl-arrv-col");
+		HTMLPanel compHdr = getStyledPnl("Comp. Time", "elem-tbl-comp-col");
+
 		HTMLPanel wrkrHdr = getStyledPnl("Worker Name", "elem-tbl-wrkr-col");
-		
+				HTMLPanel flowHdr = getStyledPnl("Flow", "elem-tbl-flow-col");
+		HTMLPanel statColorHdr = getStyledPnl("  ", "elem-tbl-color-col");
 		header.add(elemIdHdr);
 		header.add(statusHdr);
 		header.add(priorHdr);
-//		header.add(waitTime);
-//		header.add(procTime);
+		header.add(arrvHdr);
+		header.add(compHdr);
 		header.add(wrkrHdr);
-		
+		header.add(flowHdr);
+		header.add(statColorHdr);
 		body = new FlowPanel();
 		body.setStyleName("elem-tbl-body");
 		

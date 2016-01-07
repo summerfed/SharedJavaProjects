@@ -33,10 +33,19 @@ public class ElemDtlObj implements IsSerializable {
 	private String filePointer;
 	private long targetCompletionDuration;
 	private long estimatedCompletionDuration;
+	private String normalFlow;
 	
 	/*Not in the ElementObj*/
-	
+	private String elementLocation;// if element is on node or exception node
 	private String workerId;
+	private int processingState;
+	private String processingDesc;
+	private String arrivalTime;
+	private String compTime;
+
+	
+
+
 	private int waitStartTime ;
 	private int processStartTime;
 	private int processEndTime;
@@ -316,6 +325,64 @@ public class ElemDtlObj implements IsSerializable {
 				+ processDuration + ", outputCount=" + outputCount
 				+ ", errorCount=" + errorCount + ", extra1=" + extra1
 				+ ", extra2=" + extra2 + ", extra3=" + extra3 + "]";
+	}
+
+
+	public String getNormalFlow() {
+		return normalFlow;
+	}
+
+
+	public void setNormalFlow(String normalFlow) {
+		this.normalFlow = normalFlow;
+	}
+
+
+
+	public String getElementLocation() {
+		return elementLocation;
+	}
+
+
+	public void setElementLocation(String elementLocation) {
+		this.elementLocation = elementLocation;
+	}
+	public int getProcessingState() {
+		return processingState;
+	}
+
+
+	public void setProcessingState(int processingState) {
+		this.processingState = processingState;
+	}
+
+
+	public String getProcessingDesc() {
+		return processingDesc;
+	}
+
+
+	public void setProcessingDesc(String processingDesc) {
+		this.processingDesc = processingDesc;
+	}
+	
+	public String getArrivalTime() {
+		return arrivalTime;
+	}
+
+
+	public void setArrivalTime(String arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+
+
+	public String getCompTime() {
+		return compTime;
+	}
+
+
+	public void setCompTime(String compTime) {
+		this.compTime = compTime;
 	}
 
 }

@@ -34,14 +34,6 @@ public class BPO {
 	/**
 	 * This class consist of methods to use BPO Graph, Methods are divided into different types
 	 * such as:
-	 * <ul>
-	 * 	<li><b>CREATE: </b>Methods to Create Data Elements in BPO</li>
-	 * 	<li><b>READ: </b>Methods to Read Data Elements from BPO</li>
-	 * 	<li><b>UPDATE: </b>Methods to Update Data Elements from BPO</li>
-	 * 	<li><b>DELETE: </b>Methods to Delete Data Elements from BPO</li>
-	 * 	<li><b>REPORTS: </b>Methods to Get Reports, Performance Metrics of Data Elements in BPO</li>
-	 * </ul>
-	 * 
 	 * DISCLAIMER: The tool is currently in Development Phase, Methods may change anytime based on the changing requirement
 	 * @author: Fed 
 	 * @since: 4.0
@@ -104,110 +96,24 @@ public class BPO {
 	}
 	
 	/**
-	 * 
+	 * Get Current Endpoint
 	 * @return Graph Instance Endpoint
 	 */
 	public String getEndpoint() {
 		return this.graphUrl;
 	}
 
-	public void setEndpoint(String endPnt) {
+	/**
+	 * Set new graph end point, Will instantiate new BPO and Function Objects
+	 * @param endPnt
+	 * @return previous Objects
+	 */
+	public BPO setEndpoint(String endPnt) {
+		BPO tmp = this;
 		this.graphUrl = endPnt;
 		createBPOInstance();
+		return tmp;
 	}
-	
-	/********************
-	 * CREATE FUNCTIONS *
-	 ********************/
-	
-	
-
-	
-	
-	
-		
-	/******************
-	 * READ FUNCTIONS *
-	 ******************/
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	 
-	
-	/********************
-	 * UPDATE FUNCTIONS *
-	 ********************/
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/*//
-	 * public String computeTargetCompletionTime(String cluster) {
-		return nodeFunction.computeTargetCompletionTime(cluster);
-	}*/
-	
-	/*public String computeTargetCompletionTime() {
-		return nodeFunction.computeTargetCompletionTime();
-	}*/
-	
-	/*public String computeEstimatedCompletionTime() {
-		return nodeFunction.computeEstimatedCompletionTime();
-	}*/
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/*//TODO OPTIONAL?
-	 * protected boolean incrementTotalWaitedElement(String nodeId, int count) {
-		return nodeFunction.incrementTotalWaitedElement(nodeId, count);
-	}
-	
-	protected boolean incrementTotalWaitingDuration(String nodeId, int count) {
-		return nodeFunction.incrementTotalWaitingDuration(nodeId, count);
-	}
-	
-	protected boolean incrementTotalProcessElement(String nodeId, int count) {
-		return nodeFunction.incrementTotalProcessElement(nodeId, count);
-	}
-	
-	protected boolean incrementTotalProcessDuration(String nodeId, int count) {
-		return nodeFunction.incrementTotalProcessDuration(nodeId, count);
-	}*/
-	
-	
-	/********************
-	 * DELETE FUNCTIONS *
-	 ********************/
-	
-	
-	
-	
-	
 	
 	/**
 	 * <b>WARNING</b>: This method will Delete all data in the graph
@@ -226,14 +132,4 @@ public class BPO {
 			return true;
 		}
 	}
-
-	// REPORT FUNCTION
-	
-	
-	
-	
-	
-
-	
-	
 }

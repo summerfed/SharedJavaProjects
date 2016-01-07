@@ -16,9 +16,9 @@ public class NodeDshhBrdTable extends Composite{
 		inQueueHdr.setStyleName("node-dshbrd-in-queue-col");
 		HTMLPanel inProgHdr = new HTMLPanel("In Progress");
 		inProgHdr.setStyleName("node-dshbrd-in-prog-col");
-		HTMLPanel aveWTHdr = new HTMLPanel("Average Waiting Time");
+		HTMLPanel aveWTHdr = new HTMLPanel("Ave. Waiting Time");
 		aveWTHdr.setStyleName("node-dshbrd-ave-wait-time-col");
-		HTMLPanel avePTHdr = new HTMLPanel("Average Processing Time");
+		HTMLPanel avePTHdr = new HTMLPanel("Ave. Processing Time");
 		avePTHdr.setStyleName("node-dshbrd-ave-proc-time-col");
 		
 		FlowPanel pnl = new FlowPanel();

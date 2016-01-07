@@ -30,6 +30,8 @@ public class NodeRecord extends Composite {
 		inProgCell.setStyleName("node-inprog-col");
 		HTMLPanel totalElemCell = new HTMLPanel(Integer.parseInt(node.getElmtsWaiting()) + Integer.parseInt(node.getElmtsInprogress())+"");
 		totalElemCell.setStyleName("node-totalElem-col");
+		
+		
 		HTMLPanel statusCell;
 		if(node.isCanMeetTarget()){
 		statusCell = new HTMLPanel(" ");

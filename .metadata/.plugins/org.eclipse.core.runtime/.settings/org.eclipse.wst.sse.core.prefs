@@ -1,2 +1,2 @@
 eclipse.preferences.version=1
-task-tag-projects-already-scanned=BPOAdminTool Graph,BPOGraph,BPOGraphTest,FedDevUtilities,Neo4jRestUtility,RemoteSystemsTempFiles,MotorVehicleRetriever
+task-tag-projects-already-scanned=BPOAdminTool Graph,BPOGraph,BPOGraphTest,FedDevUtilities,Neo4jRestUtility,RemoteSystemsTempFiles,BPOReportTest

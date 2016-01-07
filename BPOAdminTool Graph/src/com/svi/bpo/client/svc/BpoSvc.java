@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import com.svi.bpo.objects.ElemDtlObj;
 import com.svi.bpo.objects.ExceptionDtlObj;
+import com.svi.bpo.objects.ExceptionNodeDshBrdObj;
 import com.svi.bpo.objects.NodeDshBrdObj;
 import com.svi.bpo.objects.NodeDtlObj;
 import com.svi.bpo.objects.ResultObj;
@@ -86,4 +87,6 @@ List<NodeDtlObj> getClusterNodes(String endpoint, String clusterId);
 			String newWorkerId);
 	String[] getCluster(String endpoint);
 	List<String> addExceptionNode(List<ExceptionDtlObj> nodes);
+
+	List<ExceptionNodeDshBrdObj> getSummarizedExNodes(String endpoint);
 }

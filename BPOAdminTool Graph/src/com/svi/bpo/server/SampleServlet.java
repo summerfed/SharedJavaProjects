@@ -61,7 +61,7 @@ public class SampleServlet extends HttpServlet {
 				String currentTime = new SimpleDateFormat("hh':'mm':'ss").format(new Date());
 				List<Map<String, Object>> tmp = getBpo().getReportFunctions().getNodeCurrentWaitingAndInProcessElementCount(nodeId);
 				JSONArray tmpNodeData = currentData.get(nodeId);
-				
+				System.out.println("NodeId: " + nodeId);
 				if(tmpNodeData!=null) {
 					jsonData = tmpNodeData;
 				} else {

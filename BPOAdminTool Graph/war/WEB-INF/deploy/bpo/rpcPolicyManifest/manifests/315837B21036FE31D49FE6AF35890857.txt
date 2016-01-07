@@ -1,0 +1,2 @@
+serviceClass: com.svi.bpo.client.svc.BpoSvc
+path: 3BCECF6A264307C17B5D491CB546FAEC.gwt.rpc

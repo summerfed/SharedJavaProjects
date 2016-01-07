@@ -8,10 +8,12 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
 import com.svi.bpo.client.CommonObjs;
 import com.svi.bpo.client.svc.BpoSvcAsync;
+import com.svi.bpo.client.view.widgets.dshbrd.EndPointsExceptionDashboardWidget;
 import com.svi.bpo.client.view.widgets.dshbrd.EndpointNodesDshBrdWidget;
 import com.svi.bpo.constants.BPOCnstnts;
 import com.svi.bpo.constants.Notification;
 import com.svi.bpo.objects.EndpointObj;
+import com.svi.bpo.objects.ExceptionNodeDshBrdObj;
 import com.svi.bpo.objects.NodeDshBrdObj;
 
 public class DashboardViewScnPresenter  implements Presenter{
@@ -22,6 +24,7 @@ public class DashboardViewScnPresenter  implements Presenter{
 		EndpointNodesDshBrdWidget getDashBoard();
 		FlowPanel getTblPnl();
 		void addEndpoint(EndpointNodesDshBrdWidget widget,List<NodeDshBrdObj> nodes);
+		void addExceptionEndpoint(EndPointsExceptionDashboardWidget widget,List<ExceptionNodeDshBrdObj> nodes);
 	}
 	
 	private Display display;
@@ -79,6 +82,30 @@ public class DashboardViewScnPresenter  implements Presenter{
 	 *  */
 	private void displayExceptionNodes(){
 		
+		for (final EndpointObj dtls : CommonObjs.bpoUser.getEndpoints()) {
+
+			if(dtls.isActive()){
+
+				final EndPointsExceptionDashboardWidget widget = new EndPointsExceptionDashboardWidget(dtls.getLabel());
+
+				((BpoSvcAsync)CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getSummarizedExNodes(
+						dtls.getEndpointId(), new AsyncCallback<List<ExceptionNodeDshBrdObj>>() {
+
+					@Override
+					public void onSuccess(List<ExceptionNodeDshBrdObj> result) {
+						display.addExceptionEndpoint(widget, result);
+						widget.stopLoading();
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						display.notify(Notification.ERROR, "Get Node Failed");
+						widget.stopLoading();
+					}
+				});
+
+			}
+		}
 		
 	}
 	
