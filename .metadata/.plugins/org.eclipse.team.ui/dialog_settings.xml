@@ -2,7 +2,7 @@
 <section name="Workbench">
 	<section name="SynchronizeViewSettings">
 		<item value="false" key="linkWithEditor"/>
-		<item value="1452063351187" key="lastactiveparticipant_sec_id"/>
+		<item value="1452145882109" key="lastactiveparticipant_sec_id"/>
 		<item value="org.eclipse.team.cvs.ui.workspace-participant" key="lastactiveparticipant_id"/>
 		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452062819156">
 		</section>
@@ -14,10 +14,13 @@
 		</section>
 		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452062524859">
 		</section>
-		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452060354093">
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452145882109">
+			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
 		</section>
 		<section name="org.eclipse.team.cvs.ui.workspace-participant.1451890361796">
 			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452060354093">
 		</section>
 		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452062637093">
 		</section>

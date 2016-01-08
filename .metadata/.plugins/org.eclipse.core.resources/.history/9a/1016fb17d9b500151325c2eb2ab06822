@@ -96,6 +96,4 @@ public class ReportFunctions {
 	public List<Map<String, Object>> getNodeCurrentWaitingAndInProcessElementCount(String nodeId) {
 		return bpo.getNodeFunctions().getNodeCurrentWaitingAndInProcessElementCount(nodeId);
 	}
-	
-	
 }

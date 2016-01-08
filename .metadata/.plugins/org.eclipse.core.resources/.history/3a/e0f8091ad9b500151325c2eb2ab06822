@@ -110,9 +110,6 @@ public class ElementFunctions {
 			return NOTIFICATION_INVALID_PRIORITY_RANGE;
 		}
 		
-		if((isElementExist(elementId))){//added by jm
-			return NOTIFICATION_ELEMENT_ALREADY_EXIST;
-		}
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(ELEMENT_ATTR_ELEMENT_ID, elementId);
 		properties.put(ELEMENT_ATTR_PRIORITY, priority);
@@ -638,7 +635,7 @@ public class ElementFunctions {
 	 * @return
 	 */
 	public ElementObject[] viewElementsInNode(String nodeId, int startPage, int limit) {
-	int x = startPage;
+	int x = ((startPage-1)*limit);
 	if (startPage == 0){
 		x = 0 ;
 	}
