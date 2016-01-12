@@ -1,11 +1,14 @@
 package com.fed.receipt.generator.views.receiptgenerator;
 
+import javax.swing.JFrame;
+
 public class SharedData {
 	private static TableData tableData;
 	private static ProductList productList;
 	private static TableModel tableModel;
 	private static Table table;
 	private static TotalAmountLabel totalAmountLabel;
+	private static JFrame currentFrame;
 
 	public static TableData getTableData() {
 		return tableData;
@@ -45,5 +48,13 @@ public class SharedData {
 
 	public static void setTotalAmountLabel(TotalAmountLabel totalAmountLabel) {
 		SharedData.totalAmountLabel = totalAmountLabel;
+	}
+
+	public static JFrame getCurrentFrame() {
+		return currentFrame;
+	}
+
+	public static void setCurrentFrame(JFrame currentFrame) {
+		SharedData.currentFrame = currentFrame;
 	}
 }

@@ -8,10 +8,15 @@ import java.math.BigDecimal;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
+
+import com.fed.receipt.generator.db.ProductDatabase;
+import com.fed.receipt.generator.obj.Product;
 
 public class Table extends JTable {
 
@@ -35,4 +40,14 @@ public class Table extends JTable {
         }
         return c;
     }
+	
+	public boolean addRow(int listIndex, final JList<?> list) {
+		Object productDesc = list.getModel().getElementAt(listIndex);
+		Product product = ProductDatabase.getInstance().getProduct(productDesc.toString());
+		boolean status = SharedData.getTableData().add(product);
+		if(status) {
+			SharedData.getTableModel().fireTableDataChanged();
+		} 
+		return status;
+	}
 }

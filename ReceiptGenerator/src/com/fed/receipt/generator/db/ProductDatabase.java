@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import com.fed.receipt.generator.obj.Product;
 import com.fed.receipt.generator.utils.Utilities;
@@ -56,12 +54,12 @@ public class ProductDatabase implements Serializable{
 	}
 	
 	public boolean addProduct(Product product) {
-		String desc = product.getDescription().trim().toUpperCase();
-		boolean isExist = prodDescLookup.contains(desc);
+		String desc = product.getDescription();
+		boolean isExist = prodDescLookup.contains(desc.trim().toUpperCase());
 		if(isExist) {
 			return false;
 		} else {
-			prodDescLookup.add(desc);
+			prodDescLookup.add(desc.trim().toUpperCase());
 			productStorage.put(desc, product);
 			commitDatabase();
 			return true;
@@ -74,7 +72,9 @@ public class ProductDatabase implements Serializable{
 	}
 	
 	public List<String> viewProducts() {
-		return prodDescLookup;
+		List<String> tmp = new LinkedList<>();
+		tmp.addAll(productStorage.keySet());
+		return tmp;
 	}
 	
 	private boolean commitDatabase() {
