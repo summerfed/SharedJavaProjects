@@ -5,12 +5,9 @@
 			<tag name="version1_1" type="branch"/>
 			<tag name="Root_version1_1" type="version"/>
 		</module>
-		<module path="/" lastAcessTime="1452144527343">
+		<module path="/" lastAcessTime="1452644894832">
 		</module>
-		<module path="BPOGraph" lastAcessTime="1451890336250">
-			<tag name="Version4_0_2" type="branch"/>
-			<tag name="Version4_0_1" type="version"/>
-			<tag name="Version4_0_0" type="version"/>
+		<module path="BPOGraph">
 		</module>
 	</repository>
 </repositories-view>

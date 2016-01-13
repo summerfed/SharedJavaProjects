@@ -1,0 +1,24 @@
+package com.fed.test;
+
+public class Test {
+
+	public static void main(String[] args) {
+		String tmp = "asfkasdklasdkasa";
+		System.out.println(tmp.length());
+		
+		int part = 3;
+		int modulo = tmp.length()/part;
+		int size = tmp.length()/part;
+		for(int i=0; i<part; i++) {
+			int start = (i*size);
+			System.out.println(tmp.substring(start, (start+(size))));
+		}
+		
+		if(modulo != 0) {
+			
+		} 
+		
+		
+	}
+
+}

@@ -1,5 +1,5 @@
-content_assist_lru_history=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><history maxLHS\="100" maxRHS\="10"><lhs name\="java.lang.Enum"><rhs name\="com.svi.bpo.graph.notifications.BPONotifications"/></lhs><lhs name\="com.svi.bpo.graph.notifications.BPONotifications"><rhs name\="com.svi.bpo.graph.notifications.BPONotifications"/></lhs><lhs name\="com.svi.bpo.graph.ExceptionNodeFunctions"><rhs name\="com.svi.bpo.graph.ExceptionNodeFunctions"/></lhs><lhs name\="java.lang.CharSequence"><rhs name\="java.lang.StringBuilder"/></lhs><lhs name\="java.lang.AbstractStringBuilder"><rhs name\="java.lang.StringBuilder"/></lhs><lhs name\="java.lang.Appendable"><rhs name\="java.lang.StringBuilder"/></lhs></history>
-content_assist_number_of_computers=21
+content_assist_lru_history=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><history maxLHS\="100" maxRHS\="10"><lhs name\="java.lang.Enum"><rhs name\="com.svi.bpo.graph.notifications.BPONotifications"/></lhs><lhs name\="com.svi.bpo.graph.notifications.BPONotifications"><rhs name\="com.svi.bpo.graph.notifications.BPONotifications"/></lhs><lhs name\="com.svi.bpo.graph.ExceptionNodeFunctions"><rhs name\="com.svi.bpo.graph.ExceptionNodeFunctions"/></lhs><lhs name\="java.lang.CharSequence"><rhs name\="java.lang.StringBuilder"/></lhs><lhs name\="java.lang.AbstractStringBuilder"><rhs name\="java.lang.StringBuilder"/></lhs><lhs name\="java.lang.Appendable"><rhs name\="java.lang.StringBuilder"/></lhs><lhs name\="java.awt.print.Pageable"><rhs name\="org.apache.pdfbox.pdmodel.PDDocument"/></lhs><lhs name\="java.io.Closeable"><rhs name\="org.apache.pdfbox.pdmodel.PDDocument"/></lhs><lhs name\="java.lang.AutoCloseable"><rhs name\="org.apache.pdfbox.pdmodel.PDDocument"/></lhs><lhs name\="org.apache.pdfbox.pdmodel.PDDocument"><rhs name\="org.apache.pdfbox.pdmodel.PDDocument"/></lhs><lhs name\="com.fed.test.LineObj"><rhs name\="com.fed.test.LineObj"/></lhs><lhs name\="com.fed.receipt.generator.obj.Product"><rhs name\="com.fed.receipt.generator.obj.Product"/></lhs><lhs name\="java.lang.Number"><rhs name\="java.math.BigDecimal"/></lhs><lhs name\="java.math.BigDecimal"><rhs name\="java.math.BigDecimal"/></lhs></history>
+content_assist_number_of_computers=23
 content_assist_proposals_background=255,255,255
 content_assist_proposals_foreground=0,0,0
 eclipse.preferences.version=1
@@ -25,7 +25,7 @@ org.eclipse.jdt.ui.text.code_templates_migrated=true
 org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
 org.eclipse.jdt.ui.text.custom_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
 org.eclipse.jdt.ui.text.templates_migrated=true
-org.eclipse.jface.textfont=1|Courier New|10.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Courier New;
+org.eclipse.jface.textfont=1|Consolas|10.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Consolas;
 pf_coloring_argument=223,192,125
 pf_coloring_assignment=216,216,216
 pf_coloring_comment=126,160,125

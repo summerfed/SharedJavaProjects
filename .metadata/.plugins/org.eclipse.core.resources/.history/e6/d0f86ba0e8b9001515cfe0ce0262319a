@@ -1,0 +1,17 @@
+package com.fed.test;
+
+public class Test {
+
+	public static void main(String[] args) {
+		String tmp = "asfkasdklasdkas";
+		System.out.println(tmp.length());
+		int size = tmp.length()/3;
+		System.out.println(size);
+		for(int i=0; i<3; i++) {
+			int start = (i*size);
+			System.out.println(tmp.substring(start, (start+(size-1));
+		}
+		
+	}
+
+}

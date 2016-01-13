@@ -1,0 +1,8 @@
+package com.fed.test;
+
+public class LineObj {
+	private float startX;
+	private float startY;
+	private float endX;
+	private float endY;
+}

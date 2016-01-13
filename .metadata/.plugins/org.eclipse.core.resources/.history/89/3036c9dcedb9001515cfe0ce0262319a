@@ -1,0 +1,379 @@
+package com.fed.test;
+
+import java.io.IOException;
+
+import org.apache.pdfbox.exceptions.COSVisitorException;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+
+import com.fed.receipt.generator.obj.Product;
+
+public class Main {
+	private static float currentTextYPos;
+	private static float currentTextXPos = 20;
+	private static float marginTop = 20;
+	private static float marginLeft = 20;
+	private static float marginBottom = 20;
+	private static float marginRight = 20;
+	private static float writeablePageWidth;
+	static String businessName = "OBET & LODIES MARKETING";
+	static String[] receiptHeader = {"Kingsville Hills Mahogany St. San Jose Antipolo City", "ROBERTO L. CABIGAO - Prop Tel. 630-3009", "NONVAT Reg. TIN: 109-349-024-000"};
+	static String textOrderSlip = "ORDER SLIP";
+	static String textOrderName = "RAMIL";
+	static String deliveredTo = "DELIVERED TO ";
+	static String textDate = "Date ";
+	static String date = " January 01 2015";
+	static String textAddress ="Address ";
+	static String address = " Angono";
+	static String textPoNumber = "P.O. No. ";
+	static String poNumber = "";
+	static String textTerms = "Terms ";
+	
+	static String qty = getPadding(4)+"Qty."+getPadding(4);
+	static String unit = getPadding(8)+"Unit"+getPadding(8);
+	static String desc = getPadding(9)+"Description"+getPadding(9);
+	static String unitPrice = getPadding(7)+"Unit Price"+getPadding(7);
+	static String amount = getPadding(5)+"Amount"+getPadding(5);
+	
+	public static void main(String[] args) throws COSVisitorException, IOException {
+		PDDocument document = new PDDocument();
+		PDPage page = new PDPage(PDPage.PAGE_SIZE_A5);
+		document.addPage(page);
+		PDFont fontHelvetica = PDType1Font.HELVETICA;
+		PDFont fontHelveticaBold = PDType1Font.HELVETICA_BOLD;
+		currentTextYPos = (page.getMediaBox().getHeight())-20;
+		writeablePageWidth = ((page.getMediaBox().getWidth() - marginLeft) - marginRight);
+		
+		
+		
+		
+		PDPageContentStream contentStream = new PDPageContentStream(document, page);
+		contentStream.setLineWidth(0.1f);
+		writeCenterText(15, fontHelveticaBold, page, contentStream, 2, businessName);
+		writeCenterText(9, fontHelvetica, page, contentStream, receiptHeader);
+		writeCenterText(10, fontHelveticaBold, page, contentStream, textOrderSlip);
+		
+		writeLeftText(9, fontHelvetica, page, contentStream, deliveredTo);
+		writeLeftTextUnderline(10, fontHelveticaBold, page, contentStream, textOrderName+getPadding(50));
+		writeLeftText(9, fontHelvetica, page, contentStream, textDate);
+		writeLeftTextUnderline(10, fontHelveticaBold, page, contentStream, date+getRowPadding(date,fontHelveticaBold));
+		
+		writeLeftTextNewLine(9, fontHelvetica, page, contentStream, textAddress);
+		writeLeftTextUnderline(10, fontHelveticaBold, page, contentStream, address+getPadding(59));
+		writeLeftText(9, fontHelvetica, page, contentStream, textPoNumber);
+		writeLeftTextUnderline(10, fontHelveticaBold, page, contentStream, poNumber+getRowPadding(poNumber,fontHelveticaBold));
+		
+		writeLeftTextNewLine(9, fontHelveticaBold, page, contentStream, getPadding(14));
+		writeLeftTextUnderline(11, fontHelveticaBold, page, contentStream, getPadding(59+(address.length()+1)));
+		writeLeftText(9, fontHelvetica, page, contentStream, textTerms);
+		writeLeftTextUnderline(10, fontHelveticaBold, page, contentStream, getRowPadding(textTerms,fontHelveticaBold));
+		
+		writeLeftTextNewLine(9, fontHelvetica, page, contentStream, "");
+		writeLeftTextUnderline(10, fontHelveticaBold, page, contentStream, getRowPadding("",fontHelveticaBold));
+		
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(qty);
+		sb.append(unit);
+		sb.append(desc);
+		sb.append(unitPrice);
+		sb.append(amount);
+		
+		float qtyWidth = getTextWidth(10, fontHelveticaBold, qty);
+		float unitWidth = getTextWidth(10, fontHelveticaBold, unit);
+		float descWidth = getTextWidth(10, fontHelveticaBold, desc);
+		float unitPriceWidth = getTextWidth(10, fontHelveticaBold, unitPrice);
+		float amountWidth = getTextWidth(10, fontHelveticaBold, amount);
+		
+		/*value.append(getCenterString(qtyWidth, "1000",9, fontHelvetica, contentStream));
+		value.append(getCenterString(unitWidth, "DOZ",9, fontHelvetica, contentStream));
+		value.append(getCenterString(descWidth, "PATIS BIG Testing Only",9, fontHelvetica, contentStream));
+		value.append(getCenterString(unitPriceWidth, "144",9, fontHelvetica, contentStream));
+		value.append(getCenterString(amountWidth, "432",9, fontHelvetica, contentStream));*/
+		
+		
+		/*sb.append(getPadding(5));
+		sb.append("Qty.");
+		sb.append(getPadding(11));
+		sb.append("Unit");
+		sb.append(getPadding(17));
+		sb.append("Description");
+		sb.append(getPadding(17));
+		sb.append("Unit Price");
+		sb.append(getPadding(10));
+		sb.append("Amount");
+		sb.append(getPadding(10));*/
+		
+		writeLeftTextNewLine(10, fontHelveticaBold, page, contentStream, "");
+		writeLeftTextUnderline(10, fontHelveticaBold, page, contentStream, sb.toString());
+		
+		addReceiptRow(page, fontHelvetica, fontHelveticaBold, contentStream,
+				qtyWidth, unitWidth, descWidth, unitPriceWidth, amountWidth);
+		
+		addReceiptRow(page, fontHelvetica, fontHelveticaBold, contentStream,
+				qtyWidth, unitWidth, descWidth, unitPriceWidth, amountWidth);
+		
+		
+//		writeLeftText(9, fontHelvetica, page, contentStream, value.toString());
+		
+		/*float qtyRange = getTextWidth(10, fontHelvetica, getPadding(5))+marginLeft+getTextWidth(10, fontHelvetica, qty);
+		float qtyTextWidth = getTextWidth(10, fontHelvetica, "3");
+		float qtyXPos = (qtyRange - qtyTextWidth) / 2;
+		
+		contentStream.beginText();
+			contentStream.moveTextPositionByAmount(qtyXPos, currentTextYPos);
+			contentStream.drawString("3");
+		contentStream.endText();
+		
+		float unitRange = qtyRange+marginLeft+getTextWidth(10, fontHelvetica, unit);
+		float unitTextWidth = getTextWidth(10, fontHelvetica, "3");
+		float unitXPos = (unitRange - unitTextWidth) / 2;
+		
+		contentStream.beginText();
+			contentStream.moveTextPositionByAmount(unitXPos, currentTextYPos);
+			contentStream.drawString("DOZ");
+		contentStream.endText();
+		
+		float descRange = unitRange+marginLeft+getTextWidth(10, fontHelvetica, desc);
+		float descTextWidth = getTextWidth(10, fontHelvetica, "3");
+		float descXPos = (descRange - descTextWidth) / 2;
+		
+		contentStream.beginText();
+			contentStream.moveTextPositionByAmount(descXPos, currentTextYPos);
+			contentStream.drawString("PATIS BIG");
+		contentStream.endText();*/
+		
+		/*writeLeftText(8, fontHelveticaBold, page, contentStream, "Unit"+getPadding(20));
+		writeLeftText(8, fontHelveticaBold, page, contentStream, "Description"+getPadding(20));
+		writeLeftText(8, fontHelveticaBold, page, contentStream, "Unit Price"+getPadding(10));
+		writeLeftText(8, fontHelveticaBold, page, contentStream, "Amount"+getPadding(10));*/
+		
+		
+		
+//		
+		
+		contentStream.close();
+		
+		document.save("WithText.pdf");
+		document.close();
+	}
+
+	private static void addReceiptRow(PDPage page, PDFont fontHelvetica,
+			PDFont fontHelveticaBold, PDPageContentStream contentStream,
+			float qtyWidth, float unitWidth, float descWidth,
+			float unitPriceWidth, float amountWidth, Product product) throws IOException {
+		writeLeftTextNewLine(10, fontHelveticaBold, page, contentStream, "");
+		writeCenterColumnText(10, fontHelvetica, page, contentStream, qtyWidth, DataUtilities.toStringValue(product.getQty()));
+		writeCenterColumnText(10, fontHelvetica, page, contentStream, unitWidth,product.getUnit());
+		writeCenterColumnText(10, fontHelvetica, page, contentStream, descWidth,product.getDescription());
+		writeCenterColumnText(10, fontHelvetica, page, contentStream, unitPriceWidth,product.getPrice());
+		writeCenterColumnText(10, fontHelvetica, page, contentStream, amountWidth,product.getTotalAmount());
+	}
+
+	private static String getCenterString(float locationWith, String value, int fontSize, PDFont font, PDPageContentStream contentStream) throws IOException {
+		float valueWidth = getTextWidth(fontSize, font, value);
+		float startLocation = currentTextXPos + ((locationWith-valueWidth)/2);
+		
+		contentStream.beginText();
+		contentStream.moveTextPositionByAmount(startLocation, currentTextYPos);
+		contentStream.drawString(value);
+		contentStream.endText();
+		return null;
+	}
+	
+	public static String getPadding(int distance) {
+		return String.format("%-"+distance+"s", " ");
+	}
+	
+	public static String getPadding(String text, PDFont font) throws IOException {
+		int tmpWidth = (int) getTextWidth(10, font, text);
+		int paddingSpace = (int) (currentTextXPos+tmpWidth+marginRight+marginLeft+5);
+		int distance = Math.abs(Math.round(writeablePageWidth-paddingSpace));
+		return String.format("%-"+distance+"s", " ");
+	}
+	
+	public static String getRowPadding(String text, PDFont font) throws IOException {
+		int tmpWidth = (int) getTextWidth(10, font, text);
+		int paddingSpace = (int) (currentTextXPos+tmpWidth+marginRight+marginLeft+5);
+		int distance = Math.abs(Math.round(writeablePageWidth-paddingSpace));
+		int requiredDistance = (int) Math.abs(writeablePageWidth-currentTextXPos);
+		if(requiredDistance!=distance) {
+			distance = requiredDistance;
+		}
+		return String.format("%-"+distance+"s", " ");
+	}
+	
+	public static void newLine(PDFont font, int fontSize, PDPageContentStream contentStream) throws IOException {
+		float fontHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSize;
+		contentStream.appendRawCommands(fontHeight + " TL\n");
+		contentStream.appendRawCommands("T*\n");
+	}
+	
+	public static void writeCenterText(int fontSize, PDFont font, PDPage page, PDPageContentStream contentStream, String... text) throws IOException {
+		contentStream.setFont( font, fontSize );
+		float fontHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSize;
+		currentTextYPos -= fontHeight;
+		for(String each:text) {
+			float textWidth = getTextWidth(fontSize, font, each);
+			float currentTextXPos = (page.getMediaBox().getWidth() - textWidth) / 2;
+			contentStream.beginText();
+			contentStream.moveTextPositionByAmount(currentTextXPos, currentTextYPos);
+			contentStream.drawString(each);
+			contentStream.endText();
+			currentTextYPos -= fontHeight;
+		}
+	}
+	
+	private static float determineCursorLocation(float textWidth, float locationWidth) {
+		return currentTextXPos+((locationWidth - textWidth) / 2);
+	}
+	
+	public static void writeCenterColumnText(int fontSize, PDFont font, PDPage page, PDPageContentStream contentStream, float locationWidth, String value) throws IOException {
+		contentStream.setFont( font, fontSize );
+		float textWidth = getTextWidth(fontSize, font, value);
+		float cursorLocation = determineCursorLocation(textWidth, locationWidth);
+		float fontHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSize;
+		float tmpcurrentTextYPos = currentTextYPos;
+		if(locationWidth<textWidth) {
+			int part = (int)Math.floor(textWidth/locationWidth);
+			int modulo = value.length()/part;
+			int section = value.length()/part;
+			
+			for(int i=0; i<part; i++) {
+				int start = (i*section);
+				String sectionValue = value.substring(start, (start+(section)));
+				cursorLocation = determineCursorLocation(getTextWidth(fontSize, font, sectionValue), locationWidth);
+				writeText(contentStream, cursorLocation, tmpcurrentTextYPos,
+						sectionValue);
+				tmpcurrentTextYPos -= fontHeight;
+			}
+			
+			if(modulo != 0) {
+				int start = (part)*section;
+				String sectionValue = value.substring(start, value.length());
+				cursorLocation = determineCursorLocation(getTextWidth(fontSize, font, sectionValue), locationWidth);
+				writeText(contentStream, cursorLocation, tmpcurrentTextYPos,
+						sectionValue);
+			} 
+		} else {
+			writeText(contentStream, cursorLocation, tmpcurrentTextYPos, value);
+		}
+		currentTextXPos+=locationWidth;
+	}
+
+	private static void writeText(PDPageContentStream contentStream,
+			float cursorLocation, float tmpcurrentTextYPos, String sectionValue)
+			throws IOException {
+		contentStream.beginText();
+		contentStream.moveTextPositionByAmount(cursorLocation, tmpcurrentTextYPos);
+		contentStream.drawString(sectionValue);
+		contentStream.endText();
+	}
+	
+	
+	
+	public static void writeCenterText(int fontSize, PDFont font, PDPage page, PDPageContentStream contentStream, int spacing, String... text) throws IOException {
+		contentStream.setFont( font, fontSize );
+		float fontHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSize;
+		currentTextYPos -= fontHeight;
+		for(String each:text) {
+			float textWidth = getTextWidth(fontSize, font, each);
+			float currentTextXPos = (page.getMediaBox().getWidth() - textWidth) / 2;
+			contentStream.beginText();
+			contentStream.moveTextPositionByAmount(currentTextXPos, currentTextYPos);
+			contentStream.drawString(each);
+			contentStream.endText();
+			currentTextYPos -= spacing;
+		}
+	}
+	
+	public static void writeLeftText(int fontSize, PDFont font, PDPage page, PDPageContentStream contentStream, String... text) throws IOException {
+		contentStream.setFont( font, fontSize );
+//		float fontHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSize;
+		writeText(fontSize, font, contentStream,text);
+	}
+	
+	public static void writeLeftTextUnderline(int fontSize, PDFont font, PDPage page, PDPageContentStream contentStream, String text) throws IOException {
+		contentStream.setFont( font, fontSize );
+//		float fontHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSize;
+		writeText(fontSize, font, contentStream, text);
+		/*float textWidth = getTextWidth(fontSize, font, text);
+		float tmpX = currentTextXPos-textWidth;
+		contentStream.drawLine(tmpX, currentTextYPos - 2, tmpX+textWidth-2, currentTextYPos - 2);*/
+		
+		float textWidth = getTextWidth(fontSize, font, text);
+		float startX = currentTextXPos-textWidth;
+		float startY = currentTextYPos - 2;
+		float endX = startX+textWidth-2;
+		float endY = currentTextYPos - 2;
+		if(endX>writeablePageWidth) {
+			endX = writeablePageWidth;
+		}
+		contentStream.drawLine(startX, startY, endX, endY);
+	}
+	
+	public static void writeLeftTextNewLine(int fontSize, PDFont font, PDPage page, PDPageContentStream contentStream, String... text) throws IOException {
+		contentStream.setFont( font, fontSize );
+		float fontHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSize;
+		currentTextYPos -= fontHeight;
+		currentTextXPos = marginLeft;
+		writeText(fontSize, font, contentStream, text);
+	}
+
+	private static void writeText(int fontSize, PDFont font,
+			PDPageContentStream contentStream, 
+			String... text) throws IOException {
+		contentStream.beginText();
+		contentStream.moveTextPositionByAmount(currentTextXPos, currentTextYPos);
+		float currentTextWidth = 0;
+		for(String each:text) {
+			StringBuilder textToWrite = new StringBuilder();
+			for(String word:each.split("\n", -1)) {
+				float textWidth = getTextWidth(fontSize, font, word);
+				currentTextWidth += textWidth;
+				if(currentTextWidth<=writeablePageWidth) {
+					textToWrite.append(word);
+				} else {
+					writeTextNextLine(fontSize, font,
+							contentStream, textToWrite);
+					textToWrite.append(word);
+				}
+			}
+			
+			if(textToWrite.length()>0) {
+				/*LineObj line = new LineObj();
+				line.setStartX(currentTextXPos + 2);
+				line.setStartY(currentTextYPos - 2);
+				line.setEndX(currentTextWidth);
+				line.setEndY(currentTextYPos - 2);
+				underLines.add(line);*/
+				contentStream.drawString(textToWrite.toString());
+				float textWidth = getTextWidth(fontSize, font, textToWrite.toString());
+				currentTextXPos += textWidth;
+			}
+		}
+		contentStream.endText();
+	}
+
+	private static float getTextWidth(int fontSize, PDFont font, String word)
+			throws IOException {
+		float textWidth = font.getStringWidth(word) / 1000 * fontSize;
+		return textWidth;
+	}
+	
+	
+
+	private static void writeTextNextLine(int fontSize, PDFont font,
+			PDPageContentStream contentStream, StringBuilder textToWrite)
+			throws IOException {
+		contentStream.drawString(textToWrite.toString());
+		newLine(font, fontSize, contentStream);
+		currentTextXPos = 20;
+	}
+	
+	
+
+}

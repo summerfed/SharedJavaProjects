@@ -11,12 +11,22 @@
 <fullyQualifiedTypeName name="java.lang.Exception"/>
 <fullyQualifiedTypeName name="com.svi.bpo.graph.ExceptionNodeFunctions"/>
 <fullyQualifiedTypeName name="com.svi.bpo.graph.notifications.BPONotifications"/>
-<fullyQualifiedTypeName name="java.lang.StringBuilder"/>
 <fullyQualifiedTypeName name="com.svi.bpo.graph.ElementFunctions"/>
 <fullyQualifiedTypeName name="java.util.ArrayList"/>
-<fullyQualifiedTypeName name="java.util.List"/>
 <fullyQualifiedTypeName name="com.svi.bpo.graph.NodeFunctions"/>
 <fullyQualifiedTypeName name="com.svi.bpo.graph.utils.DataUtilities"/>
 <fullyQualifiedTypeName name="com.google.gwt.activity.shared.FilteredActivityMapper.Filter"/>
 <fullyQualifiedTypeName name="javax.servlet.http.HttpServlet"/>
+<fullyQualifiedTypeName name="org.apache.pdfbox.pdmodel.PDDocument"/>
+<fullyQualifiedTypeName name="org.apache.pdfbox.pdmodel.PDPage"/>
+<fullyQualifiedTypeName name="com.fed.test.LineObj"/>
+<fullyQualifiedTypeName name="java.util.LinkedList"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="java.lang.StringBuilder"/>
+<fullyQualifiedTypeName name="org.apache.pdfbox.pdmodel.font.PDFont"/>
+<fullyQualifiedTypeName name="com.fed.receipt.generator.obj.Product"/>
+<fullyQualifiedTypeName name="java.math.BigDecimal"/>
+<fullyQualifiedTypeName name="com.fed.test.DataUtilities"/>
+<fullyQualifiedTypeName name="com.ibm.icu.text.DecimalFormat"/>
+<fullyQualifiedTypeName name="java.text.DecimalFormat"/>
 </qualifiedTypeNameHistroy>
