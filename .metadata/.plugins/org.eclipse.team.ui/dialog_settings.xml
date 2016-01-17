@@ -2,9 +2,27 @@
 <section name="Workbench">
 	<section name="SynchronizeViewSettings">
 		<item value="false" key="linkWithEditor"/>
-		<item value="1452145882109" key="lastactiveparticipant_sec_id"/>
+		<item value="1452749322438" key="lastactiveparticipant_sec_id"/>
 		<item value="org.eclipse.team.cvs.ui.workspace-participant" key="lastactiveparticipant_id"/>
 		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452062819156">
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452062524859">
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452748792827">
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452749322438">
+			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452741932689">
+			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452741872433">
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452742168887">
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452062637093">
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452742964001">
 		</section>
 		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452063351187">
 			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
@@ -12,17 +30,29 @@
 		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452041121250">
 			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
 		</section>
-		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452062524859">
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452741677719">
+			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452741294175">
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452742604822">
 		</section>
 		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452145882109">
 			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
 		</section>
-		<section name="org.eclipse.team.cvs.ui.workspace-participant.1451890361796">
-			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452741197368">
 		</section>
 		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452060354093">
 		</section>
-		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452062637093">
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1451890361796">
+			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452742417433">
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452742217290">
+		</section>
+		<section name="org.eclipse.team.cvs.ui.workspace-participant.1452741532003">
+			<item value="org.eclipse.team.ui.activeModelProvider" key="org.eclipse.team.ui.activeModelProvider"/>
 		</section>
 	</section>
 	<section name="ConfigureProjectWizard">

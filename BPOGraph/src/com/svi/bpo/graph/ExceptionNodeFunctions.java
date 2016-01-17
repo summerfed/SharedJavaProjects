@@ -227,7 +227,7 @@ public class ExceptionNodeFunctions {
 		qb.append("WHERE exception."+EXCEPTION_NODE_ATTR_ID+"={"+EXCEPTION_NODE_ATTR_ID+"} ");
 		qb.append("WITH exception, MAX(LENGTH(path1))+1 AS currentIdx, MAX(LENGTH(path2)) AS totalIdx ");
 		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-(node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:"+RELATIONSHIP_LABEL_EXCEPTION_TO+"]->(exception:"+NODE_LABEL_BPO_EXCEPTION_NODE+") ");
-		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")-[r]->node ");
+		qb.append("MATCH (element:"+ElementFunctions.NODE_LABEL_ELEMENT+")-[r]->exception ");
 		qb.append("RETURN r."+ElementFunctions.ELEMENT_ATTR_WORKER_ID+" AS "+ElementFunctions.ELEMENT_ATTR_WORKER_ID+", node."+NodeFunctions.NODE_ATTR_NODE_ID+" AS "+NodeFunctions.NODE_ATTR_NODE_ID+", element, currentIdx + ' Out of ' + (totalIdx+currentIdx) AS currentProcessLocation,");
 		qb.append("CASE element."+ElementFunctions.ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+" <= cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME +" WHEN TRUE THEN TRUE WHEN FALSE THEN FALSE END AS "+ ElementFunctions.ELEMENT_VAR_CAN_MEET_DEADLINE +";");
 		List<Map<String, Object>> dataReturned = neo4j.sendCypherQuery(qb.toString(), properties);

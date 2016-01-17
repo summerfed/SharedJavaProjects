@@ -15,7 +15,7 @@ var defaultMultiSeriesLineGraphConfig = {
     margin: {top: 20, right: 0, bottom: 100, left: 50},
     padding: {top: 0, right: 0, bottom: 0, left: 0},
     outerWidth: 900,
-    outerHeight: 600,
+    outerHeight: 400,
     innerWidth: function() { return this.outerWidth - this.margin.left - this.margin.right },
     innerHeight: function() { return this.outerHeight - this.margin.top - this.margin.bottom },
     width: function() { return this.innerWidth() - this.padding.left - this.padding.right },

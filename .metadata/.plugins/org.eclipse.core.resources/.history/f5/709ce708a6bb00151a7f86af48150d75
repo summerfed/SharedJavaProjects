@@ -1,0 +1,7 @@
+package com.fed.receipt.generator.db.views;
+
+import javax.swing.JFrame;
+
+public class AddProductFrame extends JFrame {
+	
+}

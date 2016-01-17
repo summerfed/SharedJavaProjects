@@ -22,6 +22,7 @@ public class CommonObjs {
 	public static int ElemPageCount = 0;
 	public static int ElemPageLimit = 10;
 	public static int ElemPageCurrPage = 1;
+	public static int ElemPageCurrNum = 0;
 	
 	public static void notify(Notification value, String text){
 		notifyPanel.add(new NotificationWidget(value, text));

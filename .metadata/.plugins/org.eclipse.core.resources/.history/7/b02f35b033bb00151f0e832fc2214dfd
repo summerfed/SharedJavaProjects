@@ -1,0 +1,5 @@
+package com.fed.receipt.generator.views.receiptgenerator;
+
+public class FrameMenuBar {
+
+}

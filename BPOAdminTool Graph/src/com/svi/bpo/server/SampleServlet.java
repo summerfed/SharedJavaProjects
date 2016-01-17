@@ -85,6 +85,7 @@ public class SampleServlet extends HttpServlet {
 			}
 			
 		}
+		System.err.println(jsonData);
 		PrintWriter out = response.getWriter();
 		out.print(jsonData);
 	}

@@ -1,0 +1,7 @@
+package com.fed.receipt.generator.views.receiptgenerator;
+
+import javax.swing.JMenu;
+
+public class FrameMenuBar extends JMenu {
+
+}

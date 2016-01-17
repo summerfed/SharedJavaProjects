@@ -38,8 +38,9 @@ public class NodeDtlObj implements IsSerializable{
 	private String cumuError="0";
 	
 	private String endpointId;
-	private String elmtsWaiting = "0";
-	private String elmtsInprogress = "0";
+	private int elmtsWaiting = 0;
+	private int elmtsInprogress = 0;
+	private int currentElem = 0;
 	private String elmtsCompleted = "0";
 	
 	private List<ElemDtlObj> elementList;
@@ -81,7 +82,7 @@ public class NodeDtlObj implements IsSerializable{
 	}
 	
 	public NodeDtlObj(String nodeId, String nodeName, String endpointId,
-			String elmtsWaiting, String elmtsInprogress, String cluster,
+			int elmtsWaiting, int elmtsInprogress, String cluster,
 			double cost, String status, String stdUnitOfMeasure,
 			String allowedMinWait, String allowedMaxWait,
 			String allowedAveWait, String allowedMinProc,
@@ -341,19 +342,19 @@ public class NodeDtlObj implements IsSerializable{
 		this.endpointId = endpointId;
 	}
 
-	public String getElmtsWaiting() {
+	public int getElmtsWaiting() {
 		return elmtsWaiting;
 	}
 
-	public void setElmtsWaiting(String elmtsWaiting) {
+	public void setElmtsWaiting(int elmtsWaiting) {
 		this.elmtsWaiting = elmtsWaiting;
 	}
 
-	public String getElmtsInprogress() {
+	public int getElmtsInprogress() {
 		return elmtsInprogress;
 	}
 
-	public void setElmtsInprogress(String elmtsInprogress) {
+	public void setElmtsInprogress(int elmtsInprogress) {
 		this.elmtsInprogress = elmtsInprogress;
 	}
 
@@ -433,6 +434,18 @@ public class NodeDtlObj implements IsSerializable{
 
 	public void setCanMeetTarget(boolean canMeetTarget) {
 		this.canMeetTarget = canMeetTarget;
+	}
+
+
+
+	public int getCurrentElem() {
+		return currentElem;
+	}
+
+
+
+	public void setCurrentElem(int currentElem) {
+		this.currentElem = currentElem;
 	}
 	
 }

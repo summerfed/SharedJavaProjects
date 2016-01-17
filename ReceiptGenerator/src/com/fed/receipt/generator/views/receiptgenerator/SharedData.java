@@ -2,6 +2,10 @@ package com.fed.receipt.generator.views.receiptgenerator;
 
 import javax.swing.JFrame;
 
+import com.fed.receipt.generator.views.receipt.table.Table;
+import com.fed.receipt.generator.views.receipt.table.TableData;
+import com.fed.receipt.generator.views.receipt.table.TableModel;
+
 public class SharedData {
 	private static TableData tableData;
 	private static ProductList productList;

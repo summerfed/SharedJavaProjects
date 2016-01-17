@@ -5,7 +5,7 @@
 		<item value="640" key="SyncPageWidth"/>
 	</section>
 	<section name="CommitWizard">
-		<item value="430" key="height"/>
+		<item value="509" key="height"/>
 		<item value="false" key="ShowCompare"/>
 		<item value="400" key="width"/>
 		<item value="500" key="VWeight2"/>

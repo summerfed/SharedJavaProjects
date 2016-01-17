@@ -17,6 +17,35 @@
   		<servlet-class>com.svi.bpo.server.SampleServlet</servlet-class>
  	</servlet>
  	
+ 	<servlet>
+ 		<servlet-name>realTimeServlet</servlet-name>
+  		<servlet-class>com.svi.bpo.server.RealTimeServlet</servlet-class>
+ 	</servlet>
+ 	
+ 	<servlet-mapping>
+ 	<servlet-name>realTimeServlet</servlet-name>
+  		<url-pattern>/reatltimerpt</url-pattern>
+  	</servlet-mapping>
+  	
+  	<servlet>
+ 		<servlet-name>aveDurationServlet</servlet-name>
+  		<servlet-class>com.svi.bpo.server.AveDurationServlet</servlet-class>
+ 	</servlet>
+ 	
+ 	<servlet-mapping>
+ 	<servlet-name>aveDurationServlet</servlet-name>
+  		<url-pattern>/aveduration</url-pattern>
+  	</servlet-mapping>
+  	
+  	<servlet>
+ 		<servlet-name>nodeProgress</servlet-name>
+  		<servlet-class>com.svi.bpo.server.NodeProgressServlet</servlet-class>
+ 	</servlet>
+ 	
+ 	<servlet-mapping>
+ 	<servlet-name>nodeProgress</servlet-name>
+  		<url-pattern>/nodeprogress</url-pattern>
+  	</servlet-mapping>
  	
  	<servlet-mapping>
  	<servlet-name>lginServlet</servlet-name>

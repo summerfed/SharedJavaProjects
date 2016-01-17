@@ -19,15 +19,14 @@ import com.svi.bpo.client.view.widgets.SwitchButton;
 import com.svi.bpo.constants.BPOCnstnts;
 import com.svi.bpo.constants.Notification;
 import com.svi.bpo.objects.ElemDtlObj;
+import com.svi.bpo.objects.ExceptionDtlObj;
 import com.svi.bpo.objects.NodeDtlObj;
-
-
-
 
 public class ViewElementPanel extends Composite {
 
 	private NodeDtlObj nodeObj;
-	
+	private ExceptionDtlObj exceptionNodeObj;
+
 	private Header header;
 	private ElementTable tbl;
 	private NodeDetailsBar bar;
@@ -40,8 +39,8 @@ public class ViewElementPanel extends Composite {
 	private ChangeWorkerPanel chngeWrkrPnl;
 
 	boolean updateElemCount = true;
-	public ViewElementPanel(){
 
+	public ViewElementPanel() {
 
 		insertElemPnl = new InsertElementPanel();
 		chngePriLvlPnl = new ChangePriorityLvlPanel();
@@ -52,120 +51,133 @@ public class ViewElementPanel extends Composite {
 		tbl = new ElementTable();
 		spw = new SimplePagingWidget();
 		bar = new NodeDetailsBar();
-		
+
 		FlowPanel body = new FlowPanel();
 		body.setStyleName("view-elem-body");
 		body.add(tbl);
-	
-	
-		//updateLabel();
-		
+
+		// updateLabel();
+
 		body.add(bar);
-		//body.add(spw);
-		//setPager(spw);
+		// body.add(spw);
+		// setPager(spw);
 		btnPnl = new ButtonPanel();
-		//btnPnl.
-		
+		// btnPnl.
+
 		btnPnl.getInsertPnlBtn().addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				if(btnPnl.getInsertPnlBtn().isEnable()){
+				if (btnPnl.getInsertPnlBtn().isEnable()) {
 					insertElemPnl.hide();
 					btnPnl.getInsertPnlBtn().disable();
-					InsertElementTextBoxes.nodeNameTxtbx.getTxtBx().setText(nodeObj.getNodeId());//added by jm
+					InsertElementTextBoxes.nodeNameTxtbx.getTxtBx().setText(
+							nodeObj.getNodeId());// added by jm
 
 				} else {
 					insertElemPnl.show();
-					InsertElementTextBoxes.nodeNameTxtbx.getTxtBx().setText(nodeObj.getNodeId());//added by jm
+					InsertElementTextBoxes.nodeNameTxtbx.getTxtBx().setText(
+							nodeObj.getNodeId());// added by jm
 
 					btnPnl.getInsertPnlBtn().enable();
 				}
 			}
 		});
-		
+
 		btnPnl.getChngePriLvlBtn().addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
-				if(btnPnl.getChngePriLvlBtn().isEnable()){
+				if (btnPnl.getChngePriLvlBtn().isEnable()) {
 					chngePriLvlPnl.show();
 				}
 			}
 		});
-		
+
 		btnPnl.getChngeWrkrBtn().addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
-				if(btnPnl.getChngeWrkrBtn().isEnable()){
+				if (btnPnl.getChngeWrkrBtn().isEnable()) {
 					chngeWrkrPnl.show();
 				}
 			}
 		});
-		
+
 		btnPnl.getRefreshBtn().addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
 				System.out.println("Refresh button is clicked");
-				((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getElements(getNodeObj(),CommonObjs.ElemPageCurrPage,CommonObjs.ElemPageLimit, new AsyncCallback<List<ElemDtlObj>>() {
-					
-					@Override
-					public void onSuccess(List<ElemDtlObj> result) {
-						System.out.println("result.size: " + result.size());
-					System.out.println("getNodeObj: " + getNodeObj().getNodeId());
-						setNodeObj(getNodeObj());
-						setTable(result);
-						show();
-							
-						CommonObjs.ElemPageCount= CommonObjs.ElemRecordCount/CommonObjs.ElemPageLimit;
-			
-						if(!result.isEmpty()){
-							CommonObjs.notify(Notification.SUCCESS, "Load Elements Success!");
-						} else {
-							CommonObjs.notify(Notification.INFO, "No elements in the node selected!");
-						}
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						CommonObjs.notify(Notification.ERROR, "Get Elements Failed");
-					}
-				});
-				
-				((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getNodeWithElements(getNodeObj(), new AsyncCallback<NodeDtlObj>(){
+				((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC
+						.getValue())).getElements(getNodeObj(),
+						CommonObjs.ElemPageCurrPage, CommonObjs.ElemPageLimit,
+						new AsyncCallback<List<ElemDtlObj>>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-						CommonObjs.notify(Notification.ERROR, "Get Nodes Failed");
-						
-					}
+							@Override
+							public void onSuccess(List<ElemDtlObj> result) {
+								System.out.println("result.size: "
+										+ result.size());
+								System.out.println("getNodeObj: "
+										+ getNodeObj().getNodeId());
+								setNodeObj(getNodeObj());
+								setTable(result);
+								show();
 
-					@Override
-					public void onSuccess(NodeDtlObj result) {
-						// TODO Auto-generated method stub
-						setNodeObj(result);
-						
-						show();
-						
-						
-						
-					}
-				
-				});
+								CommonObjs.ElemPageCount = CommonObjs.ElemRecordCount
+										/ CommonObjs.ElemPageLimit;
+
+								if (!result.isEmpty()) {
+									CommonObjs.notify(Notification.SUCCESS,
+											"Load Elements Success!");
+								} else {
+									CommonObjs
+											.notify(Notification.INFO,
+													"No elements in the node selected!");
+								}
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								CommonObjs.notify(Notification.ERROR,
+										"Get Elements Failed");
+							}
+						});
+
+				((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC
+						.getValue())).getNodeWithElements(getNodeObj(),
+						new AsyncCallback<NodeDtlObj>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// TODO Auto-generated method stub
+								CommonObjs.notify(Notification.ERROR,
+										"Get Nodes Failed");
+
+							}
+
+							@Override
+							public void onSuccess(NodeDtlObj result) {
+								// TODO Auto-generated method stub
+								setNodeObj(result);
+
+								show();
+
+							}
+
+						});
+				updateLabel();
 			}
 		});
-		
+
 		FlowPanel mainPnl = new FlowPanel();
 		mainPnl.setStyleName("view-elem-pnl");
 		mainPnl.add(header);
 		setPager(spw);
-	//	body.add(spw);
+		// body.add(spw);
 		mainPnl.add(body);
 		mainPnl.add(spw);
-		
+
 		spw.setStyleName("pager");
 		mainPnl.add(btnPnl);
 		mainPnl.add(insertElemPnl);
@@ -173,65 +185,243 @@ public class ViewElementPanel extends Composite {
 		mainPnl.add(trnsfrElmPnl);
 		mainPnl.add(chngeWrkrPnl);
 
-		if(CommonObjs.bpoProps.getMode().equalsIgnoreCase("Y")){
+		if (CommonObjs.bpoProps.getMode().equalsIgnoreCase("Y")) {
 			insertElemPnl.setVisible(false);
 			chngePriLvlPnl.setVisible(false);
 			trnsfrElmPnl.setVisible(false);
 			chngeWrkrPnl.setVisible(false);
 		}
-		
+
 		initWidget(mainPnl);
 
 		this.getElement().getStyle().setDisplay(Display.NONE);
 	}
 
+	public ViewElementPanel(ExceptionDtlObj exceptNode) {
+
+		insertElemPnl = new InsertElementPanel();
+		chngePriLvlPnl = new ChangePriorityLvlPanel();
+		trnsfrElmPnl = new TransferElementPanel();
+		chngeWrkrPnl = new ChangeWorkerPanel();
+
+		header = new Header();
+		tbl = new ElementTable();
+		spw = new SimplePagingWidget();
+		bar = new NodeDetailsBar();
+
+		FlowPanel body = new FlowPanel();
+		body.setStyleName("view-elem-body");
+		body.add(tbl);
+//btnPnl.getInsertPnlBtn().setVisible(false);
+	
+
+		body.add(bar);
+		// body.add(spw);
+		// setPager(spw);
+		btnPnl = new ButtonPanel();
+		// btnPnl.
+		btnPnl.getInsertPnlBtn().setVisible(false);
+		btnPnl.getInsertPnlBtn().addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				if (btnPnl.getInsertPnlBtn().isEnable()) {
+					insertElemPnl.hide();
+					btnPnl.getInsertPnlBtn().disable();
+					InsertElementTextBoxes.nodeNameTxtbx.getTxtBx().setText(
+							getExceptionNodeObj().getNodeId());// added by jm
+
+				} else {
+					insertElemPnl.show();
+					InsertElementTextBoxes.nodeNameTxtbx.getTxtBx().setText(
+							getExceptionNodeObj().getNodeId());// added by jm
+
+					btnPnl.getInsertPnlBtn().enable();
+				}
+			}
+		});
+
+		btnPnl.getChngePriLvlBtn().addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				if (btnPnl.getChngePriLvlBtn().isEnable()) {
+					chngePriLvlPnl.show();
+				}
+			}
+		});
+
+		btnPnl.getChngeWrkrBtn().addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				if (btnPnl.getChngeWrkrBtn().isEnable()) {
+					chngeWrkrPnl.show();
+				}
+			}
+		});
+
+		btnPnl.getRefreshBtn().addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				System.out.println("Refresh button is clicked");
+				((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC
+						.getValue())).getExceptionElements(getExceptionNodeObj(),
+						
+						new AsyncCallback<List<ElemDtlObj>>() {
+
+							@Override
+							public void onSuccess(List<ElemDtlObj> result) {
+								System.out.println("result.size: "
+										+ result.size());
+								System.out.println("getNodeObj: "
+										+ getExceptionNodeObj().getNodeId());
+								setExceptionNodeObj(getExceptionNodeObj());
+								setTable(result);
+								show();
+
+								CommonObjs.ElemPageCount = CommonObjs.ElemRecordCount
+										/ CommonObjs.ElemPageLimit;
+
+								if (!result.isEmpty()) {
+									CommonObjs.notify(Notification.SUCCESS,
+											"Load Elements Success!");
+								} else {
+									CommonObjs
+											.notify(Notification.INFO,
+													"No elements in the node selected!");
+								}
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								CommonObjs.notify(Notification.ERROR,
+										"Get Elements Failed");
+							}
+						});
+
+			/*	((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC
+						.getValue())).getNodeWithElements(getNodeObj(),
+						new AsyncCallback<NodeDtlObj>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// TODO Auto-generated method stub
+								CommonObjs.notify(Notification.ERROR,
+										"Get Nodes Failed");
+
+							}
+
+							@Override
+							public void onSuccess(NodeDtlObj result) {
+								// TODO Auto-generated method stub
+								setNodeObj(result);
+
+								show();
+
+							}
+
+						});*/
+			}
+		});
+
+		FlowPanel mainPnl = new FlowPanel();
+		mainPnl.setStyleName("view-elem-pnl");
+		mainPnl.add(header);
+		setPager(spw);
+		// body.add(spw);
+		mainPnl.add(body);
+		mainPnl.add(spw);
+
+		spw.setStyleName("pager");
+		mainPnl.add(btnPnl);
+		mainPnl.add(insertElemPnl);
+		mainPnl.add(chngePriLvlPnl);
+		mainPnl.add(trnsfrElmPnl);
+		mainPnl.add(chngeWrkrPnl);
+
+		if (CommonObjs.bpoProps.getMode().equalsIgnoreCase("Y")) {
+			insertElemPnl.setVisible(false);
+			chngePriLvlPnl.setVisible(false);
+			trnsfrElmPnl.setVisible(false);
+			chngeWrkrPnl.setVisible(false);
+		}
+
+		initWidget(mainPnl);
+
+		this.getElement().getStyle().setDisplay(Display.NONE);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public void setNodeObj(NodeDtlObj nodeObj) {
 		this.nodeObj = nodeObj;
-		header.setText("Node ID: " + nodeObj.getNodeId());// node title for the header
-		
-			this.bar.getNoOfProcess().setText(nodeObj.getElmtsInprogress());
-		this.bar.getNoOfWaiting().setText(nodeObj.getElmtsWaiting());
-		this.bar.getCompleteCnt().setText(nodeObj.getCumElemCount());
-//		this.bar.getCompleteCnt().setText(nodeObj.getElmtsCompleted());
-		this.bar.getOutputCnt().setText(nodeObj.getCumOutput()+" "+nodeObj.getStdUnitOfMeasure());
+		header.setText("Node ID: " + nodeObj.getNodeId());// node title for the
+															// header
+
+		this.bar.getNoOfProcess().setText(""+nodeObj.getElmtsInprogress());
+		this.bar.getNoOfWaiting().setText(""+nodeObj.getElmtsWaiting());
+		this.bar.getCompleteCnt().setText(""+nodeObj.getCurrentElem());
+		// this.bar.getCompleteCnt().setText(nodeObj.getElmtsCompleted());
+		this.bar.getOutputCnt().setText(
+				nodeObj.getCurrentElem() + " " + nodeObj.getStdUnitOfMeasure());
 		this.bar.getErrorCnt().setText(nodeObj.getCumError());
 	}
 
-	public void setTable(List<ElemDtlObj> elems){
+	public void setTable(List<ElemDtlObj> elems) {
 		tbl.clear();
-	  //int counter = 0;
-	  //int pagelimit = CommonObjs.ElemPageLimit;
-	  //int start = (CommonObjs.ElemPageCurrPage - 1) * CommonObjs.ElemPageLimit;
-		for(final ElemDtlObj elem : elems){
-			addToTable(elem);		
-	//   counter++;
+		// int counter = 0;
+		// int pagelimit = CommonObjs.ElemPageLimit;
+		// int start = (CommonObjs.ElemPageCurrPage - 1) *
+		// CommonObjs.ElemPageLimit;
+		for (final ElemDtlObj elem : elems) {
+			addToTable(elem);
+			// counter++;
 		}
 	}
 
-	public void setTable(ElemDtlObj elem){
+	public void setTable(ElemDtlObj elem) {
 		tbl.clear();
 		addToTable(elem);
 	}
 
-	public void addToTable(final ElemDtlObj elem){
+	public void addToTable(final ElemDtlObj elem) {
 
 		final ElementRecord record = new ElementRecord(elem);
-		/*ADDED*/
-		 
-		if(nodeObj.getAllowedMaxWait() == null){
+		/* ADDED */
+if (nodeObj != null)
+		{if (nodeObj.getAllowedMaxWait() == null) {
 			nodeObj.setAllowedMaxWait("0");
 		}
-		if(nodeObj.getAllowedMaxProc() == null){
+		if (nodeObj.getAllowedMaxProc() == null) {
 			nodeObj.setAllowedMaxProc("0");
 		}
-		
-		
-			if(elem.getStatus().equalsIgnoreCase("W")){
-			if(elem.getWaitDuration() > Integer.parseInt(nodeObj.getAllowedMaxWait())){
+		}
+		if (elem.getStatus().equalsIgnoreCase("W")) {
+			if (elem.getWaitDuration() > Integer.parseInt(nodeObj
+					.getAllowedMaxWait())) {
 				record.getElement().addClassName("elem-tbl-row-exceed");
 			}
-		}else if(elem.getStatus().equalsIgnoreCase("P")){
-			if(elem.getProcessDuration() > Integer.parseInt(nodeObj.getAllowedMaxProc())){
+		} else if (elem.getStatus().equalsIgnoreCase("P")) {
+			if (elem.getProcessDuration() > Integer.parseInt(nodeObj
+					.getAllowedMaxProc())) {
 				record.getElement().addClassName("elem-tbl-row-exceed");
 			}
 		}
@@ -244,17 +434,18 @@ public class ViewElementPanel extends Composite {
 
 				String elemId = record.getElemObj().getElementId();
 
-				if(!tbl.getMapOfSelectedElements().containsKey(elemId)){
+				if (!tbl.getMapOfSelectedElements().containsKey(elemId)) {
 					tbl.getMapOfSelectedElements().put(elemId, elem);
 					record.addStyleName("elem-tbl-row-selected");
 				} else {
 					tbl.getMapOfSelectedElements().remove(elemId);
 					record.removeStyleName("elem-tbl-row-selected");
 				}
-System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().size());
+				System.out.println("tbl.getElementsSelected(): "
+						+ tbl.getElementsSelected().size());
 				System.out.println(tbl.getElementsSelected());
 
-				if(hasSlctdNodes()){
+				if (hasSlctdNodes()) {
 					btnPnl.getDelBtn().enable();
 					btnPnl.getChngePriLvlBtn().enable();
 					btnPnl.getTrnsfrElmntBtn().enable();
@@ -268,69 +459,84 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 			}
 		}, ClickEvent.getType());
 
-		updateLabel();}
+		updateLabel();
+	}
 
-	public void show(){
+	public void show() {
 		this.getElement().getStyle().setDisplay(Display.BLOCK);
 		btnPnl.getDelBtn().disable();
 		btnPnl.getChngePriLvlBtn().disable();
 		btnPnl.getTrnsfrElmntBtn().disable();
 		btnPnl.getChngeWrkrBtn().disable();
 	}
-	
-	public void close(){
+
+	public void close() {
 		tbl.clearSelectedElements();
 		hide();
 	}
-	public void hide(){
+
+	public void hide() {
 		this.getElement().getStyle().setDisplay(Display.NONE);
 	}
+
 	public NodeDtlObj getNodeObj() {
 		return nodeObj;
 	}
+
 	public SwitchButton getInsertPnlBtn() {
 		return btnPnl.getInsertPnlBtn();
 	}
+
 	public InsertElementPanel getInsertElemPnl() {
 		return insertElemPnl;
 	}
-	public boolean hasSlctdNodes(){
+
+	public boolean hasSlctdNodes() {
 		return !tbl.getElementsSelected().isEmpty();
 	}
+
 	public SwitchButton getDelBtn() {
 		return btnPnl.getDelBtn();
 	}
-	public SwitchButton getChngePriLvlBtn(){
+
+	public SwitchButton getChngePriLvlBtn() {
 		return btnPnl.getChngePriLvlBtn();
 	}
-	public SwitchButton getTrnsfrElmntBtn(){
+
+	public SwitchButton getTrnsfrElmntBtn() {
 		return btnPnl.getTrnsfrElmntBtn();
 	}
+
 	public SwitchButton getChngeWrkrBtn() {
 		return btnPnl.getChngeWrkrBtn();
 	}
+
 	public ElementTable getTbl() {
 		return tbl;
 	}
-	public ChangePriorityLvlPanel getChangePriorityLvlPanel(){
+
+	public ChangePriorityLvlPanel getChangePriorityLvlPanel() {
 		return this.chngePriLvlPnl;
 	}
-	public TransferElementPanel getTrnsfrElmPnl(){
+
+	public TransferElementPanel getTrnsfrElmPnl() {
 		return trnsfrElmPnl;
 	}
-	public ChangeWorkerPanel getChangeWorkerPanel(){
+
+	public ChangeWorkerPanel getChangeWorkerPanel() {
 		return this.chngeWrkrPnl;
 	}
+
 	public Button getCloseBtn() {
 		return header.getCloseBtn();
 	}
-	
-	public class Header extends Composite{
+
+	public class Header extends Composite {
 
 		private Label label;
 		private Label total;
 		private Button closeBtn;
-		
+
 		public Header() {
 
 			closeBtn = new Button();
@@ -338,7 +544,7 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 
 			label = new Label();
 			label.setStyleName("view-elem-hdr-lbl");
-			
+
 			total = new Label();
 			total.setStyleName("view-elem-hdr-total");
 
@@ -347,14 +553,14 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 			mainPnl.add(label);
 			mainPnl.add(total);
 			mainPnl.add(closeBtn);
-			
+
 			initWidget(mainPnl);
 		}
 
 		public void setText(String text) {
 			this.label.setText(text);
 		}
-		
+
 		public void setTotal(String text) {
 			this.total.setText(text);
 		}
@@ -362,40 +568,40 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 		public Button getCloseBtn() {
 			return closeBtn;
 		}
-		
+
 	}
-	
+
 	public class NodeDetailsBar extends Composite {
-		
+
 		private Label noOfWaiting = new Label();
 		private Label noOfProcess = new Label();
 		private Label completeCnt = new Label();
 		private Label outputCnt = new Label();
 		private Label errorCnt = new Label();
-		
+
 		public NodeDetailsBar() {
-			
+
 			FlowPanel mainPnl = new FlowPanel();
 			mainPnl.setStyleName("node-dtl-pnl");
-			
+
 			noOfWaiting = new Label();
 			noOfProcess = new Label();
 			completeCnt = new Label();
 			outputCnt = new Label();
 			errorCnt = new Label();
-			
+
 			HTMLPanel waitLbl = new HTMLPanel("WAITING");
 			HTMLPanel procLbl = new HTMLPanel("PROCESSING");
 			HTMLPanel ccLbl = new HTMLPanel("Total Element Count");
 			HTMLPanel ocLbl = new HTMLPanel("Total Output");
 			HTMLPanel ecLbl = new HTMLPanel("Total Errors");
-			
-			FlowPanel topPnl =  new FlowPanel();
+
+			FlowPanel topPnl = new FlowPanel();
 			topPnl.add(noOfWaiting);
 			topPnl.add(waitLbl);
 			topPnl.add(noOfProcess);
 			topPnl.add(procLbl);
-			
+
 			FlowPanel btmPnl = new FlowPanel();
 			btmPnl.add(completeCnt);
 			btmPnl.add(ccLbl);
@@ -403,10 +609,10 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 			btmPnl.add(ocLbl);
 			btmPnl.add(errorCnt);
 			btmPnl.add(ecLbl);
-			
+
 			mainPnl.add(topPnl);
 			mainPnl.add(btmPnl);
-			
+
 			initWidget(mainPnl);
 		}
 
@@ -429,18 +635,18 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 		public Label getErrorCnt() {
 			return errorCnt;
 		}
-		
+
 	}
 
 	public class ButtonPanel extends Composite {
-		
+
 		private SwitchButton insertPnlBtn;
 		private SwitchButton delBtn;
 		private SwitchButton chngePriLvlBtn;
 		private SwitchButton trnsfrElmntBtn;
 		private SwitchButton chngeWrkrBtn;
 		private SwitchButton refreshBtn;
-		
+
 		public ButtonPanel() {
 
 			insertPnlBtn = new SwitchButton("Insert");
@@ -459,7 +665,7 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 			trnsfrElmntBtn.setEnableStyle("view-elem-transfr-btn-enable");
 			trnsfrElmntBtn.setDisableStyle("view-elem-transfr-btn-disable");
 			trnsfrElmntBtn.disable();
-			chngeWrkrBtn =  new SwitchButton("Shift Worker");
+			chngeWrkrBtn = new SwitchButton("Shift Worker");
 			chngeWrkrBtn.setEnableStyle("view-elem-chnge-wrkr-btn-enable");
 			chngeWrkrBtn.setDisableStyle("view-elem-chnge-wrkr-btn-disable");
 			chngeWrkrBtn.disable();
@@ -476,55 +682,60 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 			mainPnl.add(chngePriLvlBtn);
 			mainPnl.add(trnsfrElmntBtn);
 			mainPnl.add(chngeWrkrBtn);
-			
-			
-			if(CommonObjs.bpoProps.getMode().equalsIgnoreCase("Y")){
+
+			if (CommonObjs.bpoProps.getMode().equalsIgnoreCase("Y")) {
 				insertPnlBtn.setVisible(false);
 				delBtn.setVisible(false);
 				chngePriLvlBtn.setVisible(false);
 				trnsfrElmntBtn.setVisible(false);
 				chngeWrkrBtn.setVisible(false);
 			}
-			
+
 			initWidget(mainPnl);
 		}
 
 		public SwitchButton getInsertPnlBtn() {
 			return insertPnlBtn;
 		}
+
 		public SwitchButton getDelBtn() {
 			return delBtn;
 		}
+
 		public SwitchButton getChngePriLvlBtn() {
 			return chngePriLvlBtn;
 		}
+
 		public SwitchButton getTrnsfrElmntBtn() {
 			return trnsfrElmntBtn;
 		}
+
 		public SwitchButton getChngeWrkrBtn() {
 			return chngeWrkrBtn;
 		}
+
 		public SwitchButton getRefreshBtn() {
 			return refreshBtn;
 		}
 	}
-	
+
 	private void setPager(final SimplePagingWidget widget) {
 
-		//int pageCount = CommonObjs.ElemPageCount;
-	
+		// int pageCount = CommonObjs.ElemPageCount;
+
 		widget.getNextBtn().addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-					
+
 				updateRecordCount();
 				updateElemCount = false;
 				
-				if ((((CommonObjs.ElemPageCurrPage-1)*10+1) + 9) <= CommonObjs.ElemRecordCount) {
-			//		_SEARCHING_SHOW_OK();
-				
+				if ((((CommonObjs.ElemPageCurrPage - 1) * 10 + 1) + 9) <= CommonObjs.ElemRecordCount) {
+					// _SEARCHING_SHOW_OK();
+
 					CommonObjs.ElemPageCurrPage++;
-			//		srchData(null, CommonObjAndHistoryRep.currentSrchKeywrdLst);
+					// srchData(null,
+					// CommonObjAndHistoryRep.currentSrchKeywrdLst);
 				}
 				refresh();
 				updateLabel();
@@ -534,18 +745,18 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 		widget.getPrevBtn().addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-			
+
 				updateRecordCount();
 				updateElemCount = false;
 				if (CommonObjs.ElemPageCurrPage > 1) {
-				//	_SEARCHING_SHOW_OK();
-				//	Window.alert("getPrevBtn");
+					// _SEARCHING_SHOW_OK();
+					// Window.alert("getPrevBtn");
 					CommonObjs.ElemPageCurrPage--;
-				//	srchData(null, CommonObjAndHistoryRep.currentSrchKeywrdLst);
+					// srchData(null,
+					// CommonObjAndHistoryRep.currentSrchKeywrdLst);
 				}
 				refresh();
-				
-				
+
 				updateLabel();
 			}
 		});
@@ -555,18 +766,20 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 			public void onClick(ClickEvent arg0) {
 				updateRecordCount();
 				updateElemCount = false;
-				int lastRecordOnPage = ((CommonObjs.ElemPageCurrPage-1)*10+1) + 9;
-				if (lastRecordOnPage != CommonObjs.ElemRecordCount ) {
-				//	_SEARCHING_SHOW_OK();
-					
+				int lastRecordOnPage = ((CommonObjs.ElemPageCurrPage - 1) * 10 + 1) + 9;
+				if (lastRecordOnPage != CommonObjs.ElemRecordCount) {
+					// _SEARCHING_SHOW_OK();
+
 					if (CommonObjs.ElemRecordCount % CommonObjs.ElemPageLimit == 0) {
 						CommonObjs.ElemPageCurrPage = (CommonObjs.ElemRecordCount / CommonObjs.ElemPageLimit);
 					} else {
-						CommonObjs.ElemPageCurrPage = (CommonObjs.ElemRecordCount / CommonObjs.ElemPageLimit) + 1 ;
+						CommonObjs.ElemPageCurrPage = (CommonObjs.ElemRecordCount / CommonObjs.ElemPageLimit) + 1;
 					}
-		//			srchData(null, CommonObjAndHistoryRep.currentSrchKeywrdLst);
+					// srchData(null,
+					// CommonObjAndHistoryRep.currentSrchKeywrdLst);
 				}
-				//Window.alert("CommonObjs.ElemPageCurrPage is " + CommonObjs.ElemPageCurrPage);
+				// Window.alert("CommonObjs.ElemPageCurrPage is " +
+				// CommonObjs.ElemPageCurrPage);
 				refresh();
 				updateLabel();
 			}
@@ -577,116 +790,205 @@ System.out.println("tbl.getElementsSelected(): " + tbl.getElementsSelected().siz
 			public void onClick(ClickEvent arg0) {
 				updateRecordCount();
 				updateElemCount = false;
-				//Window.alert("getFirstBtn");
+				// Window.alert("getFirstBtn");
 				if (CommonObjs.ElemPageCurrPage > 1) {
-					//_SEARCHING_SHOW_OK();
+					// _SEARCHING_SHOW_OK();
 					CommonObjs.ElemPageCurrPage = 1;
-					//srchData(null, CommonObjAndHistoryRep.currentSrchKeywrdLst);
+					// srchData(null,
+					// CommonObjAndHistoryRep.currentSrchKeywrdLst);
 				}
 				refresh();
 				updateLabel();
 			}
 		});
 	}
-	
-	public void updateLabel(){
+
+	public void updateLabel() {
 		spw.enableLeft();
 		spw.enableRight();
 		if (CommonObjs.ElemPageCurrPage <= 0)
 			CommonObjs.ElemPageCurrPage = 1;
-			
-		CommonObjs.ElemPageCount = CommonObjs.ElemRecordCount/CommonObjs.ElemPageLimit;
+
+		CommonObjs.ElemPageCount = CommonObjs.ElemRecordCount
+				/ CommonObjs.ElemPageLimit;
 		int recordCount = CommonObjs.ElemRecordCount;
-		int startPage = ((CommonObjs.ElemPageCurrPage-1)*10+1);
-		int lastRecordOnPage = ((CommonObjs.ElemPageCurrPage-1)*10+1) + 9;
-		if ( recordCount == 0){
+		int startPage = ((CommonObjs.ElemPageCurrPage - 1) * 10 + 1);
+		int lastRecordOnPage = ((CommonObjs.ElemPageCurrPage - 1) * 10 + 1) + 9;
+		if (recordCount == 0) {
 			lastRecordOnPage = recordCount;
 			startPage = 0;
-		}
-		else if (lastRecordOnPage > recordCount){
-			lastRecordOnPage = recordCount;
+		} else if (lastRecordOnPage > recordCount) {
+
+			
+				lastRecordOnPage = recordCount;
 			
 		}
-		
-		if (startPage <= 1){
+
+		if (startPage <= 1) {
 			spw.disableLeft();
-			
+
 		}
-		if (lastRecordOnPage == recordCount){
-			spw.disableRight();
+		if (lastRecordOnPage >= recordCount) {
+
 			
+				spw.disableRight();
+			
+
 		}
-		spw.setText(recordCount,  startPage, lastRecordOnPage);
 
 		
-	}
-	
-	public void refresh(){
+			spw.setText(recordCount, startPage, lastRecordOnPage);
 		
-		if (updateElemCount){
+
+	}
+
+	public void refresh() {
+
+		if (updateElemCount) {
 			updateRecordCount();
 		}
-		
-		((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getElements(getNodeObj(),CommonObjs.ElemPageCurrPage,CommonObjs.ElemPageLimit, new AsyncCallback<List<ElemDtlObj>>() {
+if(getNodeObj() != null){
+		((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC
+				.getValue())).getElements(getNodeObj(),
+				CommonObjs.ElemPageCurrPage, CommonObjs.ElemPageLimit,
+				new AsyncCallback<List<ElemDtlObj>>() {
+
+					@Override
+					public void onSuccess(List<ElemDtlObj> result) {
+						System.out.println("result.size: " + result.size());
+						System.out.println("getNodeObj: "
+								+ getNodeObj().getNodeId());
+						setNodeObj(getNodeObj());
+						setTable(result);
+						show();
+
+						// CommonObjs.ElemRecordCount = result.size();
+
+						// CommonObjs.ElemPageCurrPage = 1;
+
+						CommonObjs.ElemPageCount = CommonObjs.ElemRecordCount
+								/ CommonObjs.ElemPageLimit;
+						CommonObjs.ElemPageCurrNum = result.size();
+						if (!result.isEmpty()) {
+							// CommonObjs.notify(Notification.SUCCESS,
+							// "Load Elements Success!");
+						} else {
+							CommonObjs.notify(Notification.INFO,
+									"Node is Empty!");
+						}
+						updateLabel();
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						CommonObjs.notify(Notification.ERROR,
+								"Get Elements Failed");
+					}
+				});}
+else if(getExceptionNodeObj() != null)
+{
+	((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC
+			.getValue())).getExceptionElements(getExceptionNodeObj(),
 			
-			@Override
-			public void onSuccess(List<ElemDtlObj> result) {
-				System.out.println("result.size: " + result.size());
-			System.out.println("getNodeObj: " + getNodeObj().getNodeId());
-				setNodeObj(getNodeObj());
-				setTable(result);
-				show();
-				
-				//CommonObjs.ElemRecordCount = result.size();
-				
-				//CommonObjs.ElemPageCurrPage = 1;
-				
-				CommonObjs.ElemPageCount= CommonObjs.ElemRecordCount/CommonObjs.ElemPageLimit;
-	
-				if(!result.isEmpty()){
-					//CommonObjs.notify(Notification.SUCCESS, "Load Elements Success!");
-				} else {
-					CommonObjs.notify(Notification.INFO, "Node is Empty!");
+			new AsyncCallback<List<ElemDtlObj>>() {
+
+				@Override
+				public void onSuccess(List<ElemDtlObj> result) {
+					
+					setExceptionNodeObj(getExceptionNodeObj());
+					setTable(result);
+					show();
+
+					// CommonObjs.ElemRecordCount = result.size();
+
+					// CommonObjs.ElemPageCurrPage = 1;
+
+					CommonObjs.ElemPageCount = CommonObjs.ElemRecordCount
+							/ CommonObjs.ElemPageLimit;
+					CommonObjs.ElemPageCurrNum = result.size();
+					if (!result.isEmpty()) {
+						// CommonObjs.notify(Notification.SUCCESS,
+						// "Load Elements Success!");
+					} else {
+						CommonObjs.notify(Notification.INFO,
+								"Node is Empty!");
+					}
+					updateLabel();
 				}
-				updateLabel();
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				CommonObjs.notify(Notification.ERROR, "Get Elements Failed");
-			}
-		});
+
+				@Override
+				public void onFailure(Throwable caught) {
+					CommonObjs.notify(Notification.ERROR,
+							"Get Elements Failed");
+				}
+			});
+
+
+}
+
+
+
 		updateElemCount = true;
 		getTbl().getElementsSelected().clear();
 	}
-	
-	public void updateRecordCount(){
+
+	public void updateRecordCount() {
+
+		if(getNodeObj() == null){return;}
 		
-((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getElements(getNodeObj(), new AsyncCallback<List<ElemDtlObj>>() {
-			
-			@Override
-			public void onSuccess(List<ElemDtlObj> result) {
-				System.out.println(" updateReordCount result.size: " + result.size());
-			System.out.println("updateReordCount getNodeObj: " + getNodeObj().getNodeId());
-				
-				CommonObjs.ElemRecordCount = result.size();
-				
-	
-				if(!result.isEmpty()){
-					//CommonObjs.notify(Notification.SUCCESS, "Load Elements Success!");
-				} else {
-					CommonObjs.notify(Notification.INFO, "Node is Empty!");
-				}
-				updateLabel();
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				CommonObjs.notify(Notification.ERROR, "Update Record Count failed");
-			}
-		});
+		((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC
+				.getValue())).getNodes(getNodeObj().getEndpointId(),
+				new AsyncCallback<List<NodeDtlObj>>() {
+
+					@Override
+					public void onSuccess(List<NodeDtlObj> result) {
+						for(int i = 0; i < result.size();i++)
+						{
+							if (result.get(i).getNodeId().equals(getNodeObj().getNodeId())) 
+							{setNodeObj(result.get(i));
+							break;}
+						}
+
+						CommonObjs.ElemRecordCount = getNodeObj().getElmtsInprogress()+getNodeObj().getElmtsWaiting();
+
+						if (!result.isEmpty()) {
+							// CommonObjs.notify(Notification.SUCCESS,
+							// "Load Elements Success!");
+						} else {
+							CommonObjs.notify(Notification.INFO,
+									"Node is Empty!");
+						}
+						updateLabel();
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						CommonObjs.notify(Notification.ERROR,
+								"Update Record Count failed");
+					}
+				});
+
+	}
+
+	public ExceptionDtlObj getExceptionNodeObj() {
+		return exceptionNodeObj;
+	}
+
+	public void setExceptionNodeObj(ExceptionDtlObj exceptionNodeObj) {
+		this.exceptionNodeObj = exceptionNodeObj;
+		
+		header.setText("Node ID: " + exceptionNodeObj.getNodeId());// node title for the
+															// header
+
+		this.bar.getNoOfProcess().setText(""+exceptionNodeObj.getCurrentTotalInProcessElements());
+		this.bar.getNoOfWaiting().setText(""+exceptionNodeObj.getCurrentTotalWaitingElements());
+		this.bar.getCompleteCnt().setText(""+exceptionNodeObj.getCurrentTotalWaitingElements()+exceptionNodeObj.getCurrentTotalInProcessElements());
+		// this.bar.getCompleteCnt().setText(nodeObj.getElmtsCompleted());
+	/*	this.bar.getOutputCnt().setText(
+				nodeObj.getCurrentElem() + " " + nodeObj.getStdUnitOfMeasure());
+		this.bar.getErrorCnt().setText(nodeObj.getCumError());
+	*/	
 		
 	}
-	
-	
+
 }

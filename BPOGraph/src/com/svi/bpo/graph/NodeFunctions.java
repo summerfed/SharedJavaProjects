@@ -544,16 +544,25 @@ public class NodeFunctions {
 	 * Increment Node Total Error Count
 	 * @param nodeId
 	 * @param errorCount
-	 * @return TRUE if Success, False otherwise
+	 * @return TRUE if Success, False otherwise = May Node Id does Not Exist or Database Connect Error
 	 */
-	public boolean incrementNodeErrorCount(String nodeId, int errorCount) {
+	public BPONotifications incrementNodeErrorCount(String nodeId, int errorCount) {
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(NODE_ATTR_NODE_ID, nodeId);
 		properties.put(REPORT_ATTR_TOTAL_ERROR_COUNT, errorCount);
 		StringBuilder qb = new StringBuilder();
 		qb.append("MATCH (:"+NODE_LABEL_BPO_NODE+" {"+NODE_ATTR_NODE_ID+":{"+NODE_ATTR_NODE_ID+"}})<-[:"+RELATIONSHIP_LABEL_REPORTING_OF+"]-(report:"+NODE_LABEL_BPO_REPORT+") ");
-		qb.append("SET report."+REPORT_ATTR_TOTAL_ERROR_COUNT+"=report."+REPORT_ATTR_TOTAL_ERROR_COUNT+"+{"+REPORT_ATTR_TOTAL_ERROR_COUNT+"};");
-		return neo4j.sendCypherBooleanResult(qb.toString(), properties);
+		qb.append("SET report."+REPORT_ATTR_TOTAL_ERROR_COUNT+"=report."+REPORT_ATTR_TOTAL_ERROR_COUNT+"+{"+REPORT_ATTR_TOTAL_ERROR_COUNT+"} ");
+		qb.append("RETURN COUNT(report) AS data;");
+		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
+		if(dbResult.size()>0) {
+			int status = DataUtilities.toInteger(dbResult.get(0).get("data"));
+			if(status>0) {
+				return BPONotifications.NODE_ERROR_COUNT_INCREMENT_SUCCESS;
+			}
+		}
+		
+		return BPONotifications.NODE_DOES_NOT_EXIST;
 	}
 	
 	 String computeTargetCompletionTime(String cluster) {
@@ -730,7 +739,9 @@ public class NodeFunctions {
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(NODE_ATTR_NODE_ID, nodeId);
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (node:"+NODE_LABEL_BPO_NODE+" {"+NODE_ATTR_NODE_ID+":{"+NODE_ATTR_NODE_ID+"}})-[r]-() DELETE r,node;");
+		qb.append("MATCH (node:"+NODE_LABEL_BPO_NODE+" {"+NODE_ATTR_NODE_ID+":{"+NODE_ATTR_NODE_ID+"}})-[r]-() ");
+		qb.append("MATCH node<-[r1:"+RELATIONSHIP_LABEL_REPORTING_OF+"]-(report:"+NODE_LABEL_BPO_REPORT+") ");
+		qb.append("DELETE r1, r, node, report; ");
 		boolean dbQueryStat1 = neo4j.sendCypherBooleanResult(qb.toString(), properties);
 		
 		String query = "MATCH (node:"+NODE_LABEL_BPO_NODE+" {"+NODE_ATTR_NODE_ID+":{"+NODE_ATTR_NODE_ID+"}}) DELETE node;";

@@ -1,0 +1,5 @@
+package com.fed.receipt.generator.printer;
+
+public class Printer {
+
+}

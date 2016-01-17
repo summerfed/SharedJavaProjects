@@ -1,7 +1,13 @@
 package com.svi.bpo.client.presenter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -62,6 +68,9 @@ public class DashboardViewScnPresenter  implements Presenter{
 					@Override
 					public void onSuccess(List<NodeDshBrdObj> result) {
 						display.addEndpoint(widget, result);
+						
+						addOnClickPopUpHandlers(widget.getRowPanels());
+						
 						widget.stopLoading();
 					}
 
@@ -77,6 +86,29 @@ public class DashboardViewScnPresenter  implements Presenter{
 		
 	}
 	
+	/// Adds on click handler on every row of flowPanel
+	protected void addOnClickPopUpHandlers(HashMap<String, FlowPanel> hashMap) {
+		
+		for(Map.Entry<String, FlowPanel> entry : hashMap.entrySet()){
+			final String nodeId = entry.getKey();
+			FlowPanel panel = entry.getValue();
+			
+			panel.addDomHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent paramClickEvent) {
+					System.err.println(GWT.getModuleBaseURL());
+					System.out.println("clicked "+nodeId);
+					
+					String rptUrl = GWT.getModuleBaseURL() + "../reportgraphs/index.html?nodeId=" + nodeId;
+					Window.open(rptUrl, "_blank", "");
+//					Window.open("http://127.0.0.1:8888/reportgraphs/index.html?nodeId="+nodeId, "_blank", "");
+				}
+			}, ClickEvent.getType());
+		}
+		
+	}
+
 	/**
 	 * Displays Exception Tab DashBoard
 	 *  */

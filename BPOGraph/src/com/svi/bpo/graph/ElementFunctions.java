@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.svi.bpo.graph.notifications.BPONotifications;
 import com.svi.bpo.graph.obj.ElementObject;
 import com.svi.bpo.graph.utils.DataUtilities;
 import com.svi.tools.neo4j.rest.service.Neo4jRestService;
@@ -126,9 +127,9 @@ public class ElementFunctions {
 		properties.put(ELEMENT_ATTR_STATUS, CONSTANT_STATUS_WAITING);
 		
 		StringBuilder qb = new StringBuilder();
+		
 		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
 		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node ");
-		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
 		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
 		qb.append("MERGE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) ");
 		qb.append("ON MATCH SET element."+ELEMENT_FLAG_IS_INSERTED+"=FALSE ");
@@ -143,25 +144,54 @@ public class ElementFunctions {
 		qb.append("element."+ELEMENT_ATTR_TOTAL_OUPUT+"={"+ELEMENT_ATTR_TOTAL_OUPUT+"}, " );
 		qb.append("element."+ELEMENT_ATTR_TOTAL_ERROR+"={"+ELEMENT_ATTR_TOTAL_ERROR+"}, ");
 		qb.append("element."+ELEMENT_FLAG_IS_INSERTED+"=TRUE ");
+		qb.append("WITH element, report, node ");
+		qb.append("WHERE NOT element-[:"+RELATIONSHIP_LABEL_TASK_AT+"|:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->(:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
 		qb.append("MERGE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
-		qb.append("SET r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
-		qb.append("SET r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='' ");
-		qb.append("SET r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='' ");
-		qb.append("SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 ");
-		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
+		qb.append("ON CREATE SET ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP(), ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='', ");
+		qb.append("r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='', ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1, ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
 		qb.append("RETURN element."+ELEMENT_FLAG_IS_INSERTED+" AS status;");
+		
+		
+		/*qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
+		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MERGE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) ");
+		qb.append("ON MATCH SET element."+ELEMENT_FLAG_IS_INSERTED+"=FALSE ");
+		qb.append("ON CREATE SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"}, ");
+		qb.append("element."+ELEMENT_ATTR_STATUS+"={"+ELEMENT_ATTR_STATUS+"}, ");
+		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_ATTR_FILE_POINTER+"={"+ELEMENT_ATTR_FILE_POINTER+"}, ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA1+"={"+ELEMENT_ATTR_EXTRA1+"}, ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA2+"={"+ELEMENT_ATTR_EXTRA2+"}, ");
+		qb.append("element."+ELEMENT_ATTR_EXTRA3+"={"+ELEMENT_ATTR_EXTRA3+"}, ");
+		qb.append("element."+ELEMENT_ATTR_TOTAL_OUPUT+"={"+ELEMENT_ATTR_TOTAL_OUPUT+"}, " );
+		qb.append("element."+ELEMENT_ATTR_TOTAL_ERROR+"={"+ELEMENT_ATTR_TOTAL_ERROR+"}, ");
+		qb.append("element."+ELEMENT_FLAG_IS_INSERTED+"=TRUE ");
+		qb.append("WITH element, report, node ");
+		qb.append("WHERE NOT element-[:"+RELATIONSHIP_LABEL_TASK_AT+"|:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->(:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("MERGE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
+		qb.append("ON CREATE SET ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP(), ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='', ");
+		qb.append("r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='', ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1, ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
+		qb.append("RETURN element."+ELEMENT_FLAG_IS_INSERTED+" AS status;");*/
 		
 		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
 		if(dbResult.size()>0) {
 			boolean status = DataUtilities.toBoolean(dbResult.get(0).get("status"));
 			if(status) {
 				return NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY;
-			} else {
-				return NOTIFICATION_ELEMENT_ALREADY_EXIST;
-			}
+			} 
 		}
 		
-		return NodeFunctions.NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
+		return NOTIFICATION_ELEMENT_ALREADY_EXIST;
 	}
 
 	/**
@@ -186,7 +216,6 @@ public class ElementFunctions {
 		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
 		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node ");
 		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
-		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
 		qb.append("MERGE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) ");
 		qb.append("ON MATCH SET element."+ELEMENT_FLAG_IS_INSERTED+"=FALSE ");
 		qb.append("ON CREATE SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"}, ");
@@ -194,12 +223,15 @@ public class ElementFunctions {
 		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
 		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
 		qb.append("element."+ELEMENT_FLAG_IS_INSERTED+"=TRUE ");
+		qb.append("WITH element, report, node ");
+		qb.append("WHERE NOT element-[:"+RELATIONSHIP_LABEL_TASK_AT+"|:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->(:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
 		qb.append("MERGE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
-		qb.append("SET r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
-		qb.append("SET r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='' ");
-		qb.append("SET r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='' ");
-		qb.append("SET report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 ");
-		qb.append("SET report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
+		qb.append("ON CREATE SET ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP(), ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='', ");
+		qb.append("r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='', ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1, ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
 		qb.append("RETURN element."+ELEMENT_FLAG_IS_INSERTED+" AS status;");
 		
 		
@@ -208,12 +240,10 @@ public class ElementFunctions {
 			boolean status = DataUtilities.toBoolean(dbResult.get(0).get("status"));
 			if(status) {
 				return NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY;
-			} else {
-				return NOTIFICATION_ELEMENT_ALREADY_EXIST;
-			}
+			} 
 		}
 		
-		return NodeFunctions.NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
+		return NOTIFICATION_ELEMENT_ALREADY_EXIST;
 	}
 	
 	/**
@@ -244,7 +274,6 @@ public class ElementFunctions {
 		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
 		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node ");
 		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
-		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
 		qb.append("MERGE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) ");
 		qb.append("ON MATCH SET element."+ELEMENT_FLAG_IS_INSERTED+"=FALSE ");
 		qb.append("ON CREATE SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"}, ");
@@ -252,8 +281,11 @@ public class ElementFunctions {
 		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
 		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
 		qb.append("element."+ELEMENT_FLAG_IS_INSERTED+"=TRUE ");
+		qb.append("WITH element, report, node ");
+		qb.append("WHERE NOT element-[:"+RELATIONSHIP_LABEL_TASK_AT+"|:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->(:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
 		qb.append("MERGE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
-		qb.append("ON CREATE SET r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP(), ");
+		qb.append("ON CREATE SET ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP(), ");
 		qb.append("r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='', ");
 		qb.append("r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='', ");
 		qb.append("r."+ELEMENT_ATTR_WORKER_ID+"={"+ELEMENT_ATTR_WORKER_ID+"}, ");
@@ -262,17 +294,37 @@ public class ElementFunctions {
 		qb.append("RETURN element."+ELEMENT_FLAG_IS_INSERTED+" AS status;");
 		
 		
+		/*qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}}) ");
+		qb.append("MATCH (cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+")<-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN+"]-node ");
+		qb.append("MATCH (report:"+NodeFunctions.NODE_LABEL_BPO_REPORT+")-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]->node ");
+		qb.append("MERGE (element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) ");
+		qb.append("ON MATCH SET element."+ELEMENT_FLAG_IS_INSERTED+"=FALSE ");
+		qb.append("ON CREATE SET element."+ELEMENT_ATTR_PRIORITY+"={"+ELEMENT_ATTR_PRIORITY+"}, ");
+		qb.append("element."+ELEMENT_ATTR_STATUS+"={"+ELEMENT_ATTR_STATUS+"}, ");
+		qb.append("element."+ELEMENT_ATTR_TARGET_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=cluster."+NodeFunctions.CLUSTER_ATTR_TARGET_COMPLETION_TIME+", ");
+		qb.append("element."+ELEMENT_FLAG_IS_INSERTED+"=TRUE, ");
+		qb.append("WITH element, report, node ");
+		qb.append("WHERE NOT element-[:"+RELATIONSHIP_LABEL_TASK_AT+"|:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]->(:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("MERGE element-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]->node ");
+		qb.append("ON CREATE SET ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP(), ");
+		qb.append("r."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+"='', ");
+		qb.append("r."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"='', ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=report."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1, ");
+		qb.append("report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"=report."+NodeFunctions.REPORT_ATTR_CURRENT_TOTAL_WAITING_ELEMENTS+"+1 ");
+		qb.append("RETURN element."+ELEMENT_FLAG_IS_INSERTED+" AS status;");*/
+		
+		
 		List<Map<String, Object>> dbResult = neo4j.sendCypherQuery(qb.toString(), properties);
 		if(dbResult.size()>0) {
 			boolean status = DataUtilities.toBoolean(dbResult.get(0).get("status"));
 			if(status) {
 				return NOTIFICATION_ELEMENT_ADDED_SUCCESSFULY;
-			} else {
-				return NOTIFICATION_ELEMENT_ALREADY_EXIST;
 			}
 		}
 		
-		return NodeFunctions.NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
+		return NOTIFICATION_ELEMENT_ALREADY_EXIST;
 	}
 	
 	/******************
@@ -633,31 +685,25 @@ public class ElementFunctions {
 	/**
 	 * View Elements in Node regardless of their state
 	 * @param nodeId, Put * to view for all nodes
-	 * @param startPage gets the start page for the element
-	 * @param limit the return  you want to limit, put 0 if you want to return all
+	 * @param skip, number of elements you don't want to load
+	 * @param limit the return  you want to limit
 	 * @return
 	 */
-	public ElementObject[] viewElementsInNode(String nodeId, int startPage, int limit) {
-	int x = startPage;
-	if (startPage == 0){
-		x = 0 ;
-	}
-		String page = " SKIP " + x + " LIMIT " + limit;
-		if (limit == 0)
-		{
-			page = " SKIP " + x;
-		}
+	public ElementObject[] viewElementsInNode(String nodeId, int skip, int limit) {
+	
+	
+		String page = " SKIP " + skip + " LIMIT " + limit;
+		
 		
 		
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
+		qb.append("MATCH (node:"+NodeFunctions.NODE_LABEL_BPO_NODE+")<-[r]-(element:"+NODE_LABEL_ELEMENT+") ");
 		qb.append("MATCH path1=(:"+NodeFunctions.NODE_LABEL_BPO_NODE+")-[:NEXT_FLOW*0..]->node ");
 		qb.append("MATCH path2=node-[:NEXT_FLOW*0..]->(:"+NodeFunctions.NODE_LABEL_BPO_NODE+") ");
 		qb.append("WHERE node."+NodeFunctions.NODE_ATTR_NODE_ID+"={"+NodeFunctions.NODE_ATTR_NODE_ID+"} ");
-		qb.append("WITH node, MAX(LENGTH(path1))+1 AS currentIdx, MAX(LENGTH(path2)) AS totalIdx ");
-		qb.append("MATCH node<-[r]-(element:"+NODE_LABEL_ELEMENT+") ");
+		qb.append("WITH node, MAX(LENGTH(path1))+1 AS currentIdx, MAX(LENGTH(path2)) AS totalIdx, element, r ");
 		qb.append("MATCH node-[:"+NodeFunctions.RELATIONSHIP_LABEL_BPO_NODE_IN +"]->(cluster:"+NodeFunctions.NODE_LABEL_CLUSTER+") ");
 		
 		if(!nodeId.contains("*")) {
@@ -769,9 +815,22 @@ public class ElementFunctions {
 		qb.append(" MATCH (n:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":'"+nextNodeId+"'})");
 		qb.append(" CREATE (element)-[rn:"+RELATIONSHIP_LABEL_TASK_AT+"]->(n)");
 		qb.append(" SET rn=r ");
-		qb.append(" WITH r");
+		qb.append(" WITH r,element");
 		qb.append(" DELETE r");
-		neo4j.sendCypherQuery(qb.toString(), properties);
+		qb.append(" RETURN element");//added by JM
+		  List<Map<String, Object>> dataReturnedElem = neo4j.sendCypherQuery(qb.toString(), properties);
+		  System.out.println( dataReturnedElem.size() + dataReturnedElem.get(0).toString());
+			
+		  String status = String.valueOf(dataReturnedElem.get(0).get("element.status"));
+		  System.out.println(dataReturnedElem.size() + dataReturnedElem.get(0).toString());
+		  //added by JM
+		  if (status.equals("W"))
+		  {updateReport(currentNodeId,"currentTotalWaitingElements","-",1);
+		  updateReport(nextNodeId,"currentTotalWaitingElements","+",1);
+		   }
+		  else if(status.equals("P"))
+		    {updateReport(currentNodeId,"currentTotalProcessElements","-",1);
+		    updateReport(nextNodeId,"currentTotalProcessElements","+",1);}
 		
 		
 		return "TRANFER_ELEMENT_COMPLETE";
@@ -875,7 +934,7 @@ public class ElementFunctions {
 				}
 				
 				if(totalError>0) {
-					if(!bpo.getNodeFunctions().incrementNodeErrorCount(nodeId, totalError)) {
+					if(!BPONotifications.NODE_ERROR_COUNT_INCREMENT_SUCCESS.equals(bpo.getNodeFunctions().incrementNodeErrorCount(nodeId, totalError))) {
 						return NOTIFICATION_FAILED_CHECK_CONNECTION;
 					}
 				}
@@ -892,7 +951,7 @@ public class ElementFunctions {
 				properties.put(ELEMENT_ATTR_STATUS, CONSTANT_STATUS_WAITING);
 				StringBuilder qb = new StringBuilder();
 
-				qb.append("MATCH (firstNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[completedRel:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}), (nextNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+CONSTANT_NEXT_NODE_ID+"}}) ");
+				qb.append("MATCH (firstNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[completedRel:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}), (nextNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+CONSTANT_NEXT_NODE_ID+"}}) ");
 				qb.append("MATCH firstNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(firstNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") ");
 				qb.append("MATCH nextNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(nextNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") ");
 				qb.append("CREATE element-[nextNodeRel:"+RELATIONSHIP_LABEL_TASK_AT+" {"+ELEMENT_ATTR_WORKER_ID+":{"+ELEMENT_ATTR_WORKER_ID+"}}]->nextNode ");
@@ -906,7 +965,7 @@ public class ElementFunctions {
 				qb.append("SET nextNodeRel."+RELATIONSHIP_ATTR_START_WAITING_TIME+"=TIMESTAMP() ");
 				qb.append("SET completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+"=completedRel."+RELATIONSHIP_ATTR_END_PROCESSING_TIME+"-completedRel."+RELATIONSHIP_ATTR_START_PROCESSING_TIME+" ");
 				qb.append("SET completedTask=completedRel ");
-				qb.append("SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(node."+NodeFunctions.NODE_ATTR_ALLOWED_PROCESS_DURATION+"-completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+") ");
+				qb.append("SET element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"=element."+ELEMENT_ATTR_ESTIMATED_COMPLETION_DURATION+"-(firstNode."+NodeFunctions.NODE_ATTR_ALLOWED_PROCESS_DURATION+"-completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+") ");
 				qb.append("WITH completedRel, firstNodeReport, nextNodeReport ");
 				qb.append("SET firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"=firstNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_PROCESS_DURATION+"+completedRel."+RELATIONSHIP_ATTR_PROCESS_DURATION+" ");
 				qb.append("SET nextNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"=nextNodeReport."+NodeFunctions.REPORT_ATTR_TOTAL_WAITING_ELEMENT+"+1 ");
@@ -961,7 +1020,8 @@ public class ElementFunctions {
 				}
 				
 				if(totalError>0) {
-					if(!bpo.getNodeFunctions().incrementNodeErrorCount(nodeId, totalError)) {
+					
+					if(!BPONotifications.NODE_ERROR_COUNT_INCREMENT_SUCCESS.equals(bpo.getNodeFunctions().incrementNodeErrorCount(nodeId, totalError))) {
 						return NOTIFICATION_FAILED_CHECK_CONNECTION;
 					}
 				}
@@ -976,7 +1036,7 @@ public class ElementFunctions {
 				properties.put(ELEMENT_ATTR_STATUS, CONSTANT_STATUS_WAITING);
 				StringBuilder qb = new StringBuilder();
 
-				qb.append("MATCH (firstNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[completedRel:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}), (nextNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+CONSTANT_NEXT_NODE_ID+"}}) "
+				qb.append("MATCH (firstNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[completedRel:"+RELATIONSHIP_LABEL_TASK_IN_PROCESS+"]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}), (nextNode:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+CONSTANT_NEXT_NODE_ID+"}}) "
 						+ "MATCH firstNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(firstNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") "
 						+ "MATCH nextNode<-[:"+NodeFunctions.RELATIONSHIP_LABEL_REPORTING_OF+"]-(nextNodeReport:"+NodeFunctions.NODE_LABEL_BPO_REPORT+") "
 						+ "CREATE element-[nextNodeRel:"+RELATIONSHIP_LABEL_TASK_AT+" {"+ELEMENT_ATTR_WORKER_ID+":{"+ELEMENT_ATTR_WORKER_ID+"}}]->nextNode "
@@ -1141,7 +1201,7 @@ public class ElementFunctions {
 			}
 			
 			if(totalError>0) {
-				if(!bpo.getNodeFunctions().incrementNodeErrorCount(nodeId, totalError)) {
+				if(!BPONotifications.NODE_ERROR_COUNT_INCREMENT_SUCCESS.equals(bpo.getNodeFunctions().incrementNodeErrorCount(nodeId, totalError))) {
 					return NOTIFICATION_FAILED_CHECK_CONNECTION;
 				}
 			}
@@ -1313,20 +1373,11 @@ public class ElementFunctions {
 	 * @param nodeId
 	 * @return
 	 */
-	public String deleteElement(String elementId, String nodeId) {
-		if(!isElementExist(elementId)) {
-			return NOTIFICATION_ELEMENT_DOES_NOT_EXIST; 
-		} else if(!bpo.getNodeFunctions().isNodeExist(nodeId)) {
-			return NOTIFICATION_NODE_ID_DOES_NOT_EXIST;
-		} else if(!isElementInNode(nodeId, elementId)) {
-			return "Element Not in Node: " + nodeId;
-		}
-		
+	public String deleteElement(String elementId) {
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(ELEMENT_ATTR_ELEMENT_ID, elementId);
-		properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
 		StringBuilder qb = new StringBuilder();
-		qb.append("MATCH (:"+NodeFunctions.NODE_LABEL_BPO_NODE+" {"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[r:"+RELATIONSHIP_LABEL_TASK_AT+"]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}})-[:"+RELATIONSHIP_LABEL_COMPLETED_TASK+"]->() DELETE r;");
+		qb.append("MATCH ()-[r]-(element:"+NODE_LABEL_ELEMENT+" {"+ELEMENT_ATTR_ELEMENT_ID+":{"+ELEMENT_ATTR_ELEMENT_ID+"}}) DELETE r, element;");
 		boolean dbQueryStat = neo4j.sendCypherBooleanResult(qb.toString(), properties);
 		if(dbQueryStat) {
 			return NOTIFICATION_ELEMENT_DELETED_SUCCESSFULLY;
@@ -1401,4 +1452,29 @@ public class ElementFunctions {
 		element.setProcessingState(processingState);
 		element.setProcessingStateDescription(processingDescription);
 	}
+	
+	/**
+		  * added by jm
+		  * 
+		  * @param nodeId
+		  * @param attribute
+		  * @param operation
+		  * @param value
+		  * 
+		  */
+		 public void updateReport(String nodeId, String attribute, String operation, int value){
+		  
+		  Map<String, Object> properties = new HashMap<>();
+		  properties.put(NodeFunctions.NODE_ATTR_NODE_ID, nodeId);
+		  StringBuilder qb = new StringBuilder();
+		  qb.append("MATCH (node:BPO_NODE{"+NodeFunctions.NODE_ATTR_NODE_ID+":{"+NodeFunctions.NODE_ATTR_NODE_ID+"}})<-[:BPO_REPORTING_OF]-currentReport ");
+		  qb.append("SET currentReport."+attribute + " = currentReport."+attribute+ " " + operation + " " + value);
+		  boolean dbQueryStat = neo4j.sendCypherBooleanResult(qb.toString(), properties);
+		  System.out.println(qb.toString());
+		  if(dbQueryStat) {
+		   
+		  } else {
+		   System.out.println("FAIL UPDATE");
+		  }
+		 }
 }

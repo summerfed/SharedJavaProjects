@@ -20,7 +20,7 @@ public class ElementRecord extends Composite {
 		HTMLPanel arrvCell = getStyledPnl(elem.getArrivalTime(), "elem-tbl-arrv-col");
 		HTMLPanel wrkrCell = getStyledPnl(elem.getWorkerId(), "elem-tbl-wrkr-col");
 		HTMLPanel flowCell = getStyledPnl(elem.getNormalFlow(), "elem-tbl-flow-col");
-		HTMLPanel statusColorCell = getStyledPnl("  ", "elem-tbl-color-col");
+		HTMLPanel statusColorCell = getStyledPnl("COLOR", "elem-tbl-color-col");
 		
 		
 		if(elem.getProcessingState() == 1){

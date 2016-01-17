@@ -1,0 +1,42 @@
+import com.svi.bpo.graph.BPO;
+import com.svi.bpo.graph.ElementFunctions;
+import com.svi.bpo.graph.ExceptionNodeFunctions;
+import com.svi.bpo.graph.NodeFunctions;
+
+
+public class Main {
+
+	public static void main(String[] args) {
+		String nodeId = "Node1";
+		String nodeName = "Node";
+		String cluster = "Cluster";
+		String stdUM = "Box";
+		double cost = 2.2;
+		long time = 1;
+		int num = 1;
+		
+		String elementId = "Element1";
+		int priority = 9;
+		String workerId = "Fed";
+		
+		String exceptionCode = "ExCode1";
+		String exceptionCode1 = "ExCode2";
+		String exceptionCode2 = "ExCode3";
+		String exceptionCode3 = "ExCode4";
+		String exceptionCode4 = "ExCode5";
+		String exceptionName = "TestExName";
+		
+		BPO bpo = new BPO("http://localhost:7474");
+		NodeFunctions node = bpo.getNodeFunctions();
+		ElementFunctions element = bpo.getElementFunctions();
+		ExceptionNodeFunctions exception = bpo.getExceptionNodeFunctions();
+		System.out.println(bpo.getNodeFunctions().insertNode(nodeId, nodeName, cluster, stdUM, cost, 100, 100, 100, 100));
+		System.out.println(bpo.getNodeFunctions().insertNode(nodeId+1, nodeName, cluster, stdUM, cost, 100, 100, 100, 100));
+		System.out.println(bpo.getNodeFunctions().buildFlow(cluster, nodeId, nodeId+1));
+		System.out.println(bpo.getElementFunctions().insertElement(elementId, priority, nodeId));
+		System.out.println(bpo.getElementFunctions().getElement(elementId, nodeId, workerId));
+		
+		System.out.println(bpo.getElementFunctions().viewElementsInNode(nodeId, 1, 10).length);
+		
+	}
+}

@@ -13,16 +13,16 @@
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="qb.append(" key="selection"/>
+		<item value="currentData" key="selection"/>
 		<list key="findhistory">
+			<item value="currentData"/>
+			<item value="File"/>
+			<item value="addButton"/>
+			<item value="Product_Font_Size"/>
 			<item value="&#x09;&#x09;+ &quot;"/>
 			<item value="[completedTask:COMPLETED_TASK]"/>
 			<item value="firstNode"/>
 			<item value="&#x09;&#x09;+ "/>
-			<item value="assignWorker"/>
-			<item value="+ "/>
-			<item value="insertElement"/>
-			<item value="getElement"/>
 		</list>
 		<list key="replacehistory">
 			<item value="qb.append("/>

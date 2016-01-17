@@ -13,6 +13,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
 import com.fed.receipt.generator.db.ProductDatabase;
 import com.fed.receipt.generator.obj.Product;
@@ -27,6 +28,7 @@ public class ProductList extends JList<String> {
 	public ProductList() {
 		SharedData.setProductList(this);
 		setVisibleRowCount(1);
+		setBorder(new EmptyBorder(0,20, 0, 0));
 		setModel(new AbstractListModel<String>() {
 			/**
 			 * 

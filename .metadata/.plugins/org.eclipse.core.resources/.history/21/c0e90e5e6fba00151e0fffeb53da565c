@@ -1,0 +1,279 @@
+package com.svi.bpo.graph;
+
+import java.util.List;
+import java.util.Map;
+
+public class ReportFunctions {
+	private BPO bpo;
+
+	protected static final String REPORT_ATTR_TOTAL_ERROR_COUNT = "totalErrorCount";
+	protected static final String REPORT_ATTR_TOTAL_OUTPUT_COUNT = "totalOutputCount";
+	protected static final String REPORT_ATTR_TARGET_OUTPUT = "targetOutput";
+	protected static final String REPORT_ATTR_AVE_PROCESS_DURATION = "averageProcessDuration";
+
+	protected static final String RELATIONSHIP_LABEL_REPORTING_OF = "BPO_REPORTING_OF";
+	protected static final String NODE_LABEL_BPO_NODE = "BPO_NODE";
+	protected static final String NODE_LABEL_BPO_REPORT = "BPO_NODE_REPORT";	
+	
+	/*******************
+	 * NODE ATTRIBUTES *
+	 *******************/
+	static final String NODE_ATTR_NODE_NAME = "nodeName";//need
+	static final String NODE_ATTR_NODE_ID = "nodeId";// need
+	
+	 static final String CONSTANT_PIPE = "|";
+		
+	private Neo4jRestService neo4j;
+	
+	protected ReportFunctions(Neo4jRestService neo4j, BPO bpo) {
+		  this.neo4j = neo4j;
+		  this.bpo = bpo;
+	}
+ 	/**
+	 * This method will compare the current <b>node average processing performance/duration</b> with <b>node allowed processing performance/duration</b>.
+	 * To determine who are the nodes who meets the target processing
+	 * <br>
+	 * <b>FORMULA</b>
+	 * @param nodeId, <b>Put * to get all nodes</b>
+	 * @return 
+	 * List&lt;Map&lt;String, Object&gt;&gt;, Where List Elements = Each Node and Map<String, Object> consist of Report Fields:
+	 * <br>
+	 * <b>WHERE KEY = Value Are:</b>
+	 * <br>
+	 * <ul>
+	 * 	<li><i><b>nodeId</b></i> = Unique Identification of the Node</li>
+	 *  <li><i><b>nodeName</b></i> = Node Name/Description</li>
+	 *  <li><i><b>Status</b></i> = TRUE or False, Wether node is meeting the target</li>
+	 * </ul>
+	 */
+	public List<Map<String, Object>> getNodeProcessMetrics(String nodeId) {
+		return bpo.getNodeFunctions().getNodeProcessMetrics(nodeId);
+	}
+	
+	/**
+	 * This method will compare the current <b>node average processing performance/duration</b> with <b>node allowed processing performance/duration</b>.
+	 * To determine who are the nodes who meets the target processing
+	 * <br>
+	 * <b>FORMULA</b>
+	 * @param nodeId, <b>Put * to get all nodes</b>
+	 * @return 
+	 * List&lt;Map&lt;String, Object&gt;&gt;, Where List Elements = Each Node and Map<String, Object> consist of Report Fields:
+	 * <br>
+	 * <b>WHERE KEY = Value Are:</b>
+	 * <br>
+	 * <ul>
+	 * 	<li><i><b>nodeId</b></i> = Unique Identification of the Node</li>
+	 *  <li><i><b>nodeName</b></i> = Node Name/Description</li>
+	 *  <li><i><b>allowedProcessDuration</b></i> = Node Allowed Process Duration, Identified during Node Creation</li>
+	 *  <li><i><b>averageProcessDuration</b></i> = Average Process Duration of the Node that is Computed Every Element Processed in the Node</li>
+	 *  <li><i><b>Status</b></i> = TRUE or False, Wether node is meeting the target</li>
+	 * </ul>
+	 */
+	public List<Map<String, Object>> getNodeProcessDurationMetrics(String nodeId) {
+		return bpo.getNodeFunctions().getNodeProcessDurationMetrics(nodeId);
+	}
+	
+	/**
+	 * This method will compare the current <b>node average waiting performance/duration</b> with <b>node allowed waiting performance/duration</b>.
+	 * To determine who are the nodes who meets the target waiting
+	 * <br>
+	 * <b>FORMULA</b>
+	 * @param nodeId, <b>Put * to get all nodes</b>
+	 * @return 
+	 * List&lt;Map&lt;String, Object&gt;&gt;, Where List Elements = Each Node and Map<String, Object> consist of Report Fields:
+	 * <br>
+	 * <b>WHERE KEY = Value Are:</b>
+	 * <br>
+	 * <ul>
+	 * 	<li><i><b>nodeId</b></i> = Unique Identification of the Node</li>
+	 *  <li><i><b>nodeName</b></i> = Node Name/Description</li>
+	 *  <li><i><b>allowedWaitingDuration</b></i> = Node Allowed Waiting Duration, Identified during Node Creation</li>
+	 *  <li><i><b>averageWaitingDuration</b></i> = Average Waiting Duration of the Node that is Computed Every Element Processed in the Node</li>
+	 *  <li><i><b>Status</b></i> = TRUE or False, Wether node is meeting the target</li>
+	 * </ul>
+	 */
+	public List<Map<String, Object>> getNodeWaitingDurationMetrics(String nodeId) {
+		return bpo.getNodeFunctions().getNodeWaitingDurationMetrics(nodeId);
+	}
+	
+	/**
+	 * This method will get <b>count of current waiting elements</b> and <b>count of current in-process elements</b> in the Node.
+	 * <br>
+	 * <b>FORMULA</b>
+	 * @param nodeId, <b>Put * to get all nodes</b>
+	 * @return 
+	 * List&lt;Map&lt;String, Object&gt;&gt;, Where List Elements = Each Node and Map<String, Object> consist of Report Fields:
+	 * <br>
+	 * <b>WHERE KEY = Value Are:</b>
+	 * <br>
+	 * <ul>
+	 * 	<li><i><b>nodeId</b></i> = Unique Identification of the Node</li>
+	 *  <li><i><b>nodeName</b></i> = Node Name/Description</li>
+	 *  <li><i><b>currentTotalWaitingElements</b></i> = Current Waiting Elements</li>
+	 *  <li><i><b>currentTotalInProcessElements</b></i> = Current InProcess Elements</li>
+	 * </ul>
+	 */
+	public List<Map<String, Object>> getNodeCurrentWaitingAndInProcessElementCount(String nodeId) {
+		return bpo.getNodeFunctions().getNodeCurrentWaitingAndInProcessElementCount(nodeId);
+	}
+	
+	
+	
+	
+	
+	/**
+	 * This method will get <b>total error count</b> and <b>total output count</b> in the Node.
+	 * <br>
+	 * <b>FORMULA</b>
+	 * @param nodeId, <b>Put * to get all nodes</b>
+	 * @return 
+	 * List&lt;Map&lt;String, Object&gt;&gt;, Where List Elements = Each Node and Map<String, Object> consist of Report Fields:
+	 * <br>
+	 * <b>WHERE KEY = Value Are:</b>
+	 * <br>
+	 * <ul>
+	 * 	<li><i><b>nodeId</b></i> = Unique Identification of the Node</li>
+	 *  <li><i><b>nodeName</b></i> = Node Name/Description</li>
+	 *  <li><i><b>totalErrorCount</b></i> = Total Error Count</li>
+	 *  <li><i><b>totalOutputCount</b></i> = Total Output Count</li>
+	 * </ul>
+	 */
+	public List<Map<String, Object>> getNodeTotalErrorAndOutputCount(String nodeId) {
+		Map<String, Object> properties = new HashMap<>();
+		boolean isAll = false;
+		if(nodeId.equals("*")) {
+			nodeId = ".*";
+			isAll = true;
+		} 
+		
+		properties.put(NODE_ATTR_NODE_ID, nodeId);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (node:"+NODE_LABEL_BPO_NODE+")<-[:"+RELATIONSHIP_LABEL_REPORTING_OF+"]-(report:"+NODE_LABEL_BPO_REPORT+") ");
+		
+		if(isAll) {
+			qb.append("WHERE node."+NODE_ATTR_NODE_ID+"=~{"+NODE_ATTR_NODE_ID+"} ");
+		} else {
+			qb.append("WHERE node."+NODE_ATTR_NODE_ID+"={"+NODE_ATTR_NODE_ID+"} ");
+		}
+		
+		qb.append("RETURN node."+NODE_ATTR_NODE_ID+" AS " + NODE_ATTR_NODE_ID +",");
+		qb.append("node."+NODE_ATTR_NODE_NAME+" AS "+NODE_ATTR_NODE_NAME+",");
+		qb.append("report."+REPORT_ATTR_TOTAL_ERROR_COUNT+" AS "+REPORT_ATTR_TOTAL_ERROR_COUNT+",");
+		qb.append("report."+REPORT_ATTR_TOTAL_OUTPUT_COUNT+" AS "+REPORT_ATTR_TOTAL_OUTPUT_COUNT+",");
+		qb.append("node."+REPORT_ATTR_TARGET_OUTPUT+" AS "+REPORT_ATTR_TARGET_OUTPUT+";");
+		
+		System.err.println("StringBuilder: " + qb.toString());
+		
+		return neo4j.sendCypherQuery(qb.toString(), properties);
+	}
+	
+	public List<Map<String, Object>> getNodeAverageProcessDuration(String nodeId) {
+		Map<String, Object> properties = new HashMap<>();
+		boolean isAll = false;
+		if(nodeId.equals("*")) {
+			nodeId = ".*";
+			isAll = true;
+		} 
+		
+		properties.put(NODE_ATTR_NODE_ID, nodeId);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (node:"+NODE_LABEL_BPO_NODE+")<-[:"+RELATIONSHIP_LABEL_REPORTING_OF+"]-(report:"+NODE_LABEL_BPO_REPORT+") ");
+		
+		if(isAll) {
+			qb.append("WHERE node."+NODE_ATTR_NODE_ID+"=~{"+NODE_ATTR_NODE_ID+"} ");
+		} else {
+			qb.append("WHERE node."+NODE_ATTR_NODE_ID+"={"+NODE_ATTR_NODE_ID+"} ");
+		}
+		
+		qb.append("RETURN node."+NODE_ATTR_NODE_ID+" AS " + NODE_ATTR_NODE_ID +",");
+		qb.append("node."+NODE_ATTR_NODE_NAME+" AS "+NODE_ATTR_NODE_NAME+",");
+		qb.append("report."+REPORT_ATTR_AVE_PROCESS_DURATION+" AS "+REPORT_ATTR_AVE_PROCESS_DURATION+";");
+		
+		System.err.println("StringBuilder: " + qb.toString());
+		
+		return neo4j.sendCypherQuery(qb.toString(), properties);
+	}
+	
+	
+	
+	
+	
+	/**
+	 * This method will get <b>total error count</b> and <b>total output count</b> in the Node.
+	 * <br>
+	 * <b>FORMULA</b>
+	 * @param nodeId, <b>Put * to get all nodes</b>
+	 * @return 
+	 * List&lt;Map&lt;String, Object&gt;&gt;, Where List Elements = Each Node and Map<String, Object> consist of Report Fields:
+	 * <br>
+	 * <b>WHERE KEY = Value Are:</b>
+	 * <br>
+	 * <ul>
+	 * 	<li><i><b>nodeId</b></i> = Unique Identification of the Node</li>
+	 *  <li><i><b>nodeName</b></i> = Node Name/Description</li>
+	 *  <li><i><b>totalErrorCount</b></i> = Total Error Count</li>
+	 *  <li><i><b>totalOutputCount</b></i> = Total Output Count</li>
+	 * </ul>
+	 */
+	public List<Map<String, Object>> getNodeTotalErrorAndOutputCount(String nodeId) {
+		Map<String, Object> properties = new HashMap<>();
+		boolean isAll = false;
+		if(nodeId.equals("*")) {
+			nodeId = ".*";
+			isAll = true;
+		} 
+		
+		properties.put(NODE_ATTR_NODE_ID, nodeId);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (node:"+NODE_LABEL_BPO_NODE+")<-[:"+RELATIONSHIP_LABEL_REPORTING_OF+"]-(report:"+NODE_LABEL_BPO_REPORT+") ");
+		
+		if(isAll) {
+			qb.append("WHERE node."+NODE_ATTR_NODE_ID+"=~{"+NODE_ATTR_NODE_ID+"} ");
+		} else {
+			qb.append("WHERE node."+NODE_ATTR_NODE_ID+"={"+NODE_ATTR_NODE_ID+"} ");
+		}
+		
+		qb.append("RETURN node."+NODE_ATTR_NODE_ID+" AS " + NODE_ATTR_NODE_ID +",");
+		qb.append("node."+NODE_ATTR_NODE_NAME+" AS "+NODE_ATTR_NODE_NAME+",");
+		qb.append("report."+REPORT_ATTR_TOTAL_ERROR_COUNT+" AS "+REPORT_ATTR_TOTAL_ERROR_COUNT+",");
+		qb.append("report."+REPORT_ATTR_TOTAL_OUTPUT_COUNT+" AS "+REPORT_ATTR_TOTAL_OUTPUT_COUNT+",");
+		qb.append("node."+REPORT_ATTR_TARGET_OUTPUT+" AS "+REPORT_ATTR_TARGET_OUTPUT+";");
+		
+		System.err.println("StringBuilder: " + qb.toString());
+		
+		return neo4j.sendCypherQuery(qb.toString(), properties);
+	}
+	
+	public List<Map<String, Object>> getNodeAverageProcessDuration(String nodeId) {
+		Map<String, Object> properties = new HashMap<>();
+		boolean isAll = false;
+		if(nodeId.equals("*")) {
+			nodeId = ".*";
+			isAll = true;
+		} 
+		
+		properties.put(NODE_ATTR_NODE_ID, nodeId);
+		
+		StringBuilder qb = new StringBuilder();
+		qb.append("MATCH (node:"+NODE_LABEL_BPO_NODE+")<-[:"+RELATIONSHIP_LABEL_REPORTING_OF+"]-(report:"+NODE_LABEL_BPO_REPORT+") ");
+		
+		if(isAll) {
+			qb.append("WHERE node."+NODE_ATTR_NODE_ID+"=~{"+NODE_ATTR_NODE_ID+"} ");
+		} else {
+			qb.append("WHERE node."+NODE_ATTR_NODE_ID+"={"+NODE_ATTR_NODE_ID+"} ");
+		}
+		
+		qb.append("RETURN node."+NODE_ATTR_NODE_ID+" AS " + NODE_ATTR_NODE_ID +",");
+		qb.append("node."+NODE_ATTR_NODE_NAME+" AS "+NODE_ATTR_NODE_NAME+",");
+		qb.append("report."+REPORT_ATTR_AVE_PROCESS_DURATION+" AS "+REPORT_ATTR_AVE_PROCESS_DURATION+";");
+		
+		System.err.println("StringBuilder: " + qb.toString());
+		
+		return neo4j.sendCypherQuery(qb.toString(), properties);
+	}
+	
+	
+}

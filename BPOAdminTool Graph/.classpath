@@ -19,7 +19,7 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/FutureGWT.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/SSOCookie.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT (2)"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BPOGraph"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

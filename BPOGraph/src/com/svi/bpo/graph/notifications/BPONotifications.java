@@ -14,6 +14,7 @@ public enum BPONotifications {
 	 */
 	NODE_ALREADY_EXIST("Node Already Exist"),
 	NODE_DOES_NOT_EXIST("Node Does Not Exist"),
+	NODE_ERROR_COUNT_INCREMENT_SUCCESS("Success: Node Error Count Incremented"),
 	
 	/**
 	 * 

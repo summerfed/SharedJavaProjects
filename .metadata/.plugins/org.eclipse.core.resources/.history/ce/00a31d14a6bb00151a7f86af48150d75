@@ -1,0 +1,9 @@
+package com.fed.receipt.generator.db.views;
+
+import javax.swing.JFrame;
+
+public class AddProductFrame extends JFrame {
+
+	private static final long serialVersionUID = 7983997438533627159L;
+	
+}

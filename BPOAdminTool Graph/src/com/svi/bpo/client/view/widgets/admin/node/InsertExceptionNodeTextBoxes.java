@@ -134,26 +134,7 @@ public TextBox getCurrentTotalInProcessElementsTxtbxTextbox(){
 		currentTotalInProcessElementsTxtbx = new LabeledTxtBx("Current In Process:");
 		currentTotalInProcessElementsTxtbx.setStyleName("insert-node-txtbx-widget-input");
 
-		//		minWaitTxtbx = new LabeledTxtBx("Allowable Min Waiting Time:");
-//		minWaitTxtbx.setStyleName("insert-node-txtbx-widget-input");
-//		maxWaitTxtbx = new LabeledTxtBx("Allowable Max Waiting Time:");
-//		maxWaitTxtbx.setStyleName("insert-node-txtbx-widget-input");
-//		aveWaitTxtbx = new LabeledTxtBx("Allowable Ave Waiting Time:");
-//		aveWaitTxtbx.setStyleName("insert-node-txtbx-widget-input");
-//		minProcTxtbx = new LabeledTxtBx("Allowable Min Processing Time:");
-//		minProcTxtbx.setStyleName("insert-node-txtbx-widget-input");
-//		maxProcTxtbx = new LabeledTxtBx("Allowable Max Processing Time:");
-//		maxProcTxtbx.setStyleName("insert-node-txtbx-widget-input");
-//		aveProcTxtbx = new LabeledTxtBx("Allowable Ave Processing Time:");
-//		aveProcTxtbx.setStyleName("insert-node-txtbx-widget-input");
-		//		errorNodeTxtbx = new LabeledTxtBx("Error Node:");
-//		errorNodeTxtbx.setStyleName("insert-node-txtbx-widget-input");
-//		nodeExceptTxtbx = new LabeledTxtBx("Node Exception Of:");
-//		nodeExceptTxtbx.setStyleName("insert-node-txtbx-widget-input");
-//		statusListBx = new LabeledListBx("Status:");
-//		statusListBx.setStyleName("insert-node-txtbx-widget-input");
-//		statusListBx.addItem("OPEN");
-//		statusListBx.addItem("CLOSE");
+		
 		endPointsListBx = new LabeledListBx("Endpoint:");
 		endPointsListBx.setStyleName("insert-node-txtbx-widget-input");
 		for (EndpointObj obj : CommonObjs.bpoUser.getEndpoints()) {

@@ -34,7 +34,16 @@ body {
 button {
 	cursor: pointer;
 }
-
+.gwt-Button {
+  margin: 0;
+  padding: 3px 5px;
+  text-decoration: none;
+  font-size: small;
+  cursor: pointer;
+  cursor: hand;
+  
+  border: 1px outset #ccc;
+}
 button:active, button:focus {
 	outline: none;
 }
@@ -596,9 +605,9 @@ div {
 
 .pager{
 	
-	position:absolute !important;
+	position:relative !important;
 	float:left;
-	bottom:10%;
+	
 }
 
 /** Cluster ListBox */
@@ -608,7 +617,7 @@ color:black;
 }
 
 .clusterListBoxStyle{
-top:11%;;
+top:9%;;
 	left:48%;
 	position:absolute;
 	
@@ -628,7 +637,45 @@ color: black;
 	color:black;
 	position:absolute;
 	left:41%;
-	top:11%;
+	top:9%;
+
+	font-size: 1.0em;
+	
+	border: 0px solid #999797;
+	-webkit-transition: all 200ms linear;
+	-moz-transition: all 200ms linear;
+	-ms-transition: all 200ms linear;
+	-o-transition: all 200ms linear;
+	transition: all 200ms linear;
+}
+/** Endpoint Node Panel*/
+.endPointsListStyle{
+color:black;
+	
+}
+
+.endPointsListBoxStyle{
+top:14%;;
+	left:48%;
+	position:absolute;
+	
+	padding: 0% 0% 0% 1%;
+color: black;
+	border: none;
+	
+	-webkit-transition: all 200ms ease-out;
+	-moz-transition: all 200ms ease-out;
+	-ms-transition: all 200ms ease-out;
+	-o-transition: all 200ms ease-out;
+	transition: all 200ms ease-out;
+}
+.endPointsList-label{
+	
+	
+	color:black;
+	position:absolute;
+	left:41%;
+	top:14%;
 
 	font-size: 1.0em;
 	
@@ -996,9 +1043,9 @@ color: black;
 /** Admin Tab - Node Panel */
 
 .admin-node-pnl{
-	height: 100%;
+	height: 95%;
 	width: 100%;
-	overflow: hidden;
+	overflow: auto;
 }
 
 .admin-node-btn-pnl{
@@ -1309,21 +1356,21 @@ color: black;
 .node-status-green{
 
 		width:8%;
-	background-color:green;
-	src: url(images/greenRectangle.png);
+	color:green;
+	background: url(images/greenRectangle.png) no-repeat;
 }
 .node-status-red{
 
 		width:8%;
-	background-color:red;
-	src: url(images/redRectangle.png);
+color:red;
+	background: url(images/redRectangle.png) no-repeat;
 }
 
 .node-status-orange{
 
 		width:8%;
-	background-color:orange;
-	src: url(images/orangeRectangle.png);
+	color:orange;
+	background: url(images/orangeRectangle.png) no-repeat;
 }
 /** Insert Node Panel */
 
@@ -1546,7 +1593,7 @@ color: black;
 
 .view-elem-btn-pnl > button{
 	height: 100%;
-	width: 15%;
+	width: 12%;
 	font-weight: bold;
 	top: 5%;
 	position: relative;
@@ -1711,7 +1758,7 @@ color: black;
 
 .elem-tbl-body{
 	width: 100%;
-	height: 94.5%;
+	
 	position: relative;
 	overflow: auto;
 	margin: 0.25% 0%;
@@ -1733,8 +1780,7 @@ color: black;
 	transition: all 200ms linear;
 	margin:0.1% 0%;
 	vertical-align: middle;
-	height:6%;
-}
+	}
 
 .elem-tbl-body > div:nth-child(odd) {
     background: #fff;

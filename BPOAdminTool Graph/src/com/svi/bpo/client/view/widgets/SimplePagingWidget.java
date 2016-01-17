@@ -148,6 +148,12 @@ public class SimplePagingWidget extends Composite  {
 		infoLbl.setText(" "+start +" to " +end+ " of "+total+" ");
 	}
 	
+	public void setText(String limit,int start, int end){
+		this.start = start;
+		this.end = end;
+		infoLbl.setText(" "+start +" to " +end);
+	}
+	
 	public Button getNextBtn(){
 		return nextBtn;
 	}

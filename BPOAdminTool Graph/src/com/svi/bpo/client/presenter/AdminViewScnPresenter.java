@@ -294,6 +294,21 @@ public class AdminViewScnPresenter implements Presenter {
 					
 			}});
 		
+		display.getNodeTabPanel().getEndpointListBox().addChangeHandler(new ChangeHandler(){
+
+			@Override
+			public void onChange(ChangeEvent arg0) {
+				// TODO Auto-generated method stub
+				//	Window.alert("Clusterbox is change!");
+					
+				setAdminTable();
+
+				setExceptionTable();
+					
+			}});
+		
+		
+		
 		display.getNodeTabPanel().getSearchWdgt().getBtn().addClickHandler(new ClickHandler() {
 
 			@Override
@@ -708,6 +723,7 @@ public class AdminViewScnPresenter implements Presenter {
 	 * @author ecruz
 	 */
 	private void setAdminTable(){
+		String chosenEndPoint = display.getNodeTabPanel().getEndpointListBox().getItemText(display.getNodeTabPanel().getEndpointListBox().getSelectedIndex());
 
 		display.getNodeTabPanel().getDelNodeBtn().disable();
 		display.getNodeTabPanel().clear();
@@ -715,7 +731,9 @@ public class AdminViewScnPresenter implements Presenter {
 		for (final EndpointObj dtls : CommonObjs.bpoUser.getEndpoints()) {
 
 			if(dtls.isActive()){
-
+				if (!(chosenEndPoint.equals("*")|| chosenEndPoint.equals(dtls.getEndpointId()))){
+					continue;
+				}
 				final SearchableEndpointNodesWidget widget = new SearchableEndpointNodesWidget(dtls.getLabel());
 
 				((BpoSvcAsync)CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getNodes(
@@ -765,9 +783,15 @@ public class AdminViewScnPresenter implements Presenter {
 				});
 			}
 		}
+		display.getNodeTabPanel().fillListBox();
 	}
+	/**
+	 * Builds the exception node table
+	 */
 	
 	private void setExceptionTable(){
+		String chosenEndPoint = display.getNodeTabPanel().getEndpointListBox().getItemText(display.getNodeTabPanel().getEndpointListBox().getSelectedIndex());
+
 		display.getExceptionTabPnl().getClusterList().setVisible(false);
 		//	display.getExceptionTabPnl().getAddNodeBtn().setVisible(false);
 		//	display.getExceptionTabPnl().getDelNodeBtn().setVisible(false);
@@ -780,7 +804,9 @@ public class AdminViewScnPresenter implements Presenter {
 		for (final EndpointObj dtls : CommonObjs.bpoUser.getEndpoints()) {
 
 			if(dtls.isActive()){
-
+				if (!(chosenEndPoint.equals("*")|| chosenEndPoint.equals(dtls.getEndpointId()))){
+					continue;
+				}
 				final ExceptionSearchableEndpointNodesWidget widget = new ExceptionSearchableEndpointNodesWidget(dtls.getLabel());
 
 				((BpoSvcAsync)CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getNodesException(
@@ -831,6 +857,7 @@ public class AdminViewScnPresenter implements Presenter {
 			}
 		}
 		
+	//	display.getNodeTabPanel().fillListBox();
 	}
 
 	private void setAdminTable(List<NodeDtlObj> nodes){
@@ -854,14 +881,17 @@ public class AdminViewScnPresenter implements Presenter {
 	}
 
 	private void setAdminTableByCluster(String cluster){// will return only by cluster
-		
+		String chosenEndPoint = display.getNodeTabPanel().getEndpointListBox().getItemText(display.getNodeTabPanel().getEndpointListBox().getSelectedIndex());
+
 		display.getNodeTabPanel().getDelNodeBtn().disable();
 		display.getNodeTabPanel().clear();
 
 		for (final EndpointObj dtls : CommonObjs.bpoUser.getEndpoints()) {
 
 			if(dtls.isActive()){
-
+				if (!(chosenEndPoint.equals("*")|| chosenEndPoint.equals(dtls.getEndpointId()))){
+					continue;
+				}
 				final SearchableEndpointNodesWidget widget = new SearchableEndpointNodesWidget(dtls.getLabel());
 
 				((BpoSvcAsync)CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getClusterNodes(

@@ -1,5 +1,7 @@
 import com.svi.bpo.graph.BPO;
 import com.svi.bpo.graph.ElementFunctions;
+import com.svi.bpo.graph.ExceptionNodeFunctions;
+import com.svi.bpo.graph.NodeFunctions;
 
 
 public class Main {
@@ -13,7 +15,7 @@ public class Main {
 		long time = 1;
 		int num = 1;
 		
-		String elementId = "Element1";
+		String elementId = "Element2";
 		int priority = 9;
 		String workerId = "Fed";
 		
@@ -25,51 +27,19 @@ public class Main {
 		String exceptionName = "TestExName";
 		
 		BPO bpo = new BPO("http://localhost:7474");
-//		bpo.clearBPO();
-//		NodeFunctions node = bpo.getNodeFunctions();
+		NodeFunctions node = bpo.getNodeFunctions();
 		ElementFunctions element = bpo.getElementFunctions();
-//		ExceptionNodeFunctions exception = bpo.getExceptionNodeFunctions();
-//		
-//		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
-//		System.out.println(node.insertNode("Node2", nodeName, cluster, stdUM, cost, time, time, num, num));
-//		System.out.println(node.insertNode("Node3", nodeName, cluster, stdUM, cost, time, time, num, num));
-//		node.buildFlow(cluster, nodeId, "Node2", "Node3");
-//		
-//		System.out.println(node.insertNode(nodeId, nodeName, cluster, stdUM, cost, time, time, num, num));
-//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode, exceptionName, time, time));
-//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode1, exceptionName, time, time));
-//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode2, exceptionName, time, time));
-//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode3, exceptionName, time, time));
-//		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode4, exceptionName, time, time));
-//		System.out.println(exception.buildFlow(nodeId, exceptionCode, exceptionCode1, exceptionCode2, exceptionCode3, exceptionCode4));
-//		System.out.println(element.insertElement(elementId, priority, nodeId, workerId));
-//		System.out.println(element.getElement(elementId, nodeId, workerId));
-		System.out.println(element.viewElementsInNode(nodeId, 0, 1)[0].getArrivalTime());
-		/*System.out.println(element.getElement(elementId, nodeId, workerId));
-		System.out.println(element.viewElementsInNode(nodeId, 0, 1)[0].getNormalFlowLocation());
-		System.out.println(exception.moveElementToException(elementId, nodeId, exceptionCode));
-		System.out.println(exception.viewExceptionElements(nodeId, exceptionCode)[0].getElementId());*/
-		/*System.out.println(exception.assignWorkerToExceptionElement(nodeId, exceptionCode, elementId, workerId));
-		System.out.println(exception.getExceptionElement(nodeId, exceptionCode, elementId, workerId).getElementId());
-		exception.completeExceptionElement(nodeId, exceptionCode, exceptionCode1, elementId, workerId);
-		System.out.println(exception.assignWorkerToExceptionElement(nodeId, exceptionCode1, elementId, workerId));
-		System.out.println(exception.getExceptionElement(nodeId, exceptionCode1, elementId, workerId).getElementId());
-		exception.viewExceptionElements(nodeId, exceptionCode1);*/
-//		exception.completeExceptionElement(nodeId, exceptionCode1, elementId, workerId);
+		ExceptionNodeFunctions exception = bpo.getExceptionNodeFunctions();
+		System.out.println(exception.insertExceptionNode(nodeId, exceptionCode4, exceptionName, 100, 100));
+//		System.out.println(bpo.getNodeFunctions().insertNode(nodeId, nodeName, cluster, stdUM, cost, 100, 100, 100, 100));
+//		System.out.println(bpo.getNodeFunctions().insertNode(nodeId+1, nodeName, cluster, stdUM, cost, 100, 100, 100, 100));
+//		System.out.println(bpo.getNodeFunctions().buildFlow(cluster, nodeId, nodeId+1));
+		System.out.println(bpo.getElementFunctions().insertElement(elementId, priority, nodeId));
+		System.out.println(bpo.getElementFunctions().assignWorkerToElement(nodeId, elementId, workerId));
+		System.out.println(bpo.getElementFunctions().getElement(elementId, nodeId, workerId));
+//		System.out.println(bpo.getElementFunctions().completeElement(elementId, nodeId, nodeId+1, workerId, "", "", "","", 100, 100));
+//		System.out.println(bpo.getElementFunctions().viewElementsInNode(nodeId, 0, 10)[0].getNormalFlowLocation());
 		
 		
-	
 	}
-	
-	//TODO
-	
-	/**
-	 * MATCH (exception:BPO_EXCEPTION_NODE)
-		MATCH path1=(:BPO_EXCEPTION_NODE)-[:NEXT_FLOW*0..]->exception
-		MATCH path2=exception-[:NEXT_FLOW*0..]->(:BPO_EXCEPTION_NODE)
-		WHERE ID(exception)=453
-		WITH MAX(LENGTH(path1))+1 AS idx, MAX(LENGTH(path2)) AS after
-		RETURN idx +"/"+(after+idx);
-	 */
-
 }

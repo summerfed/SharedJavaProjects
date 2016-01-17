@@ -68,7 +68,7 @@ public interface BpoSvc extends RemoteService{
 List<NodeDtlObj> getClusterNodes(String endpoint, String clusterId);
 	List<ElemDtlObj> getElements(NodeDtlObj node);
 	List<ElemDtlObj> getElements(NodeDtlObj node,int start,int limit);
-
+List <ElemDtlObj> getExceptionElements(ExceptionDtlObj except);
 	String changeElmtPrty(String endpoint, String nodeName, String elemId,
 			int newPriority);
 

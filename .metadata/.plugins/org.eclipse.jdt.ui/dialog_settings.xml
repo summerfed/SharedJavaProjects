@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<item value="2" key="TypeHierarchyViewPart.hierarchyview"/>
-	<item value="3" key="TypeHierarchyViewPart.orientation"/>
 	<item value="false" key="TypeHierarchyViewPart.qualifiednames"/>
+	<item value="3" key="TypeHierarchyViewPart.orientation"/>
 	<item value="false" key="TypeHierarchyViewPart.linkeditors"/>
-	<item value="C:\Software Development\Shared Projects\GitHub\ReceiptGenerator" key="org.eclipse.jdt.ui.last.external.project"/>
+	<item value="C:\Software Development\Shared Projects\GitHub\PrintView" key="org.eclipse.jdt.ui.last.external.project"/>
 	<section name="OptionalMessageDialog.hide.">
 		<item value="true" key="org.eclipse.jdt.ui.typecomment.deprecated"/>
 	</section>
@@ -14,6 +14,19 @@
 	<section name="BuildPathsPropertyPage">
 		<item value="1" key="pageIndex"/>
 	</section>
+	<section name="FatJarPackageWizard">
+		<item value="C:\Users\Fed\Desktop\TestJar.jar" key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION"/>
+		<item value="ReceiptGeneratorFrame - ReceiptGenerator" key="FatJarPackageWizardPage.LAUNCH_CONFIGURATION_SELECTION_NAME"/>
+		<item value="C:\Software Development\Shared Projects\GitHub" key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION"/>
+		<item value="false" key="FatJarPackageWizardPage.ANTSCRIPT_SAVE"/>
+		<item value="3" key="FatJarPackageWizardPage.LIBRARY_HANDLING"/>
+		<list key="FatJarPackageWizardPage.DESTINATION_NAMES_ID">
+			<item value="C:\Users\Fed\Desktop\TestJar.jar"/>
+		</list>
+		<list key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION_HISTORY">
+			<item value=".xml"/>
+		</list>
+	</section>
 	<section name="RefactoringWizard.preview">
 		<item value="400" key="height"/>
 		<item value="600" key="width"/>
@@ -21,8 +34,8 @@
 	<section name="quick_assist_proposal_size">
 	</section>
 	<section name="SourceActionDialog.methods">
-		<item value="false" key="Comments"/>
 		<item value="1" key="VisibilityModifier"/>
+		<item value="false" key="Comments"/>
 		<item value="2" key="InsertPosition.v2"/>
 		<item value="false" key="SynchronizedModifier"/>
 		<item value="false" key="FinalModifier"/>
@@ -30,13 +43,70 @@
 	<section name="ClasspathContainerSelectionPage">
 		<item value="0" key="index"/>
 	</section>
+	<section name="javadoc">
+		<item value="false" key="nodeprecatedlist"/>
+		<item value="false" key="notree"/>
+		<item value="true" key="splitindex"/>
+		<item value="C:\Program Files\Java\jdk1.7.0_79\bin\javadoc.exe" key="javadoc_command_history"/>
+		<item value="true" key="use"/>
+		<item value="false" key="nonavbar"/>
+		<item value="public" key="access"/>
+		<item value="true" key="version"/>
+		<item value="false" key="nodeprecated"/>
+		<item value="C:\Software Development\Shared Projects\GitHub\BPOGraph\doc" key="destdir"/>
+		<item value="true" key="author"/>
+		<item value="" key="docletname"/>
+		<item value="1.7" key="source"/>
+		<item value="false" key="openinbrowser"/>
+		<item value="false" key="noindex"/>
+		<item value="" key="docletpath"/>
+		<item value="C:\Software Development\Shared Projects\GitHub\BPOGraph\javadoc.xml" key="antpath"/>
+		<item value="true" key="fromStandard"/>
+		<section name="projects">
+			<section name="ReceiptGenerator">
+				<item value="C:\Software Development\Shared Projects\GitHub\ReceiptGenerator\doc" key="destdir"/>
+				<item value="" key="href"/>
+				<item value="C:\Software Development\Shared Projects\GitHub\ReceiptGenerator\javadoc.xml" key="antpath"/>
+			</section>
+			<section name="RemoteSystemsTempFiles">
+				<item value="C:\Software Development\Shared Projects\GitHub\RemoteSystemsTempFiles\doc" key="destdir"/>
+				<item value="" key="href"/>
+				<item value="C:\Software Development\Shared Projects\GitHub\RemoteSystemsTempFiles\javadoc.xml" key="antpath"/>
+			</section>
+			<section name="FedDevUtilities">
+				<item value="C:\Software Development\Shared Projects\GitHub\FedDevUtilities\doc" key="destdir"/>
+				<item value="" key="href"/>
+				<item value="C:\Software Development\Shared Projects\GitHub\FedDevUtilities\javadoc.xml" key="antpath"/>
+			</section>
+			<section name="PDFBoxTest">
+				<item value="C:\Software Development\Shared Projects\GitHub\PDFBoxTest\doc" key="destdir"/>
+				<item value="" key="href"/>
+				<item value="C:\Software Development\Shared Projects\GitHub\PDFBoxTest\javadoc.xml" key="antpath"/>
+			</section>
+			<section name="Neo4jRestUtility">
+				<item value="C:\Software Development\Shared Projects\GitHub\Neo4jRestUtility\doc" key="destdir"/>
+				<item value="" key="href"/>
+				<item value="C:\Software Development\Shared Projects\GitHub\Neo4jRestUtility\javadoc.xml" key="antpath"/>
+			</section>
+			<section name="BPOGraphTest">
+				<item value="C:\Software Development\Shared Projects\GitHub\BPOGraphTest\doc" key="destdir"/>
+				<item value="" key="href"/>
+				<item value="C:\Software Development\Shared Projects\GitHub\BPOGraphTest\javadoc.xml" key="antpath"/>
+			</section>
+			<section name="BPOGraph">
+				<item value="C:\Software Development\Shared Projects\GitHub\BPOGraph\doc" key="destdir"/>
+				<item value="" key="href"/>
+				<item value="C:\Software Development\Shared Projects\GitHub\BPOGraph\javadoc.xml" key="antpath"/>
+			</section>
+		</section>
+	</section>
 	<section name="NewPackageWizardPage">
 		<item value="false" key="create_package_info_java"/>
 	</section>
 	<section name="org.eclipse.jdt.internal.ui.typehierarchy.QuickHierarchy">
 		<item value="350" key="org.eclipse.jdt.internal.ui.typehierarchy.HierarchyInformationControlDIALOG_WIDTH"/>
-		<item value="false" key="org.eclipse.jdt.internal.ui.typehierarchy.HierarchyInformationControlDIALOG_USE_PERSISTED_LOCATION"/>
 		<item value="306" key="org.eclipse.jdt.internal.ui.typehierarchy.HierarchyInformationControlDIALOG_HEIGHT"/>
+		<item value="false" key="org.eclipse.jdt.internal.ui.typehierarchy.HierarchyInformationControlDIALOG_USE_PERSISTED_LOCATION"/>
 		<item value="true" key="org.eclipse.jdt.internal.ui.typehierarchy.HierarchyInformationControlDIALOG_USE_PERSISTED_SIZE"/>
 	</section>
 	<section name="ExtractMethodWizard">
@@ -51,25 +121,33 @@
 	<section name="DialogBounds_GetterSetterTreeSelectionDialog">
 		<item value="528" key="DIALOG_WIDTH"/>
 		<item value="8" key="DIALOG_Y_ORIGIN"/>
-		<item value="692" key="DIALOG_HEIGHT"/>
 		<item value="427" key="DIALOG_X_ORIGIN"/>
+		<item value="692" key="DIALOG_HEIGHT"/>
 		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
-	</section>
-	<section name="RenameInformationPopup">
-	</section>
-	<section name="org.eclipse.ltk.ui.refactoring.settings">
-		<item value="false" key="updateQualifiedNames"/>
-		<item value="*" key="patterns"/>
-		<item value="1" key="updateSimilarElementsMatchStrategy"/>
-		<item value="false" key="updateTextualMatches"/>
-		<item value="false" key="updateSimilarElements"/>
 	</section>
 	<section name="NewClassWizardPage">
 		<item value="false" key="create_constructor"/>
 		<item value="true" key="create_unimplemented"/>
 	</section>
+	<section name="org.eclipse.ltk.ui.refactoring.settings">
+		<item value="false" key="renameSubpackages"/>
+		<item value="*" key="patterns"/>
+		<item value="false" key="updateQualifiedNames"/>
+		<item value="1" key="updateSimilarElementsMatchStrategy"/>
+		<item value="false" key="updateTextualMatches"/>
+		<item value="false" key="updateSimilarElements"/>
+	</section>
+	<section name="RenameInformationPopup">
+	</section>
 	<section name="AddGetterSetterDialog">
 		<item value="false" key="RemoveFinal"/>
 		<item value="false" key="SortOrdering"/>
+	</section>
+	<section name="JavadocWizardDialog">
+		<item value="616" key="DIALOG_WIDTH"/>
+		<item value="8" key="DIALOG_Y_ORIGIN"/>
+		<item value="383" key="DIALOG_X_ORIGIN"/>
+		<item value="612" key="DIALOG_HEIGHT"/>
+		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
 	</section>
 </section>

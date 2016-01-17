@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BPO Admin Tool Reports</title>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" media="screen">
+<link href="css/c3.min.css" rel="stylesheet" media="screen">
+<link href="css/metricsgraphics.css" rel="stylesheet" media="screen">
+<style>
+
+#waiting-vs-inprocess svg { margin: 0 auto; }
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: auto;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.legend-box {
+  cursor: pointer;  
+}
+
+.grid .tick {
+    stroke: lightgrey;
+    opacity: 0.7;
+}
+.grid path {
+    stroke-width: 0;
+}
+</style>
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="js/c3.min.js"></script>
+<script src="js/metricsgraphics.min.js"></script>
+
+
+</head>
+<body>
+<div class="container">
+	<div class="row">
+		<h1>CLUSTER:</h1>
+		<p >NOTE:</p>
+		<p>**Only the TOP 3 nodes per cluster per category will be displayed on the report.</p>
+		<p>**NODES EXCEEDING ALLOWABLE WAITING TIME</p>
+		<h2>INTERACTIVE MULTI-METRIC</h2>
+	</div>
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><div id="bargraph" ></div></div>
+	</div>
+<!--	<div class="row">
+	<p>LEGEND:</p>
+		<table>
+			<tr>
+				<td style="height:20px; width:50px; background-color:#4682b4"></td>
+				<td> Allowable Waiting/Processing</td>
+			</tr>
+			<tr>
+				<td style="height:20px; width:50px; background-color:#FF7F0E"></td>
+				<td>Actual Waiting/Processing</td>
+			</tr>
+		</table>
+	</div>
+-->
+	<br /><br />
+	<div class="row">
+		<p>**NODE WITH HIGHEST OUTPUT COUNT and NODE WITH HIGHEST ERROR COUNT</p>
+		<h1>BAR CHART</p>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><div id="barchart"></div></div>
+		</div>
+		
+		<br /><br />
+		<div class="row">
+			<p style="font-weight:bold; text-align:center">CLUSTER</p>
+			<hr />
+			<p>SUMMARY</p>
+			<table align="center" border=1>
+				<tr style="text-align: right">
+					<td>Total Output</td>
+					<td>1500</td>
+				</tr>
+				<tr style="text-align: right">
+					<td>Total Error</td>
+					<td>200</td>
+				</tr>
+				<tr style="text-align: right">
+					<td>Ave. Processing Time</td>
+					<td>30 mins</td>
+				</tr>
+				<tr style="text-align: right">
+					<td>Ave. Waiting Time</td>
+					<td>10 mins</td>
+				</tr>
+			</table>
+		</div>
+		
+		<div class="row">
+		</div>
+	</div>
+</div>
+</body>
+<script src="js/multilinegraph.js"></script>
+<script>
+	//console.log($.ajax("/bporeports?nodeId=test"));
+	var config = defaultMultiSeriesLineGraphConfig;
+	config.container = "#waiting-vs-inprocess";
+	config.outerWidth = $(config.container).width();
+	$.ajax("/bporeports?nodeId=NodeTest2").done(function(data){
+		try{
+			config.jsonStr = $.parseJSON(data);
+			console.log("VALID");
+			console.log(config.jsonStr);
+			generateMultiSeriesLineGraph(config);
+		} catch (err) {
+			console.log("invalid json" + err.message);
+		}
+	});
+
+
+	setInterval(function() {
+		//console.log(config.jsonStr);
+	//	config.jsonStr = $.parseJSON('[{"time": "10:59:16", "waiting": 74, "processing": 0},{"time": "10:59:17", "waiting": 68, "processing": 0},{"time": "10:59:18", "waiting": 70, "processing": 0},{"time": "10:59:19", "waiting": 60, "processing": 10},{"time": "10:59:20", "waiting": 57, "processing": 25}]');
+		config.outerWidth = $(config.container).width();
+		$.ajax("/bporeports?nodeId=NodeTest2").done(function(data){
+			try{
+				config.jsonStr = $.parseJSON(data);
+				console.log("VALID");
+				console.log(config.jsonStr);
+				updateMultiSeriesLineGraph(config);
+			} catch (err) {
+				console.log("invalid json" + err.message);
+			}
+		});
+	}, 1000);
+
+	var bargph = c3.generate({
+		bindto: '#bargraph',
+		size: {
+			height: 275,
+		},
+	    data: {
+	        columns: [
+				['data1', 30, 200, 100],
+				['data2', 130, 100, 140]
+	        ],
+			names:{
+				data1: 'Allowable Waiting/Processing',
+				data2: 'Actual Waiting/Processing'
+			},
+	        type : 'bar'
+	    },
+		axis: {
+			x:{
+				type: 'category',
+				categories: ['Node 1', 'Node 2', 'Node 3']
+			}
+		}
+	});
+	
+//	setTimeout(function () {
+//		bargph.load({
+//			columns: [
+//				['data3', 130, 500, 200]
+//			]
+//		});
+//	}, 1000);
+	
+	var barchrt = c3.generate({
+		bindto: '#barchart',
+		size: {
+			height: 200,
+			width: 800
+		},
+	    data: {
+	        columns: [
+				['data1', 30, 200, 100]
+	        ],
+			names:{
+				data1: 'Error Count'
+			},
+	        type : 'bar'
+	    },
+		axis:{
+			rotated: true,	
+			x:{
+				type: 'category',
+				categories: ['Node 1', 'Node 2', 'Node 3']
+			}
+		}
+	});
+	
+</script>
+</html>

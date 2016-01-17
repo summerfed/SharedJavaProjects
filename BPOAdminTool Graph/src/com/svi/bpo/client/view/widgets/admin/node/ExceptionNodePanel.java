@@ -37,14 +37,14 @@ public class ExceptionNodePanel extends Composite{
 	private SearchWidget searchWdgt;
 	private LabeledListBx clusterList;
 	private FlowPanel tblPnl;
-	
+	private ExceptionDtlObj exceptNode;
 	private InsertExceptionNodePanel addNodePnl;
 	private ViewElementPanel viewElemPnl;
 
 	public ExceptionNodePanel() {
 		clusterList = new LabeledListBx("Clusters: ");
 		addNodePnl = new InsertExceptionNodePanel();
-		viewElemPnl = new ViewElementPanel();
+		viewElemPnl = new ViewElementPanel(getExceptNode());
 		
 		searchWdgt = new SearchWidget("Search Node");
 		addNodeBtn = new SwitchButton("Add Exception Node");
@@ -117,9 +117,6 @@ public class ExceptionNodePanel extends Composite{
 		
 		for(final NodeDtlObj node : nodes){
 			
-		//	if(listboxContains(node.getCluster()))
-		//	{clusterList.addItem(node.getCluster()) ;
-		//	}			
 			final NodeRecord record = new NodeRecord(node);//adds the node to the node table
 			
 			
@@ -147,13 +144,7 @@ public class ExceptionNodePanel extends Composite{
 
 				}
 			});
-			
-	//		if (clusterList.getListBx().getItemText(clusterList.getListBx().getSelectedIndex()).equals("all"))
-	//		{ widget.addNode(record); }
-	//		else if (clusterList.getListBx().getItemText(clusterList.getListBx().getSelectedIndex()).equals(node.getCluster()))
-	//			{
-	//			widget.addNode(record);
-	//			}
+	
 		
 			widget.addNode(record);
 			
@@ -240,7 +231,7 @@ public void addExceptionEndpoint(final ExceptionEndPointsWidget widget, List<Exc
 
 				}
 			});
-			
+			setExceptNode(node);
 	//		if (clusterList.getListBx().getItemText(clusterList.getListBx().getSelectedIndex()).equals("all"))
 	//		{ widget.addNode(record); }
 	//		else if (clusterList.getListBx().getItemText(clusterList.getListBx().getSelectedIndex()).equals(node.getCluster()))
@@ -250,16 +241,16 @@ public void addExceptionEndpoint(final ExceptionEndPointsWidget widget, List<Exc
 		
 			widget.addNode(record);
 			
-		/*	record.getViewBtn().addClickHandler(new ClickHandler() {
+			record.getViewBtn().addClickHandler(new ClickHandler() {
 				
 				@Override
 				public void onClick(ClickEvent event) {
 					
-					((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getElements(node, new AsyncCallback<List<ElemDtlObj>>() {
+					((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getExceptionElements(node, new AsyncCallback<List<ElemDtlObj>>() {
 						
 						@Override
 						public void onSuccess(List<ElemDtlObj> result) {
-							viewElemPnl.setNodeObj(record.getNodeObj());
+							viewElemPnl.setExceptionNodeObj(record.getExceptionNodeObj());
 							//viewElemPnl.setTable(result);
 							viewElemPnl.show();
 									if(!result.isEmpty()){
@@ -290,7 +281,7 @@ public void addExceptionEndpoint(final ExceptionEndPointsWidget widget, List<Exc
 					});
 					
 				}
-			});*/
+			});
 			
 		}
 		
@@ -483,6 +474,14 @@ public boolean listboxContains(String item){
 		
 		
 		}
+	}
+
+	public ExceptionDtlObj getExceptNode() {
+		return exceptNode;
+	}
+
+	public void setExceptNode(ExceptionDtlObj exceptNode) {
+		this.exceptNode = exceptNode;
 	}
 
 

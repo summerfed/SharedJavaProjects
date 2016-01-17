@@ -1,0 +1,35 @@
+package com.fed.receipt.generator.main;
+
+import java.math.BigDecimal;
+
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+
+import com.fed.receipt.generator.db.ProductDatabase;
+import com.fed.receipt.generator.obj.Product;
+
+public class ReceiptGenerator {
+	public static void main(String args[]) {
+//		ReceiptGeneratorFrame.showView();
+		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
+        System.out.println("Number of print services: " + printServices.length);
+
+        for (PrintService printer : printServices)
+            System.out.println("Printer: " + printer.getName()); 
+	}
+
+	@SuppressWarnings("unused")
+	private static void TestDataGenerator() {
+		ProductDatabase db = ProductDatabase.getInstance();
+		
+		for(int i=0; i<100; i++) {
+			Product prod = new Product();
+			prod.setDescription("Testing" + i);
+			prod.setPrice(new BigDecimal(20.5));
+			prod.setUnit("Bottle");
+			
+			System.out.println(db.addProduct(prod));
+			
+		}
+	}
+}

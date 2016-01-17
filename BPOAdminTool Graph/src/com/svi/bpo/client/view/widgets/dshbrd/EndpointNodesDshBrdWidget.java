@@ -1,5 +1,6 @@
 package com.svi.bpo.client.view.widgets.dshbrd;
 
+import java.util.HashMap;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -8,6 +9,7 @@ public class EndpointNodesDshBrdWidget extends Composite {
 
 	private NodeDshhBrdTable tbl;
 	private HTMLPanel hdr;
+	private HashMap<String, FlowPanel> rowPanels;
 	
 	public EndpointNodesDshBrdWidget(String endpointName) {
 		
@@ -22,12 +24,16 @@ public class EndpointNodesDshBrdWidget extends Composite {
 		
 		initWidget(mainPnl);
 		
+		///
+		rowPanels = new HashMap<String, FlowPanel>();
+		
 		hdr.setStyleName("endpt-nodes-dshbrd-wdgt-hdr-loading");
 		
 	}
-	
+	///
 	public void addNode(NodeDshBrdRecord record){
 		tbl.getTableContents().add(record);
+		rowPanels.put(record.getRecordId(), record.getRowPanel());
 	}
 
 	public HTMLPanel getHdr() {
@@ -36,6 +42,10 @@ public class EndpointNodesDshBrdWidget extends Composite {
 
 	public NodeDshhBrdTable getTbl() {
 		return tbl;
+	}
+	
+	public HashMap<String, FlowPanel> getRowPanels(){
+		return rowPanels;
 	}
 	
 	public void loading(){

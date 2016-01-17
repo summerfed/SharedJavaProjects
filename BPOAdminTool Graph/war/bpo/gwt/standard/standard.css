@@ -14,7 +14,7 @@
 
 body, table td, select {
   font-family: Arial Unicode MS, Arial, sans-serif;
-  font-size: 1em;
+  
 }
 pre {
   font-family: "courier new", courier;
@@ -51,7 +51,7 @@ a, a:visited, a:hover {
   font-size: small;
   cursor: pointer;
   cursor: hand;
-/*  background: url("images/hborder.png") repeat-x 0px -27px;*/
+  
   border: 1px outset #ccc;
 }
 .gwt-Button:active {

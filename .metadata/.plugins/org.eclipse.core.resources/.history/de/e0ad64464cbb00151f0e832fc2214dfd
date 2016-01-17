@@ -1,0 +1,12 @@
+package com.fed.receipt.generator.printer;
+
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+
+public class Printer {
+	private PrintService[] installedPrinters;
+	{
+		 PrintService[]  = PrintServiceLookup.lookupPrintServices(null, null);
+	      
+	}
+}

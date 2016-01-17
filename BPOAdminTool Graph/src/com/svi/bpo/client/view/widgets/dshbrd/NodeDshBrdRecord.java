@@ -12,6 +12,7 @@ public class NodeDshBrdRecord extends Composite {
 	
 	private NodeDshBrdObj node;
 	private FlowPanel tblPnl;
+	private String id = "";
 	
 	public NodeDshBrdRecord(NodeDshBrdObj node){
 		
@@ -19,11 +20,14 @@ public class NodeDshBrdRecord extends Composite {
 		
 		tblPnl = new FlowPanel();
 		
+		///
+		id = node.getNodeId();
+		
 		HTMLPanel nodeNameCell = new HTMLPanel(node.getNodeName());
 		nodeNameCell.setStyleName("node-dshbrd-node-name-col");
-		HTMLPanel inQueueCell = new HTMLPanel(node.getElmtsWaiting());
+		HTMLPanel inQueueCell = new HTMLPanel(node.getElmtsWaiting()+"");
 		inQueueCell.setStyleName("node-dshbrd-in-queue-col");
-		HTMLPanel inProgCell = new HTMLPanel(node.getElmtsInprogress());
+		HTMLPanel inProgCell = new HTMLPanel(node.getElmtsInprogress()+"");
 		inProgCell.setStyleName("node-dshbrd-in-prog-col");
 		HTMLPanel aveWaitTimeCell = new HTMLPanel(node.getAveWaitTime());
 		aveWaitTimeCell.setStyleName("node-dshbrd-ave-wait-time-col");
@@ -40,6 +44,10 @@ public class NodeDshBrdRecord extends Composite {
 		
 		initWidget(mainPnl);
 	}
+	///
+	public String getRecordId(){
+		return id;
+	}
 	
 	public NodeDtlObj getNodeObj() {
 		return node;
@@ -51,5 +59,9 @@ public class NodeDshBrdRecord extends Composite {
 
 	public void addClickHandler(ClickHandler handler){
 		tblPnl.addDomHandler(handler, ClickEvent.getType());
+	}
+	///
+	public FlowPanel getRowPanel(){
+		return tblPnl;
 	}
 }

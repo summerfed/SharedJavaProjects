@@ -14,5 +14,5 @@
 	ENDPOINT = http://localhost:7474
 	ENDPOINT_LABEL = Test Server Local
 [BPOTEST2]
-	ENDPOINT = http://localhost:7474
+	ENDPOINT = http://192.168.128.196:17474
 	ENDPOINT_LABEL = Test Server Public

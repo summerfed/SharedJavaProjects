@@ -77,6 +77,9 @@ public interface BpoSvcAsync {
 	void getSummarizedExNodes(String endpoint,
 			AsyncCallback<List<ExceptionNodeDshBrdObj>> callback);
 
+	void getExceptionElements(ExceptionDtlObj except,
+			AsyncCallback<List<ElemDtlObj>> callback);
+
 	
 
 }

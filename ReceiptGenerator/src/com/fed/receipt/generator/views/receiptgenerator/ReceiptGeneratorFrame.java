@@ -1,35 +1,55 @@
 package com.fed.receipt.generator.views.receiptgenerator;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+
+import org.apache.pdfbox.exceptions.COSVisitorException;
+
+import com.fed.dev.utilities.DataUtilities;
+import com.fed.receipt.generator.pdf.PDFGenerator;
+import com.fed.receipt.generator.views.receipt.table.Table;
+import com.fed.receipt.generator.views.receipt.table.TableData;
+import com.fed.receipt.generator.views.receipt.table.TableModel;
 
 public class ReceiptGeneratorFrame extends JFrame {
+	private static final String BUTTON_TEXT_GENERATE_PDF_AND_PRINT = "Generate PDF and Print";
+	private static final String BUTTON_TEXT_DELETE = "Delete";
+	private static final String BUTTON_TEXT_EDIT = "Edit";
+	private static final String BUTTON_TEXT_ADD_TO_RECEIPT = "Add to Receipt";
 	private static final long serialVersionUID = 1743239330855881603L;
 	private GridBagConstraints gbc = new GridBagConstraints();
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void showView() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ReceiptGeneratorFrame frame = new ReceiptGeneratorFrame();
+					new ReceiptGeneratorFrame();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -43,8 +63,19 @@ public class ReceiptGeneratorFrame extends JFrame {
 	 */
 	public ReceiptGeneratorFrame() {
 		SharedData.setCurrentFrame(this);
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		double width = screenSize.getWidth();
+		double height = screenSize.getHeight();
+		
+		setExtendedState(getExtendedState()|JFrame.MAXIMIZED_BOTH); 
+		pack();
+		this.setVisible(true);
+		
+		int frameWidth = this.getWidth();
+		int frameHeight = this.getHeight();
+		
 		 for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-		        if ("Nimbus".equals(info.getName())) {
+		        if ("Metal".equals(info.getName())) {
 		            try {
 						UIManager.setLookAndFeel(info.getClassName());
 					} catch (ClassNotFoundException | InstantiationException
@@ -56,43 +87,50 @@ public class ReceiptGeneratorFrame extends JFrame {
 		        }
 		    }
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(new GridBagLayout());
+//		setLayout(new GridBagLayout());
+		setLayout(new BorderLayout());
 		
 		ProductList productList = new ProductList();
 		JScrollPane scrollPane = new JScrollPane(productList);
-//		scrollPane.setSize((int) (this.getWidth()*.1), this.getHeight());
-//		scrollPane.setViewportView(list);
-		Dimension dim = new Dimension();
-		dim.width = 100;
-		dim.height = 100;
-		scrollPane.setPreferredSize(dim);
 		
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridwidth = 1;
+		int twentyPercent = DataUtilities.getIntPercentage(frameWidth, 15f);
+		scrollPane.setPreferredSize(new Dimension(twentyPercent,frameHeight));
+//		scrollPane.setMinimumSize(new Dimension(twentyPercent,frameHeight));
+		scrollPane.setMaximumSize(new Dimension(twentyPercent,frameHeight));
+		
+		
+        gbc.fill = GridBagConstraints.BOTH;
+		
+		/*gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.weightx = 0.2;
-		gbc.weighty = 0;
-		add(scrollPane, gbc);
+		gbc.weightx = 2;
+		gbc.weighty = 1;
+		add(scrollPane, gbc);*/
+        
+        add(scrollPane, BorderLayout.WEST);
 		
-		JButton addButton = new JButton("Add to Receipt");
-		JButton editButton = new JButton("Edit");
-		JButton deleteButton = new JButton("Delete");
-		JButton unselectItems = new JButton("Unselect");
+		JButton addButton = new JButton(BUTTON_TEXT_ADD_TO_RECEIPT);
+		JButton editButton = new JButton(BUTTON_TEXT_EDIT);
+		JButton deleteButton = new JButton(BUTTON_TEXT_DELETE);
+		JButton generatePdfAndPrint = new JButton(BUTTON_TEXT_GENERATE_PDF_AND_PRINT);
 		
-		addProductEvent(addButton);
+		addButton.setPreferredSize(new Dimension(150, 50));
+		addButton.setBackground(Color.blue);
 		
-		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		addButtonEvent(addButton);
+		addButtonEvent(generatePdfAndPrint);
+		
+		/*JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.add(addButton);
 		panel.add(editButton);
 		panel.add(deleteButton);
-		panel.add(unselectItems);
+		panel.add(generatePdfAndPrint);
 		
 		gbc.gridx = 0;
 		gbc.gridy = 2;
-		gbc.weightx = 0.1;
 		gbc.weighty = 1;
-		this.add(panel, gbc);
+		this.add(panel, gbc);*/
 		
 		TableData tableData = new TableData();
 		TableModel tableModel = new TableModel(tableData);
@@ -100,33 +138,80 @@ public class ReceiptGeneratorFrame extends JFrame {
 		Table table = new Table(tableModel);
 		
 		JScrollPane tableScrollPane = new JScrollPane(table);
-		addToDisplay(gbc, 1, 1, this,tableScrollPane);
+		add(tableScrollPane, BorderLayout.CENTER);
+//		addToDisplay(gbc, 1, 1, this,tableScrollPane);
+		
 		
 		TotalAmountLabel total = new TotalAmountLabel();
-		addToDisplay(gbc, 1, 2, this,total);
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-		this.setVisible(true);
+		/*TotalAmountLabel total = new TotalAmountLabel();
+		addToDisplay(gbc, 1, 2, this,total);*/
+		
+		/*JMenuBar menuBar = new JMenuBar();
+		JMenu menuFile = new JMenu();
+		JMenuItem themes = new JMenuItem("Themes");
+		menuFile.add(themes);
+		menuFile.addSeparator();
+		menuBar.add(menuFile);
+		menuFile.addSeparator();*/
+		
+		this.setJMenuBar(new Menu().getMenuBar());
+		
+		// create the status bar panel and shove it down the bottom of the frame
+		JPanel statusPanel = new JPanel();
+		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		add(statusPanel, BorderLayout.SOUTH);
+		statusPanel.setPreferredSize(new Dimension(getWidth(), 16));
+		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+		JLabel statusLabel = new JLabel("status");
+		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		statusPanel.add(statusLabel);
+		statusPanel.add(total);
 	}
 
-	private void addProductEvent(JButton addButton) {
-		addButton.addActionListener(new ActionListener() {
-			
+	private void addButtonEvent(JButton button) {
+		
+		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int[] selectedItems = SharedData.getProductList().getSelectedIndices();
-				for(int each:selectedItems) {
-					 SharedData.getTable().addRow(each, SharedData.getProductList());
+				JButton button = (JButton) e.getSource();
+				String buttonText = button.getText();
+				switch(buttonText) {
+					case BUTTON_TEXT_ADD_TO_RECEIPT: addTableItems();
+						break;
+					case BUTTON_TEXT_GENERATE_PDF_AND_PRINT: 
+							try {
+								generatePdf();
+							} catch (COSVisitorException | IOException e1) {
+								e1.printStackTrace();
+							}
+						break;
 				}
 			}
 		});
+		
+		
+	}
+	
+	private void addTableItems() {
+		int[] selectedItems = SharedData.getProductList().getSelectedIndices();
+		for(int each:selectedItems) {
+			 SharedData.getTable().addRow(each, SharedData.getProductList());
+		}
+	}
+	
+	private File generatePdf() throws IOException, COSVisitorException {
+		PDFGenerator pdf = new PDFGenerator(SharedData.getTableData());
+		return pdf.getPdfFile();
+//		SilentPrinter.printFile(pdf.getPdfFile(), "", 1);
 	}
 	
 	private void addToDisplay(GridBagConstraints gbc, int gridX, int gridY, JFrame frame, Component component) {
 		gbc.gridx = gridX;
 		gbc.gridy = gridY;
-		gbc.weightx = 0.8;
+		gbc.weightx = 8;
 		gbc.weighty = 1;
 		frame.add(component, gbc);
 	}
 
+	
 }

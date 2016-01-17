@@ -36,6 +36,7 @@ public class AdminNodePanel extends Composite{
 	private SwitchButton delNodeBtn;
 	private SearchWidget searchWdgt;
 	private LabeledListBx clusterList;
+	private EndLabeledListBx endPointsListBx;
 	private FlowPanel tblPnl;
 	
 	private InsertNodePanel addNodePnl;
@@ -43,6 +44,15 @@ public class AdminNodePanel extends Composite{
 
 	public AdminNodePanel() {
 		clusterList = new LabeledListBx("Clusters: ");
+		endPointsListBx = new EndLabeledListBx("Endpoint:");
+		endPointsListBx.setStyleName("insert-node-txtbx-widget-input");
+		//endPointsListBx.addItem("*");
+		for (EndpointObj obj : CommonObjs.bpoUser.getEndpoints()) {
+			if (obj.isActive()) {
+				endPointsListBx.addItem(obj.getEndpointId());
+			}
+		}
+		
 		addNodePnl = new InsertNodePanel();
 		viewElemPnl = new ViewElementPanel();
 		
@@ -63,10 +73,13 @@ public class AdminNodePanel extends Composite{
 		btnPnl.add(searchWdgt);
 		
 		clusterList.addItem("*");
-		fillListBox();
+	//	fillListBox();
 		btnPnl.add(clusterList);
+		btnPnl.add(endPointsListBx);
 		clusterList.setStyleName("clusterListStyle");
 		clusterList.getListBx().setStyleName("clusterListBoxStyle");
+		endPointsListBx.setStyleName("endPointsListStyle");
+		endPointsListBx.getListBx().setStyleName("endPointsListBoxStyle");
 	//	clusterList.setStyleName("clusterListBoxStyle");
 		if(CommonObjs.bpoProps.getMode().equalsIgnoreCase("Y")){
 			delNodeBtn.setVisible(false);
@@ -120,9 +133,7 @@ public class AdminNodePanel extends Composite{
 		
 		for(final NodeDtlObj node : nodes){
 			
-		//	if(listboxContains(node.getCluster()))
-		//	{clusterList.addItem(node.getCluster()) ;
-		//	}			
+		
 			final NodeRecord record = new NodeRecord(node);//adds the node to the node table
 			
 			
@@ -171,6 +182,7 @@ public class AdminNodePanel extends Composite{
 						public void onSuccess(List<ElemDtlObj> result) {
 							viewElemPnl.setNodeObj(record.getNodeObj());
 							//viewElemPnl.setTable(result);
+							
 							viewElemPnl.show();
 									if(!result.isEmpty()){
 								CommonObjs.notify(Notification.SUCCESS, "Load Elements Success!");
@@ -244,56 +256,10 @@ public void addExceptionEndpoint(final ExceptionEndPointsWidget widget, List<Exc
 				}
 			});
 			
-	//		if (clusterList.getListBx().getItemText(clusterList.getListBx().getSelectedIndex()).equals("all"))
-	//		{ widget.addNode(record); }
-	//		else if (clusterList.getListBx().getItemText(clusterList.getListBx().getSelectedIndex()).equals(node.getCluster()))
-	//			{
-	//			widget.addNode(record);
-	//			}
 		
 			widget.addNode(record);
 			
-		/*	record.getViewBtn().addClickHandler(new ClickHandler() {
-				
-				@Override
-				public void onClick(ClickEvent event) {
-					
-					((BpoSvcAsync) CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getElements(node, new AsyncCallback<List<ElemDtlObj>>() {
-						
-						@Override
-						public void onSuccess(List<ElemDtlObj> result) {
-							viewElemPnl.setNodeObj(record.getNodeObj());
-							//viewElemPnl.setTable(result);
-							viewElemPnl.show();
-									if(!result.isEmpty()){
-								CommonObjs.notify(Notification.SUCCESS, "Load Elements Success!");
-
-								CommonObjs.ElemRecordCount = result.size();
-								
-								CommonObjs.ElemPageCurrPage = 1;
-								
-								CommonObjs.ElemPageCount = CommonObjs.ElemRecordCount/CommonObjs.ElemPageLimit;
-								
-								viewElemPnl.updateLabel();
-								viewElemPnl.refresh();
-							
-							} else {
-								CommonObjs.notify(Notification.INFO, "Node is Empty!");
-								CommonObjs.ElemRecordCount = result.size();
-								
-								CommonObjs.ElemPageCurrPage = 0;
-								viewElemPnl.updateLabel();
-							}
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							CommonObjs.notify(Notification.ERROR, "Get Elements Failed");
-						}
-					});
-					
-				}
-			});*/
+		
 			
 		}
 		
@@ -380,6 +346,14 @@ public void addExceptionEndpoint(final ExceptionEndPointsWidget widget, List<Exc
 	public ListBox getListBox(){
 		return clusterList.getListBx();
 	}
+	
+	public EndLabeledListBx getEndpointList(){
+		return endPointsListBx;
+	}
+	
+	public ListBox getEndpointListBox(){
+		return endPointsListBx.getListBx();
+	}
 	public class SearchWidget extends Composite {
 
 		private TextBox txtbx;
@@ -452,6 +426,38 @@ public class LabeledListBx extends Composite {
 		
 	}
 
+public class EndLabeledListBx extends Composite {
+	private ListBox listBx;
+	
+	public EndLabeledListBx(String lbl){
+		
+		HTMLPanel label = new HTMLPanel(lbl);
+		label.setStyleName("endPointsList-label");
+		
+		listBx = new ListBox();
+		listBx.setStyleName("lbl-listbx-listbox");
+		listBx.setVisibleItemCount(1);
+		
+		FlowPanel mainPnl = new FlowPanel();
+		mainPnl.add(label);
+		mainPnl.add(listBx);
+		
+		initWidget(mainPnl);
+		
+	}
+
+	public ListBox getListBx() {
+		return listBx;
+	}
+	
+	private void addItem(String item){
+		listBx.addItem(item);
+	}
+	
+}
+
+
+
 public boolean listboxContains(String item){
 	int total = clusterList.getListBx().getItemCount();
 		for(int i =0 ;i < total;i++){
@@ -467,20 +473,22 @@ public boolean listboxContains(String item){
 }
 
 	public void fillListBox(){
-	
-	
+		String chosenEndPoint = getEndpointListBox().getItemText(getEndpointListBox().getSelectedIndex());
+
+		clusterList.getListBx().clear();
+		clusterList.addItem("*");
 		for (final EndpointObj dtls : CommonObjs.bpoUser.getEndpoints()) {
 
 			if(dtls.isActive()){
-
-				final SearchableEndpointNodesWidget widget = new SearchableEndpointNodesWidget(dtls.getLabel());
-
+				if (!(chosenEndPoint.equals("*")|| chosenEndPoint.equals(dtls.getEndpointId()))){
+					continue;
+				}
+			
 				((BpoSvcAsync)CommonObjs.factory.getService(BPOCnstnts.BPOSVC.getValue())).getCluster(
 						dtls.getEndpointId(), new AsyncCallback<String[]>() {
 
 					@Override
 					public void onSuccess(String[] result) {
-					//	display.getNodeTabPanel().addEndpoint(widget, result);// adds the node
 								for (String clusterObj : result) {
 									if (listboxContains(clusterObj)) {
 										clusterList.addItem(clusterObj);

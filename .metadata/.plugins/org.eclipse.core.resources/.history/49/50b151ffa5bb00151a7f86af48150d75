@@ -1,0 +1,5 @@
+package com.fed.receipt.generator.db.views;
+
+public class AddProductFrame {
+
+}

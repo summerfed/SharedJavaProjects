@@ -12,6 +12,8 @@ public class ExceptionDtlObj implements IsSerializable {
 	private long currentTotalWaitingElements;
 	private long currentTotalInProcessElements;
 	
+	private String endPoint;
+	
 	public ExceptionDtlObj(String nodeId,String exceptionName, String exceptionCode,
 			long allowedWaitingDuration, long allowedProcessDuration,
 			long currentTotalWaitingElements, long currentTotalInProcessElements) {
@@ -68,6 +70,12 @@ public class ExceptionDtlObj implements IsSerializable {
 	}
 	public void setNodeId(String nodeId) {
 		this.nodeId = nodeId;
+	}
+	public String getEndPoint() {
+		return endPoint;
+	}
+	public void setEndPoint(String endPoint) {
+		this.endPoint = endPoint;
 	}
 	
 }

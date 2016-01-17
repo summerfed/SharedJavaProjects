@@ -55,7 +55,7 @@ public class BPO {
 		
 		nodeFunction = new NodeFunctions(neo4j, this);
 		elementFunction = new ElementFunctions(neo4j, this);
-		reportFunction = new ReportFunctions(this);
+		reportFunction = new ReportFunctions(neo4j, this);
 		exceptionNodeFunction = new ExceptionNodeFunctions(neo4j, this);
 	}
 	

@@ -24,11 +24,11 @@ public class NodeRecord extends Composite {
 		queueNoCell.setStyleName("node-queue-no-col");
 		HTMLPanel queueDescCell = new HTMLPanel(node.getNodeName());
 		queueDescCell.setStyleName("node-queue-desc-col");
-		HTMLPanel waitingCell = new HTMLPanel(node.getElmtsWaiting());
+		HTMLPanel waitingCell = new HTMLPanel(""+node.getElmtsWaiting());
 		waitingCell.setStyleName("node-wait-col");
-		HTMLPanel inProgCell = new HTMLPanel(node.getElmtsInprogress());
+		HTMLPanel inProgCell = new HTMLPanel(""+node.getElmtsInprogress());
 		inProgCell.setStyleName("node-inprog-col");
-		HTMLPanel totalElemCell = new HTMLPanel(Integer.parseInt(node.getElmtsWaiting()) + Integer.parseInt(node.getElmtsInprogress())+"");
+		HTMLPanel totalElemCell = new HTMLPanel(node.getElmtsWaiting() +node.getElmtsInprogress()+"");
 		totalElemCell.setStyleName("node-totalElem-col");
 		
 		

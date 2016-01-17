@@ -1,0 +1,142 @@
+package com.fed.receipt.generator.views.receiptgenerator;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.print.PrintService;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+
+import com.fed.receipt.generator.printer.Printer;
+
+class Menu {
+	private static final String MENU_ITEM_ADD_PRODUCTS = "Add Products";
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4091922469347120199L;
+	private final int	ITEM_PLAIN	=	0;	// Item types
+	private final int	ITEM_CHECK	=	1;
+	private final int	ITEM_RADIO	=	2;
+
+	private	JMenuBar	menuBar;
+	
+	
+	private	JMenuItem	menuPropertySystem;
+	private	JMenuItem	menuPropertyEditor;
+	private	JMenuItem	menuPropertyDisplay;
+	private	JMenuItem	menuFileNew;
+	private	JMenuItem	menuFileOpen;
+	private	JMenuItem	menuFileSave;
+	private	JMenuItem	menuFileSaveAs;
+	private	JMenuItem	menuFileExit;
+	private	JMenuItem	menuEditCopy;
+	private	JMenuItem	menuEditCut;
+	private	JMenuItem	menuEditPaste;
+
+	public Menu() {
+
+		setMenuBar(new JMenuBar());
+		
+		JMenu mainMenuPrinterSettings = new JMenu("Printer Settings");
+		getMenuBar().add(mainMenuPrinterSettings);
+		
+		JMenu mainMenuProducts = new JMenu("Products");
+		getMenuBar().add(mainMenuProducts);
+		
+		JMenuItem subMenuAddProducts = new JMenuItem(MENU_ITEM_ADD_PRODUCTS);
+		addMenuItemEvent(subMenuAddProducts);
+		
+
+		JMenu subMenuSelectPrinter = new JMenu("Select Printer");
+		ButtonGroup availablePrinters = new ButtonGroup();
+
+		PrintService[] installedPrinters = Printer.getInstalledPrinters();
+		for(int i=0; i<installedPrinters.length; i++) {
+			PrintService printer = installedPrinters[i];
+			JMenuItem menuItem = new JRadioButtonMenuItem();
+			menuItem.setText(printer.getName());
+			availablePrinters.add(menuItem);
+			subMenuSelectPrinter.add(menuItem);
+			
+		}
+
+		mainMenuPrinterSettings.add( subMenuSelectPrinter );	
+		mainMenuProducts.add(subMenuAddProducts);
+	}
+
+	public JMenuItem CreateMenuItem( JMenu menu, int iType, String sText,
+								ImageIcon image, int acceleratorKey,
+								String sToolTip ) {
+		// Create the item
+		JMenuItem menuItem;
+
+		switch( iType ) {
+			case ITEM_RADIO:
+				menuItem = new JRadioButtonMenuItem();
+				break;
+
+			case ITEM_CHECK:
+				menuItem = new JCheckBoxMenuItem();
+				break;
+
+			default:
+				menuItem = new JMenuItem();
+				break;
+		}
+
+		// Add the item test
+		menuItem.setText( sText );
+
+		// Add the optional icon
+		if( image != null )
+			menuItem.setIcon( image );
+
+		// Add the accelerator key
+		if( acceleratorKey > 0 )
+			menuItem.setMnemonic( acceleratorKey );
+
+		// Add the optional tool tip text
+		if( sToolTip != null )
+			menuItem.setToolTipText( sToolTip );
+
+//		// Add an action handler to this menu item
+//		menuItem.addActionListener( this );
+
+		menu.add( menuItem );
+
+		return menuItem;
+	}
+
+	public void addMenuItemEvent(JMenuItem component) {
+		component.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				JMenuItem eventSourceComponent = (JMenuItem) event.getSource();
+				String menuText = eventSourceComponent.getText();
+				if(menuText.equals(MENU_ITEM_ADD_PRODUCTS)) {
+					
+				}
+			}
+		});
+		
+	}
+
+	public JMenuBar getMenuBar() {
+		return menuBar;
+	}
+
+	public void setMenuBar(JMenuBar menuBar) {
+		this.menuBar = menuBar;
+	}
+}
